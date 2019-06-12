@@ -126,10 +126,10 @@ $runtime->run();
 $requirementsCheck = new RequirementsCheck($requirements, $runtime);
 
 if (isset($_REQUEST['action'])) {
-    // if ($RequirementsCheck->missing) {
+    // if ($requirementsCheck->missing) {
     //     $Output = new Output();
     //     $missing = array();
-    //     foreach ($RequirementsCheck->missing as $k => $v) {
+    //     foreach ($requirementsCheck->missing as $k => $v) {
     //         $missing[] = $v;
     //     }
     //     $Output->addData('missing', $missing);
@@ -140,9 +140,9 @@ if (isset($_REQUEST['action'])) {
     // $processAction = new processAction();
 }
 
-$page = $RequirementsCheck->missing ? 'error' : 'install';
+$pageId = $requirementsCheck->missing ? 'error' : 'install';
 
-if ($page == 'install' && !isset($_REQUEST['UpgradeToPaid']) && preg_match('/nginx/i', $runtime->serverSoftware)) {
+if ($pageId == 'install' && !isset($_REQUEST['UpgradeToPaid']) && preg_match('/nginx/i', $runtime->serverSoftware)) {
     $nginx = '<p>Make sure to add the following rules to your <a href="https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts" target="_blank">nginx.conf</a> server block. Restart the server to apply changes. Once done, come back here and continue the process.</p>
 <textarea class="pre" ondblclick="this.select()">#Chevereto: Disable access to sensitive files
 location ~* '.$runtime->relPath.'(app|content|lib)/.*\.(po|php|lock|sql)$ {
