@@ -171,7 +171,7 @@ location '.$runtime->relPath.' {
 $shortcutIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACABAMAAAAxEHz4AAAAMFBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABaPxwLAAAAD3RSTlMAECAwQGBwgI+fr7/P3+/Lm0b7AAABXElEQVR4Xu3WP0oDQRiG8dWN6vq/tLQTu21sJYUHEDyAHkHs7PQGwcYyHsFeBG8Qe4sIHiA2goFkHxlMeMOGwMyXLn5vtZnix5OFhcn+w3yN5nzAUmewNxewCpdzAWtw5YADDjjggAMOOOCAA7U54IADDhyX00B+Hg+s8DMNtDmLBnagVQcK+IgGdqFfB9rwFQ2sM0oQUAC3WfTa0Begk+gVQEuADpISBOh3WoIABSQlCFBAakIAFGBICIACDAkBUIAhIQAKMCQEQAGGhAAowJDwADcKMCRU0FOAJQEUYEoABRgSFGBOUIA9wR6gz9C+QgHWhIiATWjOTpgd0IAnAYYtHuCAAw5swKXxHv04fnizANvjK2AO3xbgAso/qktVpgN5j6Goz3TgROFbwH0qcAS8joDlHvD+nLQXoDpQjWn633kXw4YTb34fw+6yiR12SNzguvZWTxOXLdJ8v+uv3HMGDU3uAAAAAElFTkSuQmCC';
 
 /** @var string a SVG inline element */
-$doctitle = APP_NAME;
+$doctitle = APP_NAME.' v'.APP_VERSION;
 $css = file_get_contents('html/style.css');
 $scripts = file_get_contents('html/scripts.js');
 $script = file_get_contents('html/script.js');
