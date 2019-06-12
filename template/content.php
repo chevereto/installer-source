@@ -1,5 +1,5 @@
 <?php if ($pageId == 'error') { ?>
-    <div class="container container--error">
+    <div id="screen-error" class="screen">
       <div class="flex-box error-box" >
         <div>
           <h1>Aw, Snap!</h1>
@@ -20,12 +20,12 @@
       </div>
     </div>
 <?php } else { ?>
-    <div class="container container--splashe animate animate--slow">
+    <div id="screen-welcome" class="screen screen--show animate animate--slow">
       <div class="header flex-item"><?php echo $svgLogo; ?></div>
       <div class="flex-box flex-item">
         <div>
           <h1>Chevereto Installer <a class="installer-version radius" href="<?php echo APP_URL; ?>" target="_blank">v<?php echo APP_VERSION; ?></a></h1>
-          <p>This tool will guide you through the process of installing Chevereto. To proceed, check the information below.</p>
+          <p>This tool will guide you through the process of installing <a href="https://chevereto.com/" target="_blank">Chevereto</a>. To proceed, check the information below.</p>
           <ul>
             <li>Server path <code><?php echo $runtime->absPath; ?></code></li>
             <li>Website url <code><?php echo $runtime->rootUrl; ?></code></li>
@@ -35,31 +35,32 @@
                       echo $nginx;
                   } ?>
           <div>
-            <button class="action radius" data-action="begin">Continue</button>
+            <button class="action radius" data-action="show" data-arg="license">Continue</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container container--splashe animate animate--slow">
+    <div id="screen-license" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>License key</h1>
-          <p>Enter a Chevereto license to install our paid edition. You can find the license key at your client panel.</p>
-          <p class="highlight">You can upgrade from Chevereto-Free to our paid edition at anytime.</p>
+          <p>The main release, Chevereto, is proprietary software and you require to <a href="https://chevereto.com/purchase" target="_blank">buy a license</a> to use it. The free edition (known as <a href="https://chevereto.com/free" target="_blank">Chevereto-Free</a>) is Free Open Source Software (FOSS).</p>
+          <p class="highlight">The paid version has more features, gets more frequent updates, and provides an additional support layer if you need help. By purchasing, you support the ongoing development of this software.</p>
+          <p>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</p>
           <div class="p input-label">
             <label for="licenseKey">License key</label>
             <input class="radius width-100p" type="text" name="licenseKey" id="licenseKey" placeholder="Paste your license key here">
           </div>
           <div>
-            <button class="action radius" data-action="set-target">Enter license key</button>
-            <button class="radius" data-action="set-target">Skip (Chevereto-Free)</button>
+            <button class="action radius" data-action="setEdition" data-arg="chevereto">Enter license key</button>
+            <button class="radius" data-action="setEdition" data-arg="chevereto-free">Skip – Use Chevereto-Free</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container container--splashe animate animate--slow">
+    <div id="screen-cpanel" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>cPanel access</h1>
@@ -75,17 +76,17 @@
           </div>
           <div class="p input-label">
           <label for="cpanelPassword">Password</label>
-            <input class="radius col-8" type="text" name="cpanelPassword" placeholder="password">
+            <input class="radius col-8" type="password" name="cpanelPassword" placeholder="password">
           </div>
           <div>
-            <button class="action radius" data-action="cpanel-process">Continue</button>
-            <button class="radius" data-action="cpanel-skip">Skip</button>
+            <button class="action radius" data-action="cpanelProcess">Connect to cPanel</button>
+            <button class="radius" data-action="show" data-arg="database">Skip</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container container--splashe animate animate--slow">
+    <div id="screen-database" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>Database</h1>
@@ -112,13 +113,13 @@
             <input class="radius col-8" type="text" name="dbUserPassword" id="dbUserPassword" placeholder="password" required>
           </div>
           <div>
-            <button class="action radius" data-action="setDB">Continue</button>
+            <button class="action radius" data-action="setDatabase">Set database</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container container--splashe animate animate--slow">
+    <div id="screen-admin" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>Administrator</h1>
@@ -136,13 +137,13 @@
             <input class="radius col-8" type="password" name="password" id="password" placeholder="password" required>
           </div>
           <div>
-            <button class="action radius" data-action="setAdmin">Continue</button>
+            <button class="action radius" data-action="setAdmin">Set administrator</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container container--splashe animate animate--slow">
+    <div id="screen-email" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>Email addresses</h1>
@@ -157,28 +158,27 @@
             <div><small>This address will be used to get contact form messages.</small></div>
           </div>
           <div>
-            <button class="action radius" data-action="setEmails">Continue</button>
+            <button class="action radius" data-action="setEmails">Set emails</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container container--splashe animate animate--slow">
-    <div class="flex-box col-width">
+    <div id="screen-ready" class="screen animate animate--slow">
+      <div class="flex-box col-width">
         <div>
           <h1>Ready to install</h1>
-          <p>The installer is ready to download and install the latest %applicationName% release in <code><?php echo $runtime->absPath; ?></code></p>
-          <p class="highlight">By installing is understood that you accept the <a href="https://chevereto.com/license" target="_blank">Chevereto EULA</a>.</p>
-          <!-- <p class="highlight">By installing is understood that you accept the Chevereto-Free <a href="https://github.com/Chevereto/Chevereto-Free/blob/master/AGPLv3" target="_blank">AGPLv3 license</a>.</p> -->
-          <!-- <div class="install-log">fsfds</div> -->
+          <p>The installer is ready to download and install the latest <span class="chevereto-free--hide">Chevereto</span><span class="chevereto--hide">Chevereto-Free</span> release in <code><?php echo $runtime->absPath; ?></code></p>
+          <p class="highlight chevereto-free--hide">By installing is understood that you accept the <a href="https://chevereto.com/license" target="_blank">Chevereto EULA</a>.</p>
+          <p class="highlight chevereto--hide">By installing is understood that you accept the Chevereto-Free <a href="https://github.com/Chevereto/Chevereto-Free/blob/master/AGPLv3" target="_blank">AGPLv3 license</a>.</p>
           <div>
-            <button class="action radius" data-action="install">Install</button>
+            <button class="action radius" data-action="install">Install <span class="chevereto-free--hide">Chevereto</span><span class="chevereto--hide">Chevereto-Free</span></button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container container--splashe animate animate--slow">
+    <div id="screen-installing" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>Installing</h1>
@@ -186,14 +186,11 @@
           <div class="install-log p">
             <p>[T0] Installation process started</p>
           </div>
-          <div>
-            <button class="action radius" data-action="install">Install</button>
-          </div>
         </div>
       </div>
     </div>
 
-    <div class="container container--splash animate animate--slow">
+    <div id="screen-complete" class="screen screen--splash animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>Installation completed</h1>
@@ -224,8 +221,8 @@ db_user_passwd: &8300f(**&39)
            
           <p>Hope you enjoy using Chevereto as much we care in creating it. Help us by providing us feedback and recommend our software.</pp>
           <div>
-            <button class="action radius" data-action="goDashboard">Open dashboard</button>
-            <button class="radius" data-action="goHome">Open homepage</button>
+            <button class="action radius" data-action="goTo" data-arg="dashboard">Open dashboard</button>
+            <button class="radius" data-action="goTo" data-arg="homepage">Open homepage</button>
           </div>
         </div>
       </div>

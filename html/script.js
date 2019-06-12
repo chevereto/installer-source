@@ -7,20 +7,6 @@ var UpgradeToPaid = getParameterByName("UpgradeToPaid") == "";
 if (!UpgradeToPaid) {
   editions.free = "Chevereto Free";
 }
-var screens = {
-  splash: {
-    callee: "splash",
-    title: "Chevereto Installer"
-  },
-  install: {
-    callee: "choose",
-    title: "Install %s"
-  },
-  installing: {
-    callee: "install",
-    title: "Installing %s"
-  }
-};
 
 var title = document.title;
 var html = document.documentElement;
@@ -28,19 +14,25 @@ var page = html.getAttribute("id");
 var body = document.getElementsByTagName("body")[0];
 var wrapper = document.querySelector(".wrapper");
 var key = document.getElementById("key");
+var screenEls = document.querySelectorAll(".screen");
+var screens = {};
+for (let i = 0; i < screenEls.length; i++) {
+  var el = screenEls[i];
+  screens[el.id.replace("screen-", "")] = {
+    title: el.querySelector("h1").innerText
+  };
+}
+console.log(screens);
 
 var installer = {
   init: function() {
     var self = this;
     var state = {
-      screen: UpgradeToPaid ? "install" : "splash"
+      action: UpgradeToPaid ? "install" : "show",
+      arg: UpgradeToPaid ? "install" : "welcome"
     };
-    if (UpgradeToPaid) {
-      state.arg = "paid";
-    }
     history.replaceState(state, title);
     if (page != "error") {
-      this.preload();
       this.bindActions();
     }
     window.onbeforeunload = function(e) {
@@ -59,54 +51,63 @@ var installer = {
         }
       }
       var state = e.state;
-      var screen = state.screen;
-      var arg = state.arg;
-      var screen2Action = {
-        splash: "splash",
-        install: "choose",
-        installing: "install"
-      };
-      var action = screens[screen].callee;
-      self.actions[action](arg, false);
+      console.log("onpopstate", state);
+      self.actions[state.action](state.arg);
     };
   },
   bindActions: function() {
     var self = this;
     var triggers = document.querySelectorAll("[data-action]");
-    for (var i = 0; i < triggers.length; i++) {
+    for (let i = 0; i < triggers.length; i++) {
       var trigger = triggers[i];
       trigger.addEventListener("click", function(e) {
-        var el = e.currentTarget;
-        var action = el.dataset.action;
-        var arg = el.dataset.arg;
-        self.actions[action](arg);
+        var dataset = e.currentTarget.dataset;
+        self.actions[dataset.action](dataset.arg);
+        console.log(dataset.action, dataset.arg);
+        installer.history(dataset.action, dataset.arg);
       });
     }
   },
-  history: function(push, screen, edition) {
-    if (typeof push == typeof undefined) {
-      var push = true;
-    }
-    document.title = screens[screen].title.replace(/%s/g, editions[edition]);
-    if (push) {
-      history.pushState({ screen: screen, arg: edition }, screen);
-    }
+  history: function(action, arg) {
+    history.pushState({ action: action, arg: arg }, action);
   },
   actions: {
-    splash: function(arg, push) {
-      body.classList = "";
-      body.classList.add("body--splash");
-      installer.history(push, "splash");
+    show: function(screen, args) {
+      document.title = screens[screen].title;
+      var shownScreens = document.querySelectorAll(".screen--show");
+      shownScreens.forEach(a => {
+        a.classList.remove("screen--show");
+      });
+      document.querySelector("#screen-" + screen).classList.add("screen--show");
     },
-    choose: function(arg, push) {
-      if (!arg) {
-        return;
+    setEdition: function(edition) {
+      body.classList.remove("sel--chevereto", "sel--chevereto-free");
+      if ("chevereto" == edition) {
+        console.log("CHECK THE LICENSE!");
       }
-      body.classList = "";
-      body.classList.add("body--install", "body--" + arg);
-      installer.history(push, "install", arg);
+      body.classList.add("sel--" + edition);
+      this.show("cpanel");
+    },
+    cpanelProcess: function() {
+      console.log("CHECK LOGIN AND DO CPANEL PROCESS!");
+      this.show("database");
+    },
+    setDatabase: function() {
+      console.log("CHECK AND SET DATABASE!");
+      this.show("admin");
+    },
+    setAdmin: function() {
+      console.log("SET ADMIN DETAILS!");
+      this.show("email");
+    },
+    setEmails: function() {
+      console.log("SET EMAILS!");
+      this.show("ready");
     },
     install: function(arg, push) {
+      console.log("I N S T A L L!");
+      this.show("installing");
+      return;
       if (!arg) {
         return;
       }
@@ -195,23 +196,6 @@ var installer = {
   },
   setWorking: function(bool) {
     body.classList[bool ? "add" : "remove"]("body--working");
-  },
-  preload: function() {
-    var self = this;
-    // var preloader = document.createElement('div');
-    // preloader.setAttribute('id', 'preloader');
-    // preloader.setAttribute('class', 'animate');
-    // var spinner = document.createElement('div');
-    // spinner.setAttribute('class', 'spinner');
-    // preloader.insertBefore(spinner, preloader.firstChild);
-    // wrapper.insertBefore(preloader, wrapper.firstChild);
-    body.classList.add("body--splash");
-    // var loader = document.createElement("div");
-    // loader.classList.add("loader", "animate");
-    // var boxInstall = document.querySelector(
-    //   ".container--installing .box--install"
-    // );
-    // boxInstall.insertBefore(loader, boxInstall.firstChild);
   },
   getKeyValue: function() {
     return key.value.replace(/\s/g, "");
