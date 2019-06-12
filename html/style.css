@@ -119,8 +119,8 @@ ul>li {
 }
 
 .highlight {
-  font-size: 90%;
-  background: rgba(0, 0, 0, .05);
+  font-size: 0.9em;
+  background: #ecf0f1;
   border-left: 2px solid #8e44ad;
   padding: 10px;
   padding-left: 1em;
@@ -198,15 +198,15 @@ button.action:focus {
 }
 
 .input-label label {
-  font-size: 90%;
+  font-size: 0.9em;
   display: block;
   font-weight: bold;
 }
 
 code {
-  font-size: 90%;
+  font-size: 0.9em;
   font-family: monospace;
-  background: rgba(0, 0, 0, .1);
+  background: #ecf0f1;
 }
 
 .pre {
@@ -214,7 +214,7 @@ code {
   background-color: rgba(0, 0, 0, .1);
   overflow: auto;
   height: 180px;
-  font-size: 0.87em;
+  font-size: 0.9em;
   white-space: nowrap;
   width: 100%;
   resize: none;
@@ -493,11 +493,6 @@ code {
   padding-top: 10px;
 }
 
-.install-details {
-  font-size: 13px;
-  font-family: 'Courier New', Courier, monospace;
-}
-
 @media (min-width: 680px) {
   .col-8 {
     width: 310px;
@@ -517,11 +512,6 @@ code {
   width: 100%;
 }
 
-.body--free .header,
-.body--paid .header {
-  color: #FFF;
-}
-
 .header>svg {
   height: 30px;
   width: auto;
@@ -533,21 +523,7 @@ code {
   filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, .15));
 }
 
-.header-heading {
-  margin: 20px;
-  margin-bottom: 0;
-  font-weight: 100;
-  font-size: 1.6em;
-}
-
-.body--background .header-heading,
-.product-box {
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, .15);
-  backface-visibility: hidden;
-}
-
 a.installer-version {
-  text-decoration: none;
   color: #FFF;
   background: #bdc3c7;
   font-size: 50%;
@@ -555,15 +531,15 @@ a.installer-version {
   vertical-align: middle;
 }
 
-fieldset {
-  border-style: solid;
-  background: #ecf0f1;
-  border-width: 0;
-  border-color: #95a5a6;
+a.installer-version {
+  text-decoration: none;
 }
 
-fieldset legend {
-  background: #3498db;
-  padding: 5px 8px;
-  color: #FFF;
+.install-details {
+  font-size: 0.9em;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.install-details pre {
+  font-family: inherit;
 }
