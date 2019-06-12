@@ -202,11 +202,12 @@
           <p>Take note on the installation details below.</p>
           <div class="install-details p highlight force-select font-size-80p">
             <pre>Chevereto installation
------------------------
+==========================
 
-Date: UTC 2019-11-06 22:18:37
-Edition: Chevereto-Free
+UTC 2019-11-06 22:18:37
+
 URL: https://localhost:8888/
+Edition: Chevereto-Free
 
 #Administrator
 Email: email@domain.com
