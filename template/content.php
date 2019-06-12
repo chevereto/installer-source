@@ -1,19 +1,20 @@
-<?php if ($page == 'error') { ?>
+<?php if ($pageId == 'error') { ?>
     <div class="container container--error">
       <div class="flex-box error-box" >
         <div>
           <h1>Aw, Snap!</h1>
-          <p>Your websever lacks some requirements that must be fixed to install Chevereto.</p>
+          <p>Your web server lacks some requirements that must be fixed to install Chevereto.</p>
           <p>Please check:</p>
           <ul>
 <?php
-                  foreach ($RequirementsCheck->missing as $k => $v) {
+                  foreach ($requirementsCheck->missing as $k => $v) {
                       ?>
               <li><?php echo $v['message']; ?></li>
 <?php
                   } ?>
           </ul>
-          <p>If you already fixed your web server then make sure to restart it to apply changes. If the problem persists contact your server administrator. Check our <a href="https://chevereto.com/hosting" target="_blank">hosting</a> offer if you don't want to worry about this.</p>
+          <p>If you already fixed your web server then make sure to restart it to apply changes. If the problem persists, contact your server administrator.</p>
+          <p>Check our <a href="https://chevereto.com/hosting" target="_blank">hosting</a> offer if you don't want to worry about this.</p>
           <p class="error-box-code">Server <?php echo $_SERVER['SERVER_SOFTWARE']; ?></p>
         </div>
       </div>

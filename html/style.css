@@ -12,6 +12,10 @@ body {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#3498db", endColorstr="#8e44ad", GradientType=0)
 }
 
+html#error body {
+  background: #ecf0f1;
+}
+
 html {
   color: #000;
   font: 16px Helvetica, Arial, sans-serif;
@@ -474,8 +478,7 @@ code {
 
 .error-box a {
   font-weight: normal;
-  text-decoration: underline;
-  text-decoration-color: rgba(0, 0, 0, .25);
+  text-decoration: none;
 }
 
 .error-box a:hover {
