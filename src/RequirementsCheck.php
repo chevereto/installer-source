@@ -154,14 +154,14 @@ class RequirementsCheck
         foreach ($workingPaths as $var) {
             foreach (array('read', 'write') as $k => $v) {
                 if (!@$rw_fn[$v]($var)) {
-                    $permissions_errors[] = $k;
+                    $permissions_errors[] = $v;
                 }
             }
             if (isset($permissions_errors)) {
                 $error = implode('/', $permissions_errors);
                 $component = $var.' '.$error.' permission'.(count($permissions_errors) > 1 ? 's' : null);
-                $message = 'No PHP <b>'.$error.'</b> permission in <b>'.$var.'</b>';
-                $this->addMissing($component, null, $message);
+                $message = "PHP don't have  %l permission in <code>".$var.'</code>';
+                $this->addMissing($error, 'https://unix.stackexchange.com/questions/35711/giving-php-permission-to-write-to-files-and-folders', $message);
                 unset($permissions_errors);
             }
         }
@@ -204,7 +204,7 @@ class RequirementsCheck
             }
         }
         if ($utf8_errors) {
-            $this->addMissing($utf8_errors['c'], $utf8_errors['l'], count($utf8_errors['c']) == 1 ? 'Enable %l function' : 'Enable %l0 and %l1 functions');
+            $this->addBundleMissing($utf8_errors['c'], $utf8_errors['l'], count($utf8_errors['c']) == 1 ? 'Enable %l function' : 'Enable %l0 and %l1 functions');
         }
     }
 
@@ -231,36 +231,36 @@ class RequirementsCheck
         }
     }
 
-    protected function addMissing()
+    /**
+     * @param string $component
+     * @param string $link
+     * @param string $msgtpl    The message template. Use %l and %c placeholders
+     */
+    protected function addMissing(string $component, string $url, string $msgtpl)
     {
-        //$components, $links, $msgtpl
-        $args = func_get_args();
+        $this->addBundleMissing([$component], [$url], strtr($msgtpl, ['%c' => '%c0', '%l' => '%l0']));
+    }
+
+    /**
+     * Same as addMissing, but for bundled requirements like utf8_encode/utf8_decode where multiple requirements are
+     * linked to the same resource.
+     *
+     * @param array  $components ['component1', 'component2',]
+     * @param array  $urls       ['component1_url', 'component2_url',]
+     * @param string $msgtpl     The message template. Use %l0 and %c0 placeholders
+     */
+    protected function addBundleMissing(array $components, array $urls, string $msgtpl)
+    {
         $placeholders = array();
-        foreach (array('c', 'l') as $k => $v) {
-            $key = '%'.$v;
-            if (gettype($args[$k]) == 'string') {
-                $args[$k] = array($args[$k]);
-            }
-            if (gettype($args[$k]) == 'string' || count($args[$k]) == 1) {
-                $args[2] = str_replace($key, $key.'0', $args[2]);
-            }
-            if (is_array($args[$k])) {
-                foreach ($args[$k] as $k_ => $v_) {
-                    if ($v == 'l') {
-                        $v_ = '<a href="'.$args[1][$k_].'" target="_blank">'.$args[0][$k_].'</a>';
-                    }
-                    $placeholders[$key.$k_] = $v_;
-                }
-            }
-        }
-        $message = strtr($args[2], $placeholders);
-        $this->missing[] = array(
-            'components' => $args[0],
-            'message' => $message,
-        );
-        foreach ($args[0] as $k => $v) {
+        foreach ($components as $k => $v) {
             $this->missed[] = $v;
+            $placeholders['%l'.$k] = '<a href="'.$urls[$k].'" target="_blank">'.$components[$k].'</a>';
         }
+        $message = strtr($msgtpl, $placeholders);
+        $this->missing[] = [
+            'components' => $components,
+            'message' => $message,
+        ];
     }
 
     /**
