@@ -351,18 +351,8 @@ code {
   transition-delay: 400ms;
 }
 
-.free--show,
-.paid--show {
-  display: none;
-}
-
-.body--free .free--show,
-.body--paid .paid--show {
-  display: block;
-}
-
-.body--free .edition-hide,
-.body--paid .edition-hide {
+.sel--chevereto .chevereto--hide,
+.sel--chevereto-free .chevereto-free--hide {
   display: none;
 }
 
@@ -381,7 +371,7 @@ code {
   overflow: hidden;
 }
 
-.container {
+.screen {
   margin: auto;
   display: none;
   flex-wrap: wrap;
@@ -391,19 +381,17 @@ code {
   transform: scale(.8);
 }
 
-.container--error {
+.screen--error {
   opacity: 1;
   display: flex;
   transform: scale(1);
 }
 
-.body--slowload .container {
+.body--slowload .screen {
   visibility: hidden;
 }
 
-.body--splash .container--splash,
-.body--install .container--install,
-.body--installing .container--installing {
+.screen--show {
   animation-name: fadeInFromNone;
   animation-fill-mode: forwards;
   animation-duration: 400ms;
