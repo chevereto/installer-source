@@ -196,8 +196,9 @@
       <div class="flex-box col-width">
         <div>
           <h1>Installation completed</h1>
-          <p>Chevereto has been installed successfully and the installer file has been removed from <code><?php echo INSTALLER_FILEPATH; ?></code></p>
-          <p>Take note of your installation details. It will be only shown once.</p>
+          <p>Chevereto has been installed. You can now login to your dashboard panel to configure your website to fit your needs.</p>
+          <p>The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
+          <p>Take note on the installation details below.</p>
           <div class="install-details p highlight force-select font-size-80p">
             <pre>Chevereto installation
 -----------------------
@@ -218,7 +219,8 @@ db_name: chevereto_c4f2h3
 db_user: chevereto_87gnI
 db_user_passwd: &8300f(**&39)
 </pre></div>
-          <p>Hope you enjoy using Chevereto as much we care in creating it. Help us by providing us feedback and telling others about our software.</p>
+           
+          <p>Hope you enjoy using Chevereto as much we care in creating it. Help us by providing us feedback and recommend our software.</pp>
           <div>
             <button class="action radius" data-action="goDashboard">Open dashboard</button>
             <button class="radius" data-action="goHome">Open homepage</button>
