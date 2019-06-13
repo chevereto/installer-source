@@ -28,9 +28,10 @@ var installer = {
   init: function() {
     var self = this;
     var state = {
-      action: UpgradeToPaid ? "install" : "show",
-      arg: UpgradeToPaid ? "install" : "welcome"
+      action: "show",
+      arg: UpgradeToPaid ? "upgrade" : "welcome"
     };
+    installer.actions[state.action](state.arg);
     history.replaceState(state, title);
     if (page != "error") {
       this.bindActions();
@@ -51,9 +52,30 @@ var installer = {
         }
       }
       var state = e.state;
-      console.log("onpopstate", state);
-      self.actions[state.action](state.arg);
+      var form = document.querySelector(".screen--show form");
+      if (form && !form.checkValidity()) {
+        var tmpSubmit = document.createElement("button");
+        form.appendChild(tmpSubmit);
+        tmpSubmit.click();
+        form.removeChild(tmpSubmit);
+      } else {
+        self.actions[state.action](state.arg);
+      }
     };
+    var forms = document.querySelectorAll("form");
+    for (let i = 0; i < forms.length; i++) {
+      forms[i].addEventListener(
+        "submit",
+        function(e) {
+          console.log("form ql " + forms[i].dataset.trigger);
+          e.preventDefault();
+          e.stopPropagation();
+          installer.actions[forms[i].dataset.trigger](forms[i].dataset.arg);
+          installer.history(forms[i].dataset.trigger, forms[i].dataset.arg);
+        },
+        false
+      );
+    }
   },
   bindActions: function() {
     var self = this;
@@ -63,13 +85,15 @@ var installer = {
       trigger.addEventListener("click", function(e) {
         var dataset = e.currentTarget.dataset;
         self.actions[dataset.action](dataset.arg);
-        console.log(dataset.action, dataset.arg);
         installer.history(dataset.action, dataset.arg);
       });
     }
   },
   history: function(action, arg) {
     history.pushState({ action: action, arg: arg }, action);
+  },
+  checkLicense: function(key) {
+    console.log("CHECK THE LICENSE! " + key);
   },
   actions: {
     show: function(screen, args) {
@@ -83,10 +107,16 @@ var installer = {
     setEdition: function(edition) {
       body.classList.remove("sel--chevereto", "sel--chevereto-free");
       if ("chevereto" == edition) {
-        console.log("CHECK THE LICENSE!");
+        installer.checkLicense("KEY DE PRUEBA");
       }
       body.classList.add("sel--" + edition);
       this.show("cpanel");
+    },
+    setUpgrade: function() {
+      body.classList.remove("sel--chevereto-free");
+      body.classList.add("sel--chevereto");
+      installer.checkLicense("KEY DE PRUEBA");
+      this.show("complete-upgrade");
     },
     cpanelProcess: function() {
       console.log("CHECK LOGIN AND DO CPANEL PROCESS!");
@@ -98,7 +128,7 @@ var installer = {
     },
     setAdmin: function() {
       console.log("SET ADMIN DETAILS!");
-      this.show("email");
+      this.show("emails");
     },
     setEmails: function() {
       console.log("SET EMAILS!");

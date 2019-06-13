@@ -60,6 +60,24 @@
       </div>
     </div>
 
+    <div id="screen-upgrade" class="screen animate animate--slow">
+      <div class="header flex-item"><?php echo $svgLogo; ?></div>
+      <div class="flex-box col-width">
+        <div>
+          <h1>Upgrade</h1>
+          <p>All previous uploads won't get altered in any way. The system database schema will change. Don't forget to backup your database.</p>
+          <p>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</p>
+          <div class="p input-label">
+            <label for="licenseKey">License key</label>
+            <input class="radius width-100p" type="text" name="licenseKey" id="licenseKey" placeholder="Paste your license key here">
+          </div>
+          <div>
+            <button class="action radius" data-action="setUpgrade">Enter license key</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="screen-cpanel" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
@@ -124,42 +142,47 @@
         <div>
           <h1>Administrator</h1>
           <p>Fill in your administrator user details. You can edit this account or add more administrators later.</p>
-          <div class="p input-label">
-            <label for="email">Email</label>
-            <input class="radius col-8" type="email" name="email" id="email" placeholder="username@domain.com" required>
-          </div>
-          <div class="p input-label">
-            <label for="username">Username</label>
-            <input class="radius col-8" type="text" name="username" id="username" placeholder="admin" required>
-          </div>
-          <div class="p input-label">
-            <label for="password">Password</label>
-            <input class="radius col-8" type="password" name="password" id="password" placeholder="password" required>
-          </div>
-          <div>
-            <button class="action radius" data-action="setAdmin">Set administrator</button>
-          </div>
+          <form method="post" name="admin" data-trigger="setAdmin">
+            <div class="p input-label">
+              <label for="email">Email</label>
+              <input class="radius col-8" type="email" name="email" id="email" placeholder="username@domain.com" required>
+            </div>
+            <div class="p input-label">
+              <label for="username">Username</label>
+              <input class="radius col-8" type="text" name="username" id="username" placeholder="admin" required>
+            </div>
+            <div class="p input-label">
+              <label for="password">Password</label>
+              <input class="radius col-8" type="password" name="password" id="password" placeholder="password" required>
+            </div>
+            <div>
+              <button class="action radius">Set administrator</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
 
-    <div id="screen-email" class="screen animate animate--slow">
+    <div id="screen-emails" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>Email addresses</h1>
-          <div class="p input-label">
-            <label for="no-reply">No-reply</label>
-            <input class="radius col-8" type="email" name="no-reply" id="password" placeholder="no-reply@domain.com" required>
-            <div><small>This address will be used as FROM email address when sending transactional emails (account functions, singup, alerts, etc.)</small></div>
-          </div>
-          <div class="p input-label">
-            <label for="inbox">Inbox</label>
-            <input class="radius col-8" type="email" name="inbox" id="password" placeholder="inbox@domain.com" required>
-            <div><small>This address will be used to get contact form messages.</small></div>
-          </div>
-          <div>
-            <button class="action radius" data-action="setEmails">Set emails</button>
-          </div>
+          <p>Fill in the email addresses that will be used by the system. You can edit this later.</p>
+          <form method="post" name="emails" data-trigger="setEmails">
+            <div class="p input-label">
+              <label for="no-reply">No-reply</label>
+              <input class="radius col-8" type="email" name="no-reply" placeholder="no-reply@domain.com" required>
+              <div><small>This address will be used as FROM email address when sending transactional emails (account functions, singup, alerts, etc.)</small></div>
+            </div>
+            <div class="p input-label">
+              <label for="inbox">Inbox</label>
+              <input class="radius col-8" type="email" name="inbox" placeholder="inbox@domain.com" required>
+              <div><small>This address will be used to get contact form messages.</small></div>
+            </div>
+            <div>
+              <button class="action radius">Set emails</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -190,7 +213,7 @@
       </div>
     </div>
 
-    <div id="screen-complete" class="screen screen--splash animate animate--slow">
+    <div id="screen-complete" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>Installation completed</h1>
@@ -217,7 +240,8 @@ db_port: 3306
 db_name: chevereto_c4f2h3
 db_user: chevereto_87gnI
 db_user_passwd: &8300f(**&39)
-</pre></div>
+</pre>
+          </div>
            
           <p>Hope you enjoy using Chevereto as much we care in creating it. Help us by providing us feedback and recommend our software.</pp>
           <div>
@@ -227,4 +251,20 @@ db_user_passwd: &8300f(**&39)
         </div>
       </div>
     </div>
+
+    <div id="screen-complete-upgrade" class="screen animate animate--slow">
+      <div class="flex-box col-width">
+        <div>
+          <h1>Upgrade completed</h1>
+          <p>Chevereto has been upgraded. You can now login to your dashboard panel to configure your website to fit your needs.</p>
+          <p>The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>     
+          <p>Hope you enjoy the software and many thanks for support our work.</p>     
+          <div>
+            <button class="action radius" data-action="goTo" data-arg="dashboard">Open dashboard</button>
+            <button class="radius" data-action="goTo" data-arg="homepage">Open homepage</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 <?php } ?>
