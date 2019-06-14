@@ -53,7 +53,12 @@ var installer = {
       }
       var state = e.state;
       var form = document.querySelector(".screen--show form");
-      if (form && !form.checkValidity()) {
+      if (
+        form &&
+        form.dataset.trigger == state.action &&
+        !form.checkValidity()
+      ) {
+        history.go(-1);
         var tmpSubmit = document.createElement("button");
         form.appendChild(tmpSubmit);
         tmpSubmit.click();
@@ -97,6 +102,7 @@ var installer = {
   },
   actions: {
     show: function(screen, args) {
+      console.log("screen " + screen);
       document.title = screens[screen].title;
       var shownScreens = document.querySelectorAll(".screen--show");
       shownScreens.forEach(a => {
@@ -294,4 +300,6 @@ var installer = {
     });
   }
 };
-installer.init();
+if ("error" != document.querySelector("html").id) {
+  installer.init();
+}

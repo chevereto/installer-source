@@ -387,10 +387,6 @@ code {
   transform: scale(1);
 }
 
-.body--slowload .screen {
-  visibility: hidden;
-}
-
 .screen--show {
   animation-name: fadeInFromNone;
   animation-fill-mode: forwards;
@@ -506,21 +502,11 @@ code {
   max-height: 100%;
   margin: 20px auto;
   display: block;
-  /* fill: #25a7e0; */
-  fill: #FFF;
   filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, .15));
 }
 
-a.installer-version {
-  color: #FFF;
-  background: #bdc3c7;
-  font-size: 50%;
-  padding: 5px;
-  vertical-align: middle;
-}
-
-a.installer-version {
-  text-decoration: none;
+.header>svg path {
+  fill: #FFF;
 }
 
 .install-details {

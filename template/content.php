@@ -1,5 +1,5 @@
 <?php if ($pageId == 'error') { ?>
-    <div id="screen-error" class="screen">
+    <div id="screen-error" class="screen screen--error">
       <div class="flex-box error-box" >
         <div>
           <h1>Aw, Snap!</h1>
@@ -24,7 +24,7 @@
       <div class="header flex-item"><?php echo $svgLogo; ?></div>
       <div class="flex-box flex-item">
         <div>
-          <h1>Chevereto Installer <a class="installer-version radius" href="<?php echo APP_URL; ?>" target="_blank">v<?php echo APP_VERSION; ?></a></h1>
+          <h1>Chevereto Installer</h1>
           <p>This tool will guide you through the process of installing <a href="https://chevereto.com/" target="_blank">Chevereto</a>. To proceed, check the information below.</p>
           <ul>
             <li>Server path <code><?php echo $runtime->absPath; ?></code></li>
@@ -79,6 +79,7 @@
     </div>
 
     <div id="screen-cpanel" class="screen animate animate--slow">
+      <div class="header flex-item"><?php echo $svgCpanelLogo; ?></div>
       <div class="flex-box col-width">
         <div>
           <h1>cPanel access</h1>

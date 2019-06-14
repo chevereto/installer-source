@@ -99,9 +99,11 @@ class RequirementsCheck
             if ($missing) {
                 $l = array();
                 $c = array();
-                $message = 'Enable %l PHP <b>%n</b>';
+                $message = 'Enable PHP %n %l.';
                 if (count($missing['c']) == 1) {
                     $missing_strtr = array('%n' => $n[0]);
+                    $message = strtr($message, $missing_strtr);
+                    $this->addMissing($missing['c'][0], $missing['l'][0], $message);
                 } else {
                     foreach ($missing['l'] as $k => $v) {
                         $l[] = '%l'.$k;
@@ -109,9 +111,9 @@ class RequirementsCheck
                     $last = array_pop($l);
                     $missing_strtr['%l'] = implode(', ', $l).' and '.$last;
                     $missing_strtr['%n'] = $n[1];
+                    $message = strtr($message, $missing_strtr);
+                    $this->addBundleMissing($missing['c'], $missing['l'], $message);
                 }
-                $message = strtr($message, $missing_strtr);
-                $this->addMissing($missing['c'], $missing['l'], $message);
             }
         }
     }
