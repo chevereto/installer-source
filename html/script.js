@@ -29,7 +29,7 @@ var installer = {
     var self = this;
     var state = {
       action: "show",
-      arg: UpgradeToPaid ? "upgrade" : "welcome"
+      arg: UpgradeToPaid ? "upgrade" : "license"
     };
     installer.actions[state.action](state.arg);
     history.replaceState(state, title);

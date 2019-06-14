@@ -25,12 +25,12 @@
       <div class="flex-box flex-item">
         <div>
           <h1>Chevereto Installer</h1>
-          <p>This tool will guide you through the process of installing <a href="https://chevereto.com/" target="_blank">Chevereto</a>. To proceed, check the information below.</p>
+          <p>This tool will guide you through the process of installing Chevereto. To proceed, check the information below.</p>
           <ul>
             <li>Server path <code><?php echo $runtime->absPath; ?></code></li>
             <li>Website url <code><?php echo $runtime->rootUrl; ?></code></li>
           </ul>
-          <p>Check that the above details match to where you want to install Chevereto and that there's no other software installed there.</p>
+          <p>Confirm that the above details match to where you want to install Chevereto and that there's no other software installed there.</p>
 <?php if ($nginx) {
                       echo $nginx;
                   } ?>
@@ -44,17 +44,19 @@
     <div id="screen-license" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
-          <h1>License key</h1>
-          <p>The main release, Chevereto, is proprietary software and you require to <a href="https://chevereto.com/purchase" target="_blank">buy a license</a> to use it. The free edition (known as <a href="https://chevereto.com/free" target="_blank">Chevereto-Free</a>) is Free Open Source Software (FOSS).</p>
-          <p class="highlight">The paid version has more features, gets more frequent updates, and provides an additional support layer if you need help. By purchasing, you support the ongoing development of this software.</p>
-          <p>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</p>
+          <h1>Enter license key</h1>
+          <p>A license key is required to install our main edition. You can purchase a license from our <a href="https://chevereto.com/pricing" target="_blank">website</a> if you don't have one yet.</p>
+          <p></p>
+          <p>Skip this to install <a href="https://chevereto.com/free" target="_blank">Chevereto-Free</a>, which is our Open Source edition.</p> 
+          <p class="highlight">The paid edition has more features, gets more frequent updates, and provides additional support assistance.</p>
           <div class="p input-label">
             <label for="licenseKey">License key</label>
             <input class="radius width-100p" type="text" name="licenseKey" id="licenseKey" placeholder="Paste your license key here">
+            <div><small>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</small></div>
           </div>
           <div>
             <button class="action radius" data-action="setEdition" data-arg="chevereto">Enter license key</button>
-            <button class="radius" data-action="setEdition" data-arg="chevereto-free">Skip – Use Chevereto-Free</button>
+            <button class=" radius" data-action="setEdition" data-arg="chevereto-free">Skip – Use Chevereto-Free</button>
           </div>
         </div>
       </div>
@@ -83,7 +85,7 @@
       <div class="flex-box col-width">
         <div>
           <h1>cPanel access</h1>
-          <p>This installer can connect to your <a href="https://documentation.cpanel.net/display/DD/Guide+to+UAPI" target="_blank">cPanel UAPI</a> to create the database, its user, and grant database privileges. Your cPanel user and password will be only used locally to connect to your cPanel backend.</p>
+          <p>This installer can connect to a <a href="https://documentation.cpanel.net/display/DD/Guide+to+UAPI" target="_blank">cPanel UAPI</a> to create the database, its user, and grant database privileges. Your cPanel user and password will be only used locally to connect to your cPanel backend.</p>
           <p>Nothing will be stored neither transmitted to anyone.</p>
 <?php if ('https' == $runtime->httpProtocol) { ?>
           <p class="highlight">You are not browsing using HTTPS. For extra security, change your cPanel password once the installation gets completed.</p>
@@ -91,11 +93,11 @@
           <p class="highlight">Skip this if you don't run cPanel or if you want to setup the database requirements manually.</p>
           <div class="p input-label">
             <label for="cpanelUser">User</label>
-            <input class="radius col-8" type="text" name="cpanelUser" placeholder="username">
+            <input class="radius col-8" type="text" name="cpanelUser" placeholder="username" autocomplete="off">
           </div>
           <div class="p input-label">
           <label for="cpanelPassword">Password</label>
-            <input class="radius col-8" type="password" name="cpanelPassword" placeholder="password">
+            <input class="radius col-8" type="password" name="cpanelPassword" placeholder="password" autocomplete="off">
           </div>
           <div>
             <button class="action radius" data-action="cpanelProcess">Connect to cPanel</button>
@@ -110,30 +112,31 @@
         <div>
           <h1>Database</h1>
           <p>Chevereto requires at least a MySQL 5.6 database. It will also work with MariaDB 10.</p>
-          <p class="highlight">✨ The installer has already created this database setup for you.</p>
-          <div class="p input-label">
-            <label for="dbHost">Host</label>
-            <input class="radius col-8" type="text" name="dbHost" id="dbHost" placeholder="localhost" required>
-          </div>
-          <div class="p input-label">
-            <label for="dbPort">Port</label>
-            <input class="radius col-8" type="number" name="dbPort" id="dbPort" value="3306" placeholder="3306" required>
-          </div>
-          <div class="p input-label">
-            <label for="dbName">Name</label>
-            <input class="radius col-8" type="text" name="dbName" id="dbName" placeholder="mydatabase" required>
-          </div>
-          <div class="p input-label">
-            <label for="dbUser">User</label>
-            <input class="radius col-8" type="text" name="dbUser" id="dbUser" placeholder="username" required>
-          </div>
-          <div class="p input-label">
-            <label for="dbUserPassword">User password</label>
-            <input class="radius col-8" type="text" name="dbUserPassword" id="dbUserPassword" placeholder="password" required>
-          </div>
-          <div>
-            <button class="action radius" data-action="setDatabase">Set database</button>
-          </div>
+          <form method="post" name="database" data-trigger="setDatabase" autocomplete="off">
+            <div class="p input-label">
+              <label for="dbHost">Host</label>
+              <input class="radius col-8" type="text" name="dbHost" id="dbHost" placeholder="localhost" required>
+            </div>
+            <div class="p input-label">
+              <label for="dbPort">Port</label>
+              <input class="radius col-8" type="number" name="dbPort" id="dbPort" value="3306" placeholder="3306" required>
+            </div>
+            <div class="p input-label">
+              <label for="dbName">Name</label>
+              <input class="radius col-8" type="text" name="dbName" id="dbName" placeholder="mydatabase" required>
+            </div>
+            <div class="p input-label">
+              <label for="dbUser">User</label>
+              <input class="radius col-8" type="text" name="dbUser" id="dbUser" placeholder="username" required>
+            </div>
+            <div class="p input-label">
+              <label for="dbUserPassword">User password</label>
+              <input class="radius col-8" type="text" name="dbUserPassword" id="dbUserPassword" placeholder="password" required>
+            </div>
+            <div>
+              <button class="action radius">Set database</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -143,18 +146,18 @@
         <div>
           <h1>Administrator</h1>
           <p>Fill in your administrator user details. You can edit this account or add more administrators later.</p>
-          <form method="post" name="admin" data-trigger="setAdmin">
+          <form method="post" name="admin" data-trigger="setAdmin" autocomplete="off">
             <div class="p input-label">
-              <label for="email">Email</label>
-              <input class="radius col-8" type="email" name="email" id="email" placeholder="username@domain.com" required>
+              <label for="adminEmail">Email</label>
+              <input class="radius col-8" type="email" name="adminEmail" placeholder="username@domain.com" autocomplete="off" required>
             </div>
             <div class="p input-label">
-              <label for="username">Username</label>
-              <input class="radius col-8" type="text" name="username" id="username" placeholder="admin" required>
+              <label for="adminUsername">Username</label>
+              <input class="radius col-8" type="text" name="adminUsername" placeholder="admin" pattern="^[\w]{3,16}$" autocomplete="off" required>
             </div>
             <div class="p input-label">
-              <label for="password">Password</label>
-              <input class="radius col-8" type="password" name="password" id="password" placeholder="password" required>
+              <label for="adminPassword">Password</label>
+              <input class="radius col-8" type="password" name="adminPassword" placeholder="password" pattern="^.{6,128}$" autocomplete="off" required>
             </div>
             <div>
               <button class="action radius">Set administrator</button>
