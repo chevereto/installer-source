@@ -24,7 +24,7 @@ var installer = {
     var self = this;
     var state = {
       action: "show",
-      arg: UpgradeToPaid ? "upgrade" : "emails"
+      arg: UpgradeToPaid ? "upgrade" : "welcome"
     };
     installer.actions[state.action](state.arg);
     history.replaceState(state, title);
@@ -48,6 +48,7 @@ var installer = {
       return onLeaveMessage;
     };
     window.onpopstate = function(e) {
+      console.log("history pop:", e.state);
       if (body.classList.contains("body--working")) {
         if (confirm(onLeaveMessage)) {
           installer.XHR.abort();
@@ -56,7 +57,7 @@ var installer = {
         }
       }
       var state = e.state;
-      var form = installer.getShownScreenEl().querySelector("form");
+      var form = installer.getShownScreenEl("form");
       if (
         form &&
         form.dataset.trigger == state.action &&
@@ -68,7 +69,12 @@ var installer = {
         tmpSubmit.click();
         form.removeChild(tmpSubmit);
       } else {
-        self.actions[state.action](state.arg);
+        console.log("Trigger pop state:", state);
+        if ("show" == state.action) {
+          self.popScreen(state.arg);
+        } else {
+          self.actions[state.action](state.arg);
+        }
       }
     };
     var forms = document.querySelectorAll("form");
@@ -76,11 +82,11 @@ var installer = {
       forms[i].addEventListener(
         "submit",
         function(e) {
-          console.log("form ql " + forms[i].dataset.trigger);
+          console.log("Form submit event: " + forms[i].dataset.trigger);
           e.preventDefault();
           e.stopPropagation();
           installer.actions[forms[i].dataset.trigger](forms[i].dataset.arg);
-          installer.history(forms[i].dataset.trigger, forms[i].dataset.arg);
+          // installer.history(forms[i].dataset.trigger, forms[i].dataset.arg);
         },
         false
       );
@@ -107,9 +113,16 @@ var installer = {
     this.getShownScreenEl(".alert").innerHTML = "";
   },
   writeFormData: function(dataKey, inputEls) {
+    console.log("WRITE:" + dataKey);
     if (typeof inputEls == typeof undefined) {
       var form = installer.getShownScreenEl("form");
-      var inputEls = form.getElementsByTagName("input");
+      if (form) {
+        var inputEls = form.getElementsByTagName("input");
+      } else {
+        Data[dataKey] = {};
+        console.log("Data wipe:" + dataKey);
+        return;
+      }
     }
     Data[dataKey] = {};
     for (let i = 0; i < inputEls.length; i++) {
@@ -127,28 +140,36 @@ var installer = {
       trigger.addEventListener("click", function(e) {
         var dataset = e.currentTarget.dataset;
         self.actions[dataset.action](dataset.arg);
-        installer.history(dataset.action, dataset.arg);
       });
     }
   },
   history: function(action, arg) {
+    console.log("history:", action, arg);
     history.pushState({ action: action, arg: arg }, action);
   },
   checkLicense: function(key) {
     console.log("CHECK THE LICENSE! " + key);
     this.pushAlert("Invalid license key.");
   },
+  pushScreen: function(screen) {
+    installer.history("show", screen);
+  },
+  popScreen: function(screen) {
+    console.log("popScreen:" + screen);
+    document.title = screens[screen].title;
+    var shownScreens = document.querySelectorAll(".screen--show");
+    shownScreens.forEach(a => {
+      a.classList.remove("screen--show");
+    });
+    document.querySelector("#screen-" + screen).classList.add("screen--show");
+  },
   actions: {
-    show: function(screen, args) {
-      console.log("screen " + screen);
-      document.title = screens[screen].title;
-      var shownScreens = document.querySelectorAll(".screen--show");
-      shownScreens.forEach(a => {
-        a.classList.remove("screen--show");
-      });
-      document.querySelector("#screen-" + screen).classList.add("screen--show");
+    show: function(screen) {
+      installer.popScreen(screen);
+      installer.pushScreen(screen);
     },
     setEdition: function(edition) {
+      console.log("setEdition");
       body.classList.remove("sel--chevereto", "sel--chevereto-free");
       if ("chevereto" == edition) {
         Data.key = document.getElementById("installKey").value;
@@ -159,6 +180,7 @@ var installer = {
       this.show("cpanel");
     },
     setUpgrade: function() {
+      console.log("setUpgrade");
       body.classList.remove("sel--chevereto-free");
       body.classList.add("sel--chevereto");
       Data.key = document.getElementById("upgradeKey").value;
@@ -166,26 +188,29 @@ var installer = {
       this.show("complete-upgrade");
     },
     cpanelProcess: function() {
-      console.log("CHECK LOGIN AND DO CPANEL PROCESS!");
+      console.log("cpanelProcess");
       this.show("database");
     },
     setDb: function() {
-      console.log("CHECK AND SET DATABASE!");
+      console.log("setDb");
       installer.writeFormData("db");
       this.show("admin");
     },
     setAdmin: function() {
-      console.log("SET ADMIN DETAILS!");
+      console.log("setAdmin");
       installer.writeFormData("admin");
       this.show("emails");
     },
     setEmails: function() {
-      console.log("SET EMAILS!");
+      console.log("setEmails");
       installer.writeFormData("email");
       this.show("ready");
     },
-    install: function(arg, push) {
-      console.log("I N S T A L L!");
+    setReady: function() {
+      this.show("ready");
+    },
+    install: function() {
+      console.log("install");
       this.show("installing");
       return;
       if (!arg) {

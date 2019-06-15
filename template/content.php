@@ -119,7 +119,7 @@
             <p class="p alert"></p>
             <div class="p input-label">
               <label for="dbHost">Host</label>
-              <input class="radius width-100p" type="text" name="dbHost" id="dbHost" placeholder="localhost" required>
+              <input class="radius width-100p" type="text" name="dbHost" id="dbHost" placeholder="localhost" value="localhost" required>
               <div><small>If you are using Docker, enter the MySQL/MariaDB container hostname or its IP.</small></div>
             </div>
             <div class="p input-label">
