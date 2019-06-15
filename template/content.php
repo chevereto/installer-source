@@ -49,9 +49,10 @@
           <p></p>
           <p>Skip this to install <a href="https://chevereto.com/free" target="_blank">Chevereto-Free</a>, which is our Open Source edition.</p> 
           <p class="highlight">The paid edition has more features, gets more frequent updates, and provides additional support assistance.</p>
+          <p class="p alert"></p>
           <div class="p input-label">
             <label for="installKey">License key</label>
-            <input class="radius width-100p" type="text" id="installKey" placeholder="Paste your license key here">
+            <input class="radius width-100p" type="text" name="installKey" id="installKey" placeholder="Paste your license key here" autofill="off" autocomplete="off">
             <div><small>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</small></div>
           </div>
           <div>
@@ -69,6 +70,7 @@
           <h1>Upgrade</h1>
           <p>All previous uploads won't get altered in any way. The system database schema will change. Don't forget to backup your database.</p>
           <p>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</p>
+          <p class="p alert"></p>
           <div class="p input-label">
             <label for="upgradeKey">License key</label>
             <input class="radius width-100p" type="text" name="upgradeKey" id="upgradeKey" placeholder="Paste your license key here">
@@ -85,19 +87,20 @@
       <div class="flex-box col-width">
         <div>
           <h1>cPanel access</h1>
-          <p>This installer can connect to a <a href="https://documentation.cpanel.net/display/DD/Guide+to+UAPI" target="_blank">cPanel UAPI</a> to create the database, its user, and grant database privileges. Your cPanel user and password will be only used locally to connect to your cPanel backend.</p>
-          <p>Nothing will be stored neither transmitted to anyone.</p>
+          <p>This installer can connect to a cPanel backend using the <a href="https://documentation.cpanel.net/display/DD/Guide+to+UAPI" target="_blank">cPanel UAPI</a> to create the database, its user, and grant database privileges.</p>
 <?php if ('https' == $runtime->httpProtocol) { ?>
           <p class="highlight">You are not browsing using HTTPS. For extra security, change your cPanel password once the installation gets completed.</p>
 <?php } ?>
+          <p>The cPanel credentials won't be stored either transmitted to anyone.</p>
           <p class="highlight">Skip this if you don't run cPanel or if you want to setup the database requirements manually.</p>
+          <p class="p alert"></p>
           <div class="p input-label">
             <label for="cpanelUser">User</label>
-            <input class="radius col-8" type="text" name="cpanelUser" id="cpanelUser" placeholder="username" autocomplete="off">
+            <input class="radius width-100p" type="text" name="cpanelUser" id="cpanelUser" placeholder="username" autocomplete="off">
           </div>
           <div class="p input-label">
           <label for="cpanelPassword">Password</label>
-            <input class="radius col-8" type="password" name="cpanelPassword" id="cpanelPassword" placeholder="password" autocomplete="off">
+            <input class="radius width-100p" type="password" name="cpanelPassword" id="cpanelPassword" placeholder="password" autocomplete="off">
           </div>
           <div>
             <button class="action radius" data-action="cpanelProcess">Connect to cPanel</button>
@@ -111,27 +114,30 @@
       <div class="flex-box col-width">
         <div>
           <h1>Database</h1>
-          <p>Chevereto requires at least a MySQL 5.6 database. It will also work with MariaDB 10.</p>
-          <form method="post" name="database" data-trigger="setDatabase" autocomplete="off">
+          <p>Chevereto requires a MySQL 5.6 (MySQL 8 recommended) database. It will also work with MariaDB 10.</p>
+          <form method="post" name="database" data-trigger="setDb" autocomplete="off">
+            <p class="p alert"></p>
             <div class="p input-label">
               <label for="dbHost">Host</label>
-              <input class="radius col-8" type="text" name="dbHost" id="dbHost" placeholder="localhost" required>
+              <input class="radius width-100p" type="text" name="dbHost" id="dbHost" placeholder="localhost" required>
+              <div><small>If you are using Docker, enter the MySQL/MariaDB container hostname or its IP.</small></div>
             </div>
             <div class="p input-label">
               <label for="dbPort">Port</label>
-              <input class="radius col-8" type="number" name="dbPort" id="dbPort" value="3306" placeholder="3306" required>
+              <input class="radius width-100p" type="number" name="dbPort" id="dbPort" value="3306" placeholder="3306" required>
             </div>
             <div class="p input-label">
               <label for="dbName">Name</label>
-              <input class="radius col-8" type="text" name="dbName" id="dbName" placeholder="mydatabase" required>
+              <input class="radius width-100p" type="text" name="dbName" id="dbName" placeholder="mydatabase" required>
             </div>
             <div class="p input-label">
               <label for="dbUser">User</label>
-              <input class="radius col-8" type="text" name="dbUser" id="dbUser" placeholder="username" required>
+              <input class="radius width-100p" type="text" name="dbUser" id="dbUser" placeholder="username" required>
+              <div><small>The database user must have ALL PRIVILEGES on the target database.</small></div>
             </div>
             <div class="p input-label">
               <label for="dbUserPassword">User password</label>
-              <input class="radius col-8" type="text" name="dbUserPassword" id="dbUserPassword" placeholder="password" required>
+              <input class="radius width-100p" type="text" name="dbUserPassword" id="dbUserPassword" placeholder="password" required>
             </div>
             <div>
               <button class="action radius">Set database</button>
@@ -147,17 +153,21 @@
           <h1>Administrator</h1>
           <p>Fill in your administrator user details. You can edit this account or add more administrators later.</p>
           <form method="post" name="admin" data-trigger="setAdmin" autocomplete="off">
+            <p class="p alert"></p>
             <div class="p input-label">
               <label for="adminEmail">Email</label>
-              <input class="radius col-8" type="email" name="adminEmail" id="adminEmail" placeholder="username@domain.com" autocomplete="off" required>
+              <input class="radius width-100p" type="email" name="adminEmail" id="adminEmail" placeholder="username@domain.com" autocomplete="off" required>
+              <div><small>Make sure that this email is working or you won't be able to recover the account if you lost the password.</small></div>
             </div>
             <div class="p input-label">
               <label for="adminUsername">Username</label>
-              <input class="radius col-8" type="text" name="adminUsername" id="adminUsername" placeholder="admin" pattern="^[\w]{3,16}$" autocomplete="off" required>
+              <input class="radius width-100p" type="text" name="adminUsername" id="adminUsername" placeholder="admin" pattern="^[\w]{3,16}$" autocomplete="off" required>
+              <div><small>3 to 16 characters. Letters, numbers and underscore.</small></div>
             </div>
             <div class="p input-label">
               <label for="adminPassword">Password</label>
-              <input class="radius col-8" type="password" name="adminPassword" id="adminPassword" placeholder="password" pattern="^.{6,128}$" autocomplete="off" required>
+              <input class="radius width-100p" type="password" name="adminPassword" id="adminPassword" placeholder="password" pattern="^.{6,128}$" autocomplete="off" required>
+              <div><small>6 to 128 characters.</small></div>
             </div>
             <div>
               <button class="action radius">Set administrator</button>
@@ -173,14 +183,15 @@
           <h1>Email addresses</h1>
           <p>Fill in the email addresses that will be used by the system. You can edit this later.</p>
           <form method="post" name="emails" data-trigger="setEmails">
+            <p class="p alert"></p>
             <div class="p input-label">
               <label for="no-reply">No-reply</label>
-              <input class="radius col-8" type="email" name="emailNoreply" id="emailNoreply" placeholder="no-reply@domain.com" required>
+              <input class="radius width-100p" type="email" name="emailNoreply" id="emailNoreply" placeholder="no-reply@domain.com" required>
               <div><small>This address will be used as FROM email address when sending transactional emails (account functions, singup, alerts, etc.)</small></div>
             </div>
             <div class="p input-label">
               <label for="inbox">Inbox</label>
-              <input class="radius col-8" type="email" name="emailInbox" name="emailInbox" placeholder="inbox@domain.com" required>
+              <input class="radius width-100p" type="email" name="emailInbox" id="emailInbox" placeholder="inbox@domain.com" required>
               <div><small>This address will be used to get contact form messages.</small></div>
             </div>
             <div>

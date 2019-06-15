@@ -1,27 +1,14 @@
-// var process = {
-//   type: null, // install,upgrade
-//   status: null, // install,upgrade
-//   status: null, // install,upgrade
-// };
-
-var data = {};
-
-var editions = {
-  paid: "Chevereto"
-};
+var Data = {};
 var onLeaveMessage =
   "The installation is not yet completed. Are you sure that you want to leave?";
 var UpgradeToPaid = getParameterByName("UpgradeToPaid") == "";
-if (!UpgradeToPaid) {
-  editions.free = "Chevereto Free";
-}
+Data.process = UpgradeToPaid ? "upgrade" : "install";
 
 var title = document.title;
 var html = document.documentElement;
 var page = html.getAttribute("id");
 var body = document.getElementsByTagName("body")[0];
 var wrapper = document.querySelector(".wrapper");
-var key = document.getElementById("key");
 var screenEls = document.querySelectorAll(".screen");
 var screens = {};
 for (let i = 0; i < screenEls.length; i++) {
@@ -37,13 +24,22 @@ var installer = {
     var self = this;
     var state = {
       action: "show",
-      arg: UpgradeToPaid ? "upgrade" : "license"
+      arg: UpgradeToPaid ? "upgrade" : "emails"
     };
     installer.actions[state.action](state.arg);
     history.replaceState(state, title);
     if (page != "error") {
       this.bindActions();
     }
+    document.addEventListener(
+      "click",
+      function(event) {
+        if (!event.target.matches(".alert-close")) return;
+        event.preventDefault();
+        installer.popAlert();
+      },
+      false
+    );
     window.onbeforeunload = function(e) {
       if (!body.classList.contains("body--working")) {
         return;
@@ -60,7 +56,7 @@ var installer = {
         }
       }
       var state = e.state;
-      var form = document.querySelector(".screen--show form");
+      var form = installer.getShownScreenEl().querySelector("form");
       if (
         form &&
         form.dataset.trigger == state.action &&
@@ -90,6 +86,39 @@ var installer = {
       );
     }
   },
+  getShownScreenEl: function(query) {
+    return document.querySelector(".screen--show " + query);
+  },
+  pushAlert: function(message) {
+    var pushiInnerHTML =
+      "<span>" + message + '</span><a class="alert-close"></a>';
+    var el = this.getShownScreenEl(".alert");
+    var html = el.innerHTML;
+    if (pushiInnerHTML == html) {
+      el.classList.add("alert--shake");
+      setTimeout(function() {
+        el.classList.remove("alert--shake");
+      }, 500);
+    } else {
+      el.innerHTML = pushiInnerHTML;
+    }
+  },
+  popAlert: function() {
+    this.getShownScreenEl(".alert").innerHTML = "";
+  },
+  writeFormData: function(dataKey, inputEls) {
+    if (typeof inputEls == typeof undefined) {
+      var form = installer.getShownScreenEl("form");
+      var inputEls = form.getElementsByTagName("input");
+    }
+    Data[dataKey] = {};
+    for (let i = 0; i < inputEls.length; i++) {
+      var id = inputEls[i].id.replace(dataKey, "");
+      var key = id.charAt(0).toLowerCase() + id.slice(1);
+      Data[dataKey][key] = inputEls[i].value;
+    }
+    console.log("Data write:" + dataKey, Data[dataKey]);
+  },
   bindActions: function() {
     var self = this;
     var triggers = document.querySelectorAll("[data-action]");
@@ -107,6 +136,7 @@ var installer = {
   },
   checkLicense: function(key) {
     console.log("CHECK THE LICENSE! " + key);
+    this.pushAlert("Invalid license key.");
   },
   actions: {
     show: function(screen, args) {
@@ -121,32 +151,37 @@ var installer = {
     setEdition: function(edition) {
       body.classList.remove("sel--chevereto", "sel--chevereto-free");
       if ("chevereto" == edition) {
-        data.key = document.getElementById("installKey").value;
-        installer.checkLicense(data.key);
+        Data.key = document.getElementById("installKey").value;
+        // installer.checkLicense(Data.key);
       }
       body.classList.add("sel--" + edition);
+      Data.software = edition;
       this.show("cpanel");
     },
     setUpgrade: function() {
       body.classList.remove("sel--chevereto-free");
       body.classList.add("sel--chevereto");
-      installer.checkLicense("KEY DE PRUEBA");
+      Data.key = document.getElementById("upgradeKey").value;
+      installer.checkLicense(Data.key);
       this.show("complete-upgrade");
     },
     cpanelProcess: function() {
       console.log("CHECK LOGIN AND DO CPANEL PROCESS!");
       this.show("database");
     },
-    setDatabase: function() {
+    setDb: function() {
       console.log("CHECK AND SET DATABASE!");
+      installer.writeFormData("db");
       this.show("admin");
     },
     setAdmin: function() {
       console.log("SET ADMIN DETAILS!");
+      installer.writeFormData("admin");
       this.show("emails");
     },
     setEmails: function() {
       console.log("SET EMAILS!");
+      installer.writeFormData("email");
       this.show("ready");
     },
     install: function(arg, push) {
