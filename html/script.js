@@ -1,4 +1,5 @@
 var Data = {};
+var uid;
 var onLeaveMessage =
   "The installation is not yet completed. Are you sure that you want to leave?";
 var UpgradeToPaid = getParameterByName("UpgradeToPaid") == "";
@@ -22,12 +23,9 @@ console.log(screens);
 var installer = {
   init: function() {
     var self = this;
-    var state = {
-      action: "show",
-      arg: UpgradeToPaid ? "upgrade" : "welcome"
-    };
-    installer.actions[state.action](state.arg);
-    history.replaceState(state, title);
+    var defaultScreen = UpgradeToPaid ? "upgrade" : "admin";
+    this.popScreen(defaultScreen);
+    this.history.replace(defaultScreen);
     if (page != "error") {
       this.bindActions();
     }
@@ -48,7 +46,14 @@ var installer = {
       return onLeaveMessage;
     };
     window.onpopstate = function(e) {
-      console.log("history pop:", e.state);
+      var isBack = uid > e.state.uid;
+      var isForward = !isBack;
+      uid = e.state.uid;
+      console.log("onpopstate", {
+        direction: isBack ? "back" : "forward",
+        uid: uid,
+        pushState: e.state
+      });
       if (body.classList.contains("body--working")) {
         if (confirm(onLeaveMessage)) {
           installer.XHR.abort();
@@ -58,24 +63,21 @@ var installer = {
       }
       var state = e.state;
       var form = installer.getShownScreenEl("form");
-      if (
-        form &&
-        form.dataset.trigger == state.action &&
-        !form.checkValidity()
-      ) {
-        history.go(-1);
-        var tmpSubmit = document.createElement("button");
-        form.appendChild(tmpSubmit);
-        tmpSubmit.click();
-        form.removeChild(tmpSubmit);
-      } else {
-        console.log("Trigger pop state:", state);
-        if ("show" == state.action) {
-          self.popScreen(state.arg);
+      if (form && isForward) {
+        if (!form.checkValidity()) {
+          history.go(-1);
+          var tmpSubmit = document.createElement("button");
+          form.appendChild(tmpSubmit);
+          tmpSubmit.click();
+          form.removeChild(tmpSubmit);
+          // console.log("Form invalid");
+          return;
         } else {
-          self.actions[state.action](state.arg);
+          installer.actions[form.dataset.trigger](form.dataset.arg);
+          console.log("Form re-submit");
         }
       }
+      self.popScreen(state.view);
     };
     var forms = document.querySelectorAll("form");
     for (let i = 0; i < forms.length; i++) {
@@ -86,7 +88,6 @@ var installer = {
           e.preventDefault();
           e.stopPropagation();
           installer.actions[forms[i].dataset.trigger](forms[i].dataset.arg);
-          // installer.history(forms[i].dataset.trigger, forms[i].dataset.arg);
         },
         false
       );
@@ -143,16 +144,30 @@ var installer = {
       });
     }
   },
-  history: function(action, arg) {
-    console.log("history:", action, arg);
-    history.pushState({ action: action, arg: arg }, action);
+  history: {
+    push: function(view) {
+      this.writter("push", { view: view});
+    },
+    replace: function(view) {
+      this.writter("replace", { view: view});
+    },
+    writter: function(fn, data) {
+      data.uid = new Date().getTime();
+      uid = data.uid;
+      switch (fn) {
+        case "push":
+          history.pushState(data, data.view);
+          break;
+        case "replace":
+          history.replaceState(data, data.view);
+          break;
+      }
+      console.log("history.writter:", fn, data);
+    }
   },
   checkLicense: function(key) {
     console.log("CHECK THE LICENSE! " + key);
     this.pushAlert("Invalid license key.");
-  },
-  pushScreen: function(screen) {
-    installer.history("show", screen);
   },
   popScreen: function(screen) {
     console.log("popScreen:" + screen);
@@ -166,7 +181,9 @@ var installer = {
   actions: {
     show: function(screen) {
       installer.popScreen(screen);
-      installer.pushScreen(screen);
+      if(history.state.view != screen) {
+        installer.history.push(screen);
+      }
     },
     setEdition: function(edition) {
       console.log("setEdition");
@@ -222,7 +239,6 @@ var installer = {
       }
       var edition = installer.getActiveEdition();
 
-      installer.history(push, "installing", arg);
       body.classList = "";
       body.classList.add("body--installing", "body--" + edition.id);
 
