@@ -50,8 +50,8 @@
           <p>Skip this to install <a href="https://chevereto.com/free" target="_blank">Chevereto-Free</a>, which is our Open Source edition.</p> 
           <p class="highlight">The paid edition has more features, gets more frequent updates, and provides additional support assistance.</p>
           <div class="p input-label">
-            <label for="licenseKey">License key</label>
-            <input class="radius width-100p" type="text" name="licenseKey" id="licenseKey" placeholder="Paste your license key here">
+            <label for="installKey">License key</label>
+            <input class="radius width-100p" type="text" id="installKey" placeholder="Paste your license key here">
             <div><small>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</small></div>
           </div>
           <div>
@@ -70,8 +70,8 @@
           <p>All previous uploads won't get altered in any way. The system database schema will change. Don't forget to backup your database.</p>
           <p>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</p>
           <div class="p input-label">
-            <label for="licenseKey">License key</label>
-            <input class="radius width-100p" type="text" name="licenseKey" id="licenseKey" placeholder="Paste your license key here">
+            <label for="upgradeKey">License key</label>
+            <input class="radius width-100p" type="text" name="upgradeKey" id="upgradeKey" placeholder="Paste your license key here">
           </div>
           <div>
             <button class="action radius" data-action="setUpgrade">Enter license key</button>
@@ -93,11 +93,11 @@
           <p class="highlight">Skip this if you don't run cPanel or if you want to setup the database requirements manually.</p>
           <div class="p input-label">
             <label for="cpanelUser">User</label>
-            <input class="radius col-8" type="text" name="cpanelUser" placeholder="username" autocomplete="off">
+            <input class="radius col-8" type="text" name="cpanelUser" id="cpanelUser" placeholder="username" autocomplete="off">
           </div>
           <div class="p input-label">
           <label for="cpanelPassword">Password</label>
-            <input class="radius col-8" type="password" name="cpanelPassword" placeholder="password" autocomplete="off">
+            <input class="radius col-8" type="password" name="cpanelPassword" id="cpanelPassword" placeholder="password" autocomplete="off">
           </div>
           <div>
             <button class="action radius" data-action="cpanelProcess">Connect to cPanel</button>
@@ -149,15 +149,15 @@
           <form method="post" name="admin" data-trigger="setAdmin" autocomplete="off">
             <div class="p input-label">
               <label for="adminEmail">Email</label>
-              <input class="radius col-8" type="email" name="adminEmail" placeholder="username@domain.com" autocomplete="off" required>
+              <input class="radius col-8" type="email" name="adminEmail" id="adminEmail" placeholder="username@domain.com" autocomplete="off" required>
             </div>
             <div class="p input-label">
               <label for="adminUsername">Username</label>
-              <input class="radius col-8" type="text" name="adminUsername" placeholder="admin" pattern="^[\w]{3,16}$" autocomplete="off" required>
+              <input class="radius col-8" type="text" name="adminUsername" id="adminUsername" placeholder="admin" pattern="^[\w]{3,16}$" autocomplete="off" required>
             </div>
             <div class="p input-label">
               <label for="adminPassword">Password</label>
-              <input class="radius col-8" type="password" name="adminPassword" placeholder="password" pattern="^.{6,128}$" autocomplete="off" required>
+              <input class="radius col-8" type="password" name="adminPassword" id="adminPassword" placeholder="password" pattern="^.{6,128}$" autocomplete="off" required>
             </div>
             <div>
               <button class="action radius">Set administrator</button>
@@ -175,12 +175,12 @@
           <form method="post" name="emails" data-trigger="setEmails">
             <div class="p input-label">
               <label for="no-reply">No-reply</label>
-              <input class="radius col-8" type="email" name="no-reply" placeholder="no-reply@domain.com" required>
+              <input class="radius col-8" type="email" name="emailNoreply" id="emailNoreply" placeholder="no-reply@domain.com" required>
               <div><small>This address will be used as FROM email address when sending transactional emails (account functions, singup, alerts, etc.)</small></div>
             </div>
             <div class="p input-label">
               <label for="inbox">Inbox</label>
-              <input class="radius col-8" type="email" name="inbox" placeholder="inbox@domain.com" required>
+              <input class="radius col-8" type="email" name="emailInbox" name="emailInbox" placeholder="inbox@domain.com" required>
               <div><small>This address will be used to get contact form messages.</small></div>
             </div>
             <div>

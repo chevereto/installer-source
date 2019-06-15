@@ -1,3 +1,11 @@
+// var process = {
+//   type: null, // install,upgrade
+//   status: null, // install,upgrade
+//   status: null, // install,upgrade
+// };
+
+var data = {};
+
 var editions = {
   paid: "Chevereto"
 };
@@ -113,7 +121,8 @@ var installer = {
     setEdition: function(edition) {
       body.classList.remove("sel--chevereto", "sel--chevereto-free");
       if ("chevereto" == edition) {
-        installer.checkLicense("KEY DE PRUEBA");
+        data.key = document.getElementById("installKey").value;
+        installer.checkLicense(data.key);
       }
       body.classList.add("sel--" + edition);
       this.show("cpanel");

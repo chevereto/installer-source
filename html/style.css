@@ -118,13 +118,23 @@ ul>li {
   margin-bottom: 20px;
 }
 
-.highlight {
+.highlight,
+.notification {
   font-size: 0.9em;
-  background: #ecf0f1;
-  border-left: 2px solid #8e44ad;
   padding: 10px;
   padding-left: 1em;
 }
+
+.highlight {
+  background: #ecf0f1;
+  border-left: 2px solid #8e44ad;
+}
+
+.notification {
+  background: rgba(241, 196, 15, .3);
+  border-left: 2px solid #f1c40f;
+}
+
 
 input,
 select,
