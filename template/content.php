@@ -110,7 +110,7 @@
       </div>
     </div>
 
-    <div id="screen-database" class="screen animate animate--slow">
+    <div id="screen-db" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>Database</h1>

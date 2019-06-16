@@ -23,7 +23,7 @@ console.log(screens);
 var installer = {
   init: function() {
     var self = this;
-    var defaultScreen = UpgradeToPaid ? "upgrade" : "admin";
+    var defaultScreen = UpgradeToPaid ? "upgrade" : "db";
     this.popScreen(defaultScreen);
     this.history.replace(defaultScreen);
     if (page != "error") {
@@ -146,10 +146,10 @@ var installer = {
   },
   history: {
     push: function(view) {
-      this.writter("push", { view: view});
+      this.writter("push", { view: view });
     },
     replace: function(view) {
-      this.writter("replace", { view: view});
+      this.writter("replace", { view: view });
     },
     writter: function(fn, data) {
       data.uid = new Date().getTime();
@@ -181,7 +181,7 @@ var installer = {
   actions: {
     show: function(screen) {
       installer.popScreen(screen);
-      if(history.state.view != screen) {
+      if (history.state.view != screen) {
         installer.history.push(screen);
       }
     },
@@ -206,7 +206,7 @@ var installer = {
     },
     cpanelProcess: function() {
       console.log("cpanelProcess");
-      this.show("database");
+      this.show("db");
     },
     setDb: function() {
       console.log("setDb");
