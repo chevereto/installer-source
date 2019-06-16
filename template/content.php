@@ -31,9 +31,32 @@
             <li>Website url <code><?php echo $runtime->rootUrl; ?></code></li>
           </ul>
           <p>Confirm that the above details match to where you want to install Chevereto and that there's no other software installed there.</p>
-<?php if ($nginx) {
-                      echo $nginx;
-                  } ?>
+<?php
+if ($pageId == 'install' && !isset($_REQUEST['UpgradeToPaid']) && preg_match('/nginx/i', $runtime->serverSoftware)) {
+                      echo '<p>Make sure to add the following rules to your <a href="https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts" target="_blank">nginx.conf</a> server block. Restart the server to apply changes. Once done, come back here and continue the process.</p>
+<textarea class="pre" ondblclick="this.select()">#Chevereto: Disable access to sensitive files
+location ~* '.$runtime->relPath.'(app|content|lib)/.*\.(po|php|lock|sql)$ {
+deny all;
+}
+#Chevereto: CORS headers
+location ~* '.$runtime->relPath.'.*\.(ttf|ttc|otf|eot|woff|woff2|font.css|css|js) {
+add_header Access-Control-Allow-Origin "*";
+}
+#Chevereto: Upload path for image content only and set 404 replacement
+location ^~ '.$runtime->relPath.'images/ {
+location ~* (jpe?g|png|gif) {
+  log_not_found off;
+  error_page 404 '.$runtime->relPath.'content/images/system/default/404.gif;
+}
+return 403;
+}
+#Chevereto: Pretty URLs
+location '.$runtime->relPath.' {
+index index.php;
+try_files $uri $uri/ '.$runtime->relPath.'index.php?$query_string;
+}</textarea>';
+                  }
+?>
           <div>
             <button class="action radius" data-action="show" data-arg="license">Continue</button>
           </div>
