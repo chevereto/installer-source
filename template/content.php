@@ -133,7 +133,7 @@ try_files $uri $uri/ '.$runtime->relPath.'index.php?$query_string;
       </div>
     </div>
 
-    <div id="screen-database" class="screen animate animate--slow">
+    <div id="screen-db" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>Database</h1>
