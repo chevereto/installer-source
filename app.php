@@ -134,10 +134,10 @@ $runtime->run();
 $requirementsCheck = new RequirementsCheck($requirements, $runtime);
 
 if (isset($_REQUEST['action'])) {
-    // if ($requirementsCheck->missing) {
+    // if ($requirementsCheck->errors) {
     //     $Output = new Output();
     //     $missing = array();
-    //     foreach ($requirementsCheck->missing as $k => $v) {
+    //     foreach ($requirementsCheck->errors as $k => $v) {
     //         $missing[] = $v;
     //     }
     //     $Output->addData('missing', $missing);
@@ -148,15 +148,15 @@ if (isset($_REQUEST['action'])) {
     // $processAction = new processAction();
 }
 
-// $jsonResponse = new JsonResponse('Test', 200);
-// $jsonResponse->addData('Prop', 'PropVal');
-// $jsonResponse->send();
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if ($requirementsCheck->missing) {
+    if ($requirementsCheck->errors) {
+        $jsonResponse = new JsonResponse('Missing server requirements', 500);
+        $jsonResponse->addData('errors', $requirementsCheck->errors);
+        $jsonResponse->send();
     }
+    die();
 } else {
-    $pageId = $requirementsCheck->missing ? 'error' : 'install';
+    $pageId = $requirementsCheck->errors ? 'error' : 'install';
     $doctitle = APP_NAME;
     $css = file_get_contents('html/style.css');
     $scripts = file_get_contents('html/scripts.js');
