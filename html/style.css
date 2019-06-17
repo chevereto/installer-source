@@ -142,7 +142,7 @@ ul>li {
   padding-right: 2em;
 }
 
-.alert--shake {
+.shake {
   animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
@@ -181,7 +181,6 @@ ul>li {
   transform: rotate(-45deg);
 }
 
-
 input,
 select,
 button {
@@ -190,11 +189,6 @@ button {
   border: 1px solid rgba(0, 0, 0, .2);
   background: #FFF;
   color: rgba(0, 0, 0, .8);
-}
-
-input:focus,
-select:focus {
-  background: rgba(255, 255, 255, .6);
 }
 
 input:focus,
@@ -236,6 +230,8 @@ button:active {
   box-shadow: inset 0 2px 5px rgba(0, 0, 0, .3);
 }
 
+
+
 button.action {
   text-shadow: 1px 1px 0 rgba(0, 0, 0, .05);
   color: #FFF;
@@ -248,15 +244,27 @@ button.action:focus {
   background: #2ecc71;
 }
 
-.input-label input {
+button[disabled],
+input[disabled] {
+  cursor: progress;
+}
+
+input {
   background: #FFF;
-  /* width: 100%; */
+}
+
+input[disabled] {
+  background: #ecf0f1;
 }
 
 .input-label label {
   font-size: 0.9em;
   display: block;
   font-weight: bold;
+}
+
+h1 {
+  line-height: 1em;
 }
 
 code {
@@ -279,67 +287,6 @@ code {
   -moz-tab-size: 4;
   -o-tab-size: 4;
   tab-size: 4;
-}
-
-#preloader {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  opacity: 0;
-}
-
-.body--slowload #preloader {
-  opacity: 1;
-  z-index: 1;
-}
-
-.body--splash #preloader {
-  display: none;
-}
-
-/* https://codepen.io/WebSonata/ */
-.spinner {
-  position: relative;
-  left: 50%;
-  top: 50%;
-  width: 80px;
-  height: 80px;
-  margin: -40px 0 0 -40px;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  border-top-color: rgba(0, 0, 0, .2);
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
-}
-
-.spinner:before {
-  content: "";
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  right: 5px;
-  bottom: 5px;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  border-top-color: rgba(0, 0, 0, .2);
-  -webkit-animation: spin 3s linear infinite;
-  animation: spin 3s linear infinite;
-}
-
-.spinner:after {
-  content: "";
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  right: 15px;
-  bottom: 15px;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  border-top-color: rgba(0, 0, 0, .2);
-  -webkit-animation: spin 1.5s linear infinite;
-  animation: spin 1.5s linear infinite;
 }
 
 @-webkit-keyframes spin {
@@ -370,19 +317,16 @@ code {
   }
 }
 
-.loader {
+.flex-box .loader {
   display: inline-block;
-  border: .15em solid #DDD;
+  border: .15em solid #ecf0f1;
   border-top: .15em solid #3498db;
   border-radius: 50%;
   width: 1em;
   height: 1em;
   animation: spin 2s linear infinite;
   z-index: 1;
-}
-
-.box--install .loader {
-  font-size: 30px;
+  font-size: 32px;
   position: absolute;
   top: 20px;
   right: 20px;
@@ -390,7 +334,7 @@ code {
   opacity: 0;
 }
 
-.body--working .box--install .loader {
+.flex-box .loader--show {
   opacity: 1;
 }
 

@@ -19,6 +19,8 @@ for (let i = 0; i < screenEls.length; i++) {
   };
 }
 
+console.log(screens);
+
 var installer = {
   init: function() {
     var self = this;
@@ -95,6 +97,15 @@ var installer = {
   getShownScreenEl: function(query) {
     return document.querySelector(".screen--show " + query);
   },
+  shakeEl: function(el) {
+    el.classList.remove("shake");
+    setTimeout(function() {
+      el.classList.add("shake");
+    }, 1);
+    setTimeout(function() {
+      el.classList.remove("shake");
+    }, 500);
+  },
   pushAlert: function(message) {
     console.error(message);
     var pushiInnerHTML =
@@ -102,10 +113,7 @@ var installer = {
     var el = this.getShownScreenEl(".alert");
     var html = el.innerHTML;
     if (pushiInnerHTML == html) {
-      el.classList.add("alert--shake");
-      setTimeout(function() {
-        el.classList.remove("alert--shake");
-      }, 500);
+      this.shakeEl(el);
     } else {
       el.innerHTML = pushiInnerHTML;
     }
@@ -172,6 +180,20 @@ var installer = {
     for (var key in params) {
       data.append(key, params[key]);
     }
+    var disableEls = document.querySelectorAll("button, input");
+    for (let disableEl of disableEls) {
+      disableEl.disabled = true;
+    }
+    var box = this.getShownScreenEl(".flex-box");
+    var loader = this.getShownScreenEl(".loader");
+    if (!loader) {
+      var loader = document.createElement("div");
+      loader.classList.add("loader", "animate");
+      box.insertBefore(loader, box.firstChild);
+    }
+    setTimeout(function() {
+      loader.classList.add("loader--show");
+    }, 1);
     return fetch(vars.installerFile, {
       method: "POST",
       body: data
@@ -181,17 +203,20 @@ var installer = {
         self.pushAlert(error);
       })
       .then(([response, json]) => {
+        loader.classList.remove("loader--show");
+        for (let disableEl of disableEls) {
+          disableEl.disabled = false;
+        }
         if (response.ok) {
-          callback(response, json);
+          callback.success(response, json);
         } else {
           self.pushAlert(json.response.message);
+          callback.error(response, json);
         }
       });
   },
-  checkLicense: function(key) {
-    this.fetch("licenseCheck", { license: key }, function() {
-      Data.key = key;
-    });
+  checkLicense: function(key, callback) {
+    return this.fetch("licenseCheck", { license: key }, callback);
   },
   popScreen: function(screen) {
     console.log("popScreen:" + screen);
@@ -209,24 +234,39 @@ var installer = {
         installer.history.push(screen);
       }
     },
+    checkLicense: function(id) {
+      var keyEl = document.getElementById(id);
+      var key = keyEl.value;
+      if (!key) {
+        keyEl.focus();
+        installer.shakeEl(keyEl);
+        return;
+      }
+      installer.checkLicense(key, {
+        success: function() {
+          installer.popAlert();
+          Data.key = key;
+          installer.actions.setEdition("chevereto");
+        },
+        error: function() {
+          Data.key = null;
+        }
+      });
+    },
     setEdition: function(edition) {
       console.log("setEdition");
       body.classList.remove("sel--chevereto", "sel--chevereto-free");
-      if ("chevereto" == edition) {
-        Data.key = document.getElementById("installKey").value;
-        installer.checkLicense(Data.key);
-      }
       body.classList.add("sel--" + edition);
       Data.software = edition;
-      // this.show("cpanel");
+      this.show("cpanel");
     },
     setUpgrade: function() {
-      console.log("setUpgrade");
-      body.classList.remove("sel--chevereto-free");
-      body.classList.add("sel--chevereto");
-      Data.key = document.getElementById("upgradeKey").value;
-      installer.checkLicense(Data.key);
-      this.show("complete-upgrade");
+      // console.log("setUpgrade");
+      // body.classList.remove("sel--chevereto-free");
+      // body.classList.add("sel--chevereto");
+      // Data.key = document.getElementById("upgradeKey").value;
+      // installer.checkLicense(Data.key);
+      // this.show("complete-upgrade");
     },
     cpanelProcess: function() {
       console.log("cpanelProcess");

@@ -37,7 +37,7 @@ class Controller
         if ($post->json->error) {
             throw new Exception($post->json->error->message, 403);
         }
-        $this->response = 'Valid license key';
+        $this->response = 200 == $this->code ? 'Valid license key' : 'Unable to check license';
     }
 
     public function downloadAction(array $parameters)
@@ -146,7 +146,7 @@ class Controller
         if (curl_errno($ch)) {
             $curl_error = curl_error($ch);
             curl_close($ch);
-            throw new Exception('Curl error '.$curl_error);
+            throw new Exception('Curl error '.$curl_error, 503);
         }
         curl_close($ch);
         $return = new stdClass();
@@ -164,6 +164,7 @@ class Controller
                 @unlink($meta_data['uri']);
             }
         }
+        $this->code = $transfer['http_code'];
         $return->transfer = $transfer;
 
         return $return;

@@ -158,7 +158,7 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
     } else {
         try {
             $controller = new Controller($_POST, $runtime);
-            $jsonResponse->setResponse($controller->response);
+            $jsonResponse->setResponse($controller->response, $controller->code);
             if ($controller->data) {
                 $jsonResponse->setData($controller->data);
             }
