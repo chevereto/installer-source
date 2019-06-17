@@ -102,7 +102,7 @@ include 'src/RequirementsCheck.php';
 include 'src/Runtime.php';
 include 'src/Cpanel.php';
 include 'src/JsonResponse.php';
-include 'src/processAction.php';
+include 'src/Controller.php';
 
 // $database = new Database('127.0.0.1', '3306', 'dbname', 'root', 'root');
 // $database->checkEmpty();
@@ -148,16 +148,22 @@ if (isset($_REQUEST['action'])) {
     // $processAction = new processAction();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ('POST' === $_SERVER['REQUEST_METHOD']) {
+    $jsonResponse = new JsonResponse();
     if ($requirementsCheck->errors) {
         $errorsPlain = array_map(function ($v) {
             return trim(strip_tags($v));
         }, $requirementsCheck->errors);
-        $jsonResponse = new JsonResponse('Missing server requirements', 500);
+        $jsonResponse->setResponse('Missing server requirements', 500);
         $jsonResponse->addData('errors', $errorsPlain);
-        $jsonResponse->send();
+    } else {
+        try {
+            $controller = new Controller($_POST);
+        } catch (Exception $e) {
+            $jsonResponse->setResponse($e->getMessage(), $e->getCode());
+        }
     }
-    die();
+    $jsonResponse->send();
 } else {
     $pageId = $requirementsCheck->errors ? 'error' : 'install';
     $doctitle = APP_NAME;
