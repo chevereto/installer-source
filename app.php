@@ -150,8 +150,11 @@ if (isset($_REQUEST['action'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($requirementsCheck->errors) {
+        $errorsPlain = array_map(function ($v) {
+            return trim(strip_tags($v));
+        }, $requirementsCheck->errors);
         $jsonResponse = new JsonResponse('Missing server requirements', 500);
-        $jsonResponse->addData('errors', $requirementsCheck->errors);
+        $jsonResponse->addData('errors', $errorsPlain);
         $jsonResponse->send();
     }
     die();
