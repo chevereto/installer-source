@@ -79,7 +79,7 @@ try_files $uri $uri/ '.$runtime->relPath.'index.php?$query_string;
             <div><small>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</small></div>
           </div>
           <div>
-            <button class="action radius" data-action="checkLicense" data-arg="installKey">Enter license key</button>
+            <button class="action radius" data-action="setLicense" data-arg="installKey">Enter license key</button>
             <button class=" radius" data-action="setEdition" data-arg="chevereto-free">Skip – Use Chevereto-Free</button>
           </div>
         </div>
@@ -99,7 +99,7 @@ try_files $uri $uri/ '.$runtime->relPath.'index.php?$query_string;
             <input class="radius width-100p" type="text" name="upgradeKey" id="upgradeKey" placeholder="Paste your license key here">
           </div>
           <div>
-            <button class="action radius" data-action="checkLicense" data-arg="upgradeKey">Enter license key</button>
+            <button class="action radius" data-action="setLicense" data-arg="upgradeKey">Enter license key</button>
           </div>
         </div>
       </div>
@@ -160,7 +160,7 @@ try_files $uri $uri/ '.$runtime->relPath.'index.php?$query_string;
             </div>
             <div class="p input-label">
               <label for="dbUserPassword">User password</label>
-              <input class="radius width-100p" type="text" name="dbUserPassword" id="dbUserPassword" placeholder="password" required>
+              <input class="radius width-100p" type="password" name="dbUserPassword" id="dbUserPassword" placeholder="password" required>
             </div>
             <div>
               <button class="action radius">Set database</button>

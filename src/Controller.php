@@ -3,7 +3,7 @@
 class Controller
 {
     /** @var array */
-    public $parameters;
+    public $params;
 
     /** @var string */
     public $response;
@@ -14,25 +14,25 @@ class Controller
     /** @var Runtime */
     public $runtime;
 
-    public function __construct(array $parameters, Runtime $runtime)
+    public function __construct(array $params, Runtime $runtime)
     {
         $this->runtime = $runtime;
-        if (!$parameters['action']) {
+        if (!$params['action']) {
             throw new Exception('Missing `action` parameter', 400);
         }
-        $this->parameters = $parameters;
-        $method = $parameters['action'].'Action';
+        $this->params = $params;
+        $method = $params['action'].'Action';
         if (!method_exists($this, $method)) {
-            throw new Exception('Invalid action `'.$parameters['action'].'`', 400);
+            throw new Exception('Invalid action `'.$params['action'].'`', 400);
         }
-        $action = $this->{$method}($this->parameters);
+        $action = $this->{$method}($this->params);
     }
 
-    public function licenseCheckAction(array $parameters)
+    public function licenseCheckAction(array $params)
     {
         $post = $this->curl('https://chevereto.com/api/license/check', [
             CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => http_build_query(['license' => $parameters['license']]),
+            CURLOPT_POSTFIELDS => http_build_query(['license' => $params['license']]),
         ]);
         if ($post->json->error) {
             throw new Exception($post->json->error->message, 403);
@@ -40,14 +40,29 @@ class Controller
         $this->response = 200 == $this->code ? 'Valid license key' : 'Unable to check license';
     }
 
-    public function downloadAction(array $parameters)
+    public function dabataseCheckAction(array $params)
+    {
+        try {
+            $database = new Database(
+                $params['host'], $params['port'], $params['name'], $params['user'], $params['userPassword']
+            );
+            $database->checkEmpty();
+            $database->checkPrivileges();
+            $this->code = 200;
+            $this->response = 'Database OK';
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), 503);
+        }
+    }
+
+    public function downloadAction(array $params)
     {
         $fileBasename = 'chevereto-pkg-'.substr(bin2hex(random_bytes(8)), 0, 8).'.zip';
         $filePath = $this->runtime->absPath.$fileBasename;
         if (file_exists($downloadPath)) {
             @unlink($downloadPath);
         }
-        $post = $this->downloadFile('https://chevereto.com/api/download/latest', $parameters, $filePath);
+        $post = $this->downloadFile('https://chevereto.com/api/download/latest', $params, $filePath);
         if ($post->json->error) {
             throw new Exception($post->json->error->message, $post->json->status_code);
         }
@@ -60,7 +75,7 @@ class Controller
         $this->data['filepath'] = $filePath;
     }
 
-    public function extractAction(array $parameters)
+    public function extractAction(array $params)
     {
         // $file_path = __ROOT_PATH__.$_REQUEST['fileBasename'];
         // if (!is_readable($file_path)) {
@@ -103,7 +118,7 @@ class Controller
         // }
     }
 
-    public function downloadFile(string $url, array $parameters = [], string $filePath)
+    public function downloadFile(string $url, array $params = [], string $filePath)
     {
         $fp = @fopen($filePath, 'wb+');
         if (!$fp) {
@@ -112,7 +127,7 @@ class Controller
         $post = $this->curl($url, [
             CURLOPT_POST => true,
             CURLOPT_FILE => $fp,
-            CURLOPT_POSTFIELDS => http_build_query($parameters),
+            CURLOPT_POSTFIELDS => http_build_query($params),
         ]);
         fclose($fp);
 

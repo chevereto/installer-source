@@ -24,7 +24,7 @@ console.log(screens);
 var installer = {
   init: function() {
     var self = this;
-    var defaultScreen = UpgradeToPaid ? "upgrade" : "license";
+    var defaultScreen = UpgradeToPaid ? "upgrade" : "db";
     this.popScreen(defaultScreen);
     this.history.replace(defaultScreen);
     if (page != "error") {
@@ -71,14 +71,15 @@ var installer = {
           form.appendChild(tmpSubmit);
           tmpSubmit.click();
           form.removeChild(tmpSubmit);
-          // console.log("Form invalid");
           return;
         } else {
+          console.log("Form re-submit action:", form.dataset.trigger);
           installer.actions[form.dataset.trigger](form.dataset.arg);
-          console.log("Form re-submit");
         }
       }
-      self.popScreen(state.view);
+      if (isBack) {
+        self.popScreen(state.view);
+      }
     };
     var forms = document.querySelectorAll("form");
     for (let i = 0; i < forms.length; i++) {
@@ -93,6 +94,9 @@ var installer = {
         false
       );
     }
+  },
+  getCurrentScreen: function() {
+    return this.getShownScreenEl("").id.replace("screen-", "");
   },
   getShownScreenEl: function(query) {
     return document.querySelector(".screen--show " + query);
@@ -121,25 +125,25 @@ var installer = {
   popAlert: function() {
     this.getShownScreenEl(".alert").innerHTML = "";
   },
-  writeFormData: function(dataKey, inputEls) {
-    console.log("WRITE:" + dataKey);
-    if (typeof inputEls == typeof undefined) {
-      var form = installer.getShownScreenEl("form");
-      if (form) {
-        var inputEls = form.getElementsByTagName("input");
-      } else {
-        Data[dataKey] = {};
-        console.log("Data wipe:" + dataKey);
-        return;
-      }
+  getFormData: function() {
+    var form = installer.getShownScreenEl("form");
+    if (!form) {
+      return;
     }
-    Data[dataKey] = {};
-    for (let i = 0; i < inputEls.length; i++) {
-      var id = inputEls[i].id.replace(dataKey, "");
+    console.log("GET active form data", form);
+    var screen = this.getCurrentScreen();
+    var inputEls = form.getElementsByTagName("input");
+    var data = {};
+    for (let inputEl of inputEls) {
+      var id = inputEl.id.replace(screen, "");
       var key = id.charAt(0).toLowerCase() + id.slice(1);
-      Data[dataKey][key] = inputEls[i].value;
+      data[key] = inputEl.value;
     }
-    console.log("Data write:" + dataKey, Data[dataKey]);
+    return data;
+  },
+  writeFormData: function(screen, data) {
+    console.log("Data write:" + screen, Data[screen]);
+    Data[screen] = this.getFormData();
   },
   bindActions: function() {
     var self = this;
@@ -208,6 +212,7 @@ var installer = {
           disableEl.disabled = false;
         }
         if (response.ok) {
+          installer.popAlert();
           callback.success(response, json);
         } else {
           self.pushAlert(json.response.message);
@@ -218,6 +223,9 @@ var installer = {
   checkLicense: function(key, callback) {
     return this.fetch("licenseCheck", { license: key }, callback);
   },
+  checkDatabase: function(params, callback) {
+    return this.fetch("dabataseCheck", params, callback);
+  },
   popScreen: function(screen) {
     console.log("popScreen:" + screen);
     document.title = screens[screen].title;
@@ -227,6 +235,7 @@ var installer = {
     });
     document.querySelector("#screen-" + screen).classList.add("screen--show");
   },
+  // Actions wired into HTML
   actions: {
     show: function(screen) {
       installer.popScreen(screen);
@@ -234,7 +243,7 @@ var installer = {
         installer.history.push(screen);
       }
     },
-    checkLicense: function(id) {
+    setLicense: function(id) {
       var keyEl = document.getElementById(id);
       var key = keyEl.value;
       if (!key) {
@@ -244,7 +253,6 @@ var installer = {
       }
       installer.checkLicense(key, {
         success: function() {
-          installer.popAlert();
           Data.key = key;
           installer.actions.setEdition("chevereto");
         },
@@ -269,13 +277,33 @@ var installer = {
       // this.show("complete-upgrade");
     },
     cpanelProcess: function() {
+      var els = {
+        user: document.getElementById("cpanelUser"),
+        password: document.getElementById("cpanelPassword")
+      };
+      for (let key in els) {
+        let el = els[key];
+        if (!el.value) {
+          el.focus();
+          installer.shakeEl(el);
+          return;
+        }
+      }
       console.log("cpanelProcess");
       this.show("db");
     },
     setDb: function() {
       console.log("setDb");
-      installer.writeFormData("db");
-      this.show("admin");
+      var params = installer.getFormData();
+      installer.checkDatabase(params, {
+        success: function(response, json) {
+          installer.writeFormData("db", params);
+          installer.actions.show("admin");
+        },
+        error: function(response, json) {
+          console.error("error", response, json);
+        }
+      });
     },
     setAdmin: function() {
       console.log("setAdmin");

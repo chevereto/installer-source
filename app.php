@@ -101,12 +101,8 @@ include 'src/RequirementsCheck.php';
 include 'src/Runtime.php';
 include 'src/Cpanel.php';
 include 'src/JsonResponse.php';
+include 'src/Database.php';
 include 'src/Controller.php';
-
-// $database = new Database('127.0.0.1', '3306', 'dbname', 'root', 'root');
-// $database->checkEmpty();
-// $database->checkPrivileges();
-// var_dump($database);
 
 // $cpanel = new Cpanel('chevereto', ']2YdOVytq@7A');
 // $createDb = $cpanel->setupMysql();
