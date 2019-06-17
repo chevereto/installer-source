@@ -135,7 +135,6 @@ class Controller
         curl_setopt($ch, CURLOPT_FAILONERROR, 0);
         curl_setopt($ch, CURLOPT_VERBOSE, 0);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Chevereto Installer');
-
         foreach ($curlOpts as $k => $v) {
             if (CURLOPT_FILE == $k) {
                 $fp = $v;
@@ -151,18 +150,20 @@ class Controller
         }
         curl_close($ch);
         $return = new stdClass();
-        if (strpos($transfer['content_type'], 'application/json') !== false) {
-            if (true === $file_get_contents) {
-                rewind($fp);
-                $return->raw = stream_get_contents($fp);
+        if (is_resource($fp)) {
+            rewind($fp);
+            $return->raw = stream_get_contents($fp);
+        // $return->raw = $this->getBytesToMb($transfer['size_download']) < 0.5 ? $return->raw : '<data too big>';
+        } else {
+            $return->raw = $file_get_contents;
+        }
+        if (false !== strpos($transfer['content_type'], 'application/json')) {
+            $return->json = json_decode($return->raw);
+            if (is_resource($fp)) {
                 $meta_data = stream_get_meta_data($fp);
                 @unlink($meta_data['uri']);
             }
-            $return->json = json_decode($return->raw);
-        } else {
-            $return->raw = $this->getBytesToMb($transfer['size_download']) < 0.5 ? $file_get_contents : '<data too big>';
         }
-
         $return->transfer = $transfer;
 
         return $return;
