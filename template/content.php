@@ -7,9 +7,9 @@
           <p>Please check:</p>
           <ul>
 <?php
-                  foreach ($requirementsCheck->missing as $k => $v) {
+                  foreach ($requirementsCheck->errors as $v) {
                       ?>
-              <li><?php echo $v['message']; ?></li>
+              <li><?php echo $v; ?></li>
 <?php
                   } ?>
           </ul>

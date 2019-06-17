@@ -8,10 +8,10 @@ class RequirementsCheck
     /** @var Runtime */
     public $runtime;
 
-    /** @var array Missing table used for output [k => ['components' => %, 'message']] */
-    public $missing;
+    /** @var array Error messages */
+    public $errors;
 
-    /** @var array Missing index used for internal awareness */
+    /** @var array Missed compontents array used for internal awareness */
     public $missed;
 
     /** @var array Maps PHP extension name to its documentation identifier */
@@ -40,7 +40,7 @@ class RequirementsCheck
 
     public function __construct(Requirements $requirements, Runtime $runtime)
     {
-        $this->missing = array();
+        $this->errors = array();
         $this->checkPHPVersion($requirements->phpVersions);
         $this->checkPHPProfile($requirements->phpExtensions, $requirements->phpClasses);
         $this->checkTimezone();
@@ -256,13 +256,11 @@ class RequirementsCheck
         $placeholders = array();
         foreach ($components as $k => $v) {
             $this->missed[] = $v;
-            $placeholders['%l'.$k] = '<a href="'.$urls[$k].'" target="_blank">'.$components[$k].'</a>';
+            $placeholders['%c'.$k] = $v;
+            $placeholders['%l'.$k] = '<a href="'.$urls[$k].'" target="_blank">'.$v.'</a>';
         }
         $message = strtr($msgtpl, $placeholders);
-        $this->missing[] = [
-            'components' => $components,
-            'message' => $message,
-        ];
+        $this->errors[] = $message;
     }
 
     /**
