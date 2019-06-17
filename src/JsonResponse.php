@@ -3,95 +3,96 @@
 class JsonResponse
 {
     /** var array [code => , description =>,]*/
-    public $status;
+    protected $status;
 
     /** var array [code => , message =>,]*/
     public $response;
 
-    public function __construct(string $message, $code = null)
+    const HTTP_CODES = [
+        100 => 'Continue',
+        101 => 'Switching Protocols',
+        102 => 'Processing',
+        200 => 'OK',
+        201 => 'Created',
+        202 => 'Accepted',
+        203 => 'Non-Authoritative Information',
+        204 => 'No Content',
+        205 => 'Reset Content',
+        206 => 'Partial Content',
+        207 => 'Multi-Status',
+        226 => 'IM Used',
+        300 => 'Multiple Choices',
+        301 => 'Moved Permanently',
+        302 => 'Found',
+        303 => 'See Other',
+        304 => 'Not Modified',
+        305 => 'Use Proxy',
+        306 => 'Reserved',
+        307 => 'Temporary Redirect',
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        402 => 'Payment Required',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        405 => 'Method Not Allowed',
+        406 => 'Not Acceptable',
+        407 => 'Proxy Authentication Required',
+        408 => 'Request Timeout',
+        409 => 'Conflict',
+        410 => 'Gone',
+        411 => 'Length Required',
+        412 => 'Precondition Failed',
+        413 => 'Request Entity Too Large',
+        414 => 'Request-URI Too Long',
+        415 => 'Unsupported Media Type',
+        416 => 'Requested Range Not Satisfiable',
+        417 => 'Expectation Failed',
+        422 => 'Unprocessable Entity',
+        423 => 'Locked',
+        424 => 'Failed Dependency',
+        426 => 'Upgrade Required',
+        500 => 'Internal Server Error',
+        501 => 'Not Implemented',
+        502 => 'Bad Gateway',
+        503 => 'Service Unavailable',
+        504 => 'Gateway Timeout',
+        505 => 'HTTP Version Not Supported',
+        506 => 'Variant Also Negotiates',
+        507 => 'Insufficient Storage',
+        510 => 'Not Extended',
+    ];
+
+    public function __construct(string $responseMessage, $httpCode = null)
     {
-        $this->setResponse($message, $code);
+        $this->setResponse($responseMessage, $httpCode);
     }
 
-    public function setResponse(string $message, $code = null)
+    public function setResponse(string $message, $httpCode = null)
     {
         $this->response = array(
-            'code' => $code,
+            'code' => $httpCode,
             'message' => $message,
         );
     }
 
-    public function setStatus($code)
+    public function setStatus($httpCode)
     {
         $this->status = array(
-            'code' => $code,
-            'description' => $this->getHttpStatusDesc($code),
+            'code' => $httpCode,
+            'description' => $this->getHttpStatusDesc($httpCode),
         );
     }
 
-    public function getHttpStatusDesc($code)
+    public function getHttpStatusDesc($httpCode)
     {
-        $codes_to_desc = array(
-            100 => 'Continue',
-            101 => 'Switching Protocols',
-            102 => 'Processing',
-            200 => 'OK',
-            201 => 'Created',
-            202 => 'Accepted',
-            203 => 'Non-Authoritative Information',
-            204 => 'No Content',
-            205 => 'Reset Content',
-            206 => 'Partial Content',
-            207 => 'Multi-Status',
-            226 => 'IM Used',
-            300 => 'Multiple Choices',
-            301 => 'Moved Permanently',
-            302 => 'Found',
-            303 => 'See Other',
-            304 => 'Not Modified',
-            305 => 'Use Proxy',
-            306 => 'Reserved',
-            307 => 'Temporary Redirect',
-            400 => 'Bad Request',
-            401 => 'Unauthorized',
-            402 => 'Payment Required',
-            403 => 'Forbidden',
-            404 => 'Not Found',
-            405 => 'Method Not Allowed',
-            406 => 'Not Acceptable',
-            407 => 'Proxy Authentication Required',
-            408 => 'Request Timeout',
-            409 => 'Conflict',
-            410 => 'Gone',
-            411 => 'Length Required',
-            412 => 'Precondition Failed',
-            413 => 'Request Entity Too Large',
-            414 => 'Request-URI Too Long',
-            415 => 'Unsupported Media Type',
-            416 => 'Requested Range Not Satisfiable',
-            417 => 'Expectation Failed',
-            422 => 'Unprocessable Entity',
-            423 => 'Locked',
-            424 => 'Failed Dependency',
-            426 => 'Upgrade Required',
-            500 => 'Internal Server Error',
-            501 => 'Not Implemented',
-            502 => 'Bad Gateway',
-            503 => 'Service Unavailable',
-            504 => 'Gateway Timeout',
-            505 => 'HTTP Version Not Supported',
-            506 => 'Variant Also Negotiates',
-            507 => 'Insufficient Storage',
-            510 => 'Not Extended',
-        );
-        if (array_key_exists($code, $codes_to_desc)) {
-            return $codes_to_desc[$code];
+        if (array_key_exists($httpCode, static::HTTP_CODES)) {
+            return static::HTTP_CODES[$httpCode];
         }
     }
 
-    public function setStatusCode($code)
+    public function setStatusCode($httpCode)
     {
-        http_response_code($code);
+        http_response_code($httpCode);
     }
 
     public function addData($key, $var = null)
@@ -115,9 +116,12 @@ class JsonResponse
         if (!isset($this->data) && !isset($this->response)) {
             $this->setStatus(400);
         } else {
-            if (!isset($this->status['code'])) {
-                $this->setStatus(200);
+            if (!isset($this->status['code']) && $this->getHttpStatusDesc($this->response['code'])) {
+                $code = $this->response['code'];
+            } else {
+                $code = 200;
             }
+            $this->setStatus($code);
         }
         if (!isset($this->response)) {
             $this->setResponse($this->status['description'], $this->status['code']);
