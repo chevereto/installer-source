@@ -18,12 +18,11 @@ for (let i = 0; i < screenEls.length; i++) {
     title: el.querySelector("h1").innerText
   };
 }
-console.log(screens);
 
 var installer = {
   init: function() {
     var self = this;
-    var defaultScreen = UpgradeToPaid ? "upgrade" : "db";
+    var defaultScreen = UpgradeToPaid ? "upgrade" : "license";
     this.popScreen(defaultScreen);
     this.history.replace(defaultScreen);
     if (page != "error") {
@@ -97,6 +96,7 @@ var installer = {
     return document.querySelector(".screen--show " + query);
   },
   pushAlert: function(message) {
+    console.error(message);
     var pushiInnerHTML =
       "<span>" + message + '</span><a class="alert-close"></a>';
     var el = this.getShownScreenEl(".alert");
@@ -165,9 +165,33 @@ var installer = {
       console.log("history.writter:", fn, data);
     }
   },
+  fetch: function(action, params, callback) {
+    var self = this;
+    var data = new FormData();
+    data.append("action", action);
+    for (var key in params) {
+      data.append(key, params[key]);
+    }
+    return fetch(vars.installerFile, {
+      method: "POST",
+      body: data
+    })
+      .then(response => Promise.all([response, response.json()]))
+      .catch(error => {
+        self.pushAlert(error);
+      })
+      .then(([response, json]) => {
+        if (response.ok) {
+          callback(response, json);
+        } else {
+          self.pushAlert(json.response.message);
+        }
+      });
+  },
   checkLicense: function(key) {
-    console.log("CHECK THE LICENSE! " + key);
-    this.pushAlert("Invalid license key.");
+    this.fetch("licenseCheck", { license: key }, function() {
+      Data.key = key;
+    });
   },
   popScreen: function(screen) {
     console.log("popScreen:" + screen);
@@ -190,11 +214,11 @@ var installer = {
       body.classList.remove("sel--chevereto", "sel--chevereto-free");
       if ("chevereto" == edition) {
         Data.key = document.getElementById("installKey").value;
-        // installer.checkLicense(Data.key);
+        installer.checkLicense(Data.key);
       }
       body.classList.add("sel--" + edition);
       Data.software = edition;
-      this.show("cpanel");
+      // this.show("cpanel");
     },
     setUpgrade: function() {
       console.log("setUpgrade");
