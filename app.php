@@ -93,8 +93,7 @@ $shortcutIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAMAAABOo
 
 const INSTALLER_FILEPATH = __FILE__;
 
-include 'src/dump.php';
-include 'src/password.php';
+include 'src/functions.php';
 include 'src/Installer.php';
 include 'src/Logger.php';
 include 'src/Requirements.php';
@@ -158,7 +157,9 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
         $jsonResponse->addData('errors', $errorsPlain);
     } else {
         try {
-            $controller = new Controller($_POST);
+            $controller = new Controller($_POST, $runtime);
+            $jsonResponse->setResponse($controller->response);
+            $jsonResponse->setData($controller->data);
         } catch (Exception $e) {
             $jsonResponse->setResponse($e->getMessage(), $e->getCode());
         }

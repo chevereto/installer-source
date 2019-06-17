@@ -62,11 +62,8 @@ class JsonResponse
         510 => 'Not Extended',
     ];
 
-    public function setResponse(string $message, $httpCode = null)
+    public function setResponse(string $message, $httpCode = 200)
     {
-        if (!isset(static::HTTP_CODES[$httpCode])) {
-            throw new Exception('Unknown HTTP code '.$httpCode);
-        }
         $this->response = array(
             'code' => $httpCode,
             'message' => $message,
@@ -91,6 +88,11 @@ class JsonResponse
     public function setStatusCode($httpCode)
     {
         http_response_code($httpCode);
+    }
+
+    public function setData(array $data)
+    {
+        $this->data = $data;
     }
 
     public function addData($key, $var = null)
