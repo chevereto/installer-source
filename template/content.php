@@ -262,8 +262,8 @@ db_user_passwd: &8300f(**&39)
            
           <p>Hope you enjoy using Chevereto as much we care in creating it. Help us by providing us feedback and recommend our software.</pp>
           <div>
-            <button class="action radius" data-action="goTo" data-arg="dashboard">Open dashboard</button>
-            <button class="radius" data-action="goTo" data-arg="homepage">Open homepage</button>
+            <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>dashboard" target="_blank">Open dashboard</a>
+            <a class="button radius" href="<?php echo $runtime->rootUrl; ?>" target="_blank">Open homepage</a>
           </div>
         </div>
       </div>

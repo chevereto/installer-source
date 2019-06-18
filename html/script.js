@@ -4,7 +4,6 @@ var onLeaveMessage =
 // var title = document.title;
 var html = document.documentElement;
 var page = html.getAttribute("id");
-var body = document.getElementsByTagName("body")[0];
 var wrapper = document.querySelector(".wrapper");
 var screenEls = document.querySelectorAll(".screen");
 var screens = {};
@@ -44,7 +43,7 @@ var installer = {
   data: {},
   isUpgradeToPaid: locationHasParameter("UpgradeToPaid"),
   process: "install",
-  defaultScreen: "ready",
+  defaultScreen: "cpanel",
   init: function() {
     if (this.isUpgradeToPaid) {
       this.process = "upgrade";
@@ -65,29 +64,18 @@ var installer = {
       },
       false
     );
-    window.onbeforeunload = function(e) {
-      if (!body.classList.contains("body--working")) {
-        return;
-      }
-      e.returnValue = onLeaveMessage;
-      return onLeaveMessage;
-    };
+    // window.onbeforeunload = function(e) {
+    //   if (!installer.isInstalling()) {
+    //     return;
+    //   }
+    //   e.returnValue = onLeaveMessage;
+    //   return onLeaveMessage;
+    // };
     window.onpopstate = function(e) {
       var isBack = installer.uid > e.state.uid;
       var isForward = !isBack;
       installer.uid = e.state.uid;
-      console.log("onpopstate", {
-        direction: isBack ? "back" : "forward",
-        uid: installer.uid,
-        pushState: e.state
-      });
-      if (body.classList.contains("body--working")) {
-        if (confirm(onLeaveMessage)) {
-          installer.XHR.abort();
-        } else {
-          return;
-        }
-      }
+
       var state = e.state;
       var form = installer.getShownScreenEl("form");
       if (isForward && form) {
@@ -202,6 +190,7 @@ var installer = {
           history.replaceState(data, data.view);
           break;
       }
+      document.title = screens[data.view].title; // Otherwise the titles at the browser bar could fail
       console.log("history.writter:", fn, data);
     }
   },
@@ -232,7 +221,7 @@ var installer = {
     setTimeout(function() {
       loader.classList.add("loader--show");
     }, 1);
-    return fetch(vars.installerFile, {
+    return fetch(runtime.installerFilename, {
       method: "POST",
       body: data
     })
@@ -259,7 +248,6 @@ var installer = {
   },
   popScreen: function(screen) {
     console.log("popScreen:" + screen);
-    document.title = screens[screen].title;
     var shownScreens = document.querySelectorAll(".screen--show");
     shownScreens.forEach(a => {
       a.classList.remove("screen--show");
@@ -267,16 +255,56 @@ var installer = {
     document.querySelector("#screen-" + screen).classList.add("screen--show");
   },
   checkLicense: function(key, callback) {
-    return this.fetch("licenseCheck", { license: key }, callback);
+    return this.fetch("checkLicense", { license: key }, callback);
   },
-  checkDatabase: function(params, callback) {
-    return this.fetch("dabataseCheck", params, callback);
-  },
-  download: function(params, callback) {
-    return this.fetch("download", params, callback);
-  },
-  extract: function(filePath, callback) {
-    return this.fetch("extract", { filePath: filePath }, callback);
+  callbacks: {
+    error: function() {
+      installer.abortInstall();
+    },
+    always: function(response, json) {
+      installer.log(json.response.message);
+    },
+    downloaded: function(response, json) {
+      installer.log("Extracting `" + json.data.fileBasename + "`");
+      installer.fetch(
+        "extract",
+        {
+          software: installer.data.software,
+          filePath: json.data.filePath,
+          workingPath: runtime.absPath + "test/"
+        },
+        {
+          always: installer.callbacks.always,
+          error: installer.callbacks.error,
+          success: installer.callbacks.extracted
+        }
+      );
+    },
+    extracted: function(response, json) {
+      installer.log(
+        "Removing installer file at `" + runtime.installerFilepath + "`"
+      );
+      installer.fetch("selfDestruct", null, {
+        always: installer.callbacks.always,
+        error: function(response, json) {
+          var todo =
+            "Remove the installer file at `" +
+            runtime.installerFilepath +
+            "` and open " +
+            runtime.rootUrl +
+            " to continue the process.";
+          installer.pushAlert(todo);
+          installer.abortInstall(false);
+        },
+        success: function(response, json) {
+          // installer.setBodyInstalling(false);
+          // installer.log("Process completed");
+          // setTimeout(function() {
+          //   installer.actions.show("complete");
+          // }, 1000);
+        }
+      });
+    }
   },
   actions: {
     show: function(screen) {
@@ -304,21 +332,21 @@ var installer = {
       });
     },
     setEdition: function(edition) {
-      console.log("setEdition");
-      body.classList.remove("sel--chevereto", "sel--chevereto-free");
-      body.classList.add("sel--" + edition);
+      document.body.classList.remove("sel--chevereto", "sel--chevereto-free");
+      document.body.classList.add("sel--" + edition);
       installer.data.software = edition;
       this.show("cpanel");
     },
     setUpgrade: function() {
       // console.log("setUpgrade");
-      // body.classList.remove("sel--chevereto-free");
-      // body.classList.add("sel--chevereto");
+      // document.body.classList.remove("sel--chevereto-free");
+      // document.body.classList.add("sel--chevereto");
       // installer.data.license = document.getElementById("upgradeKey").value;
       // installer.checkLicense(installer.data.license);
       // this.show("complete-upgrade");
     },
     cpanelProcess: function() {
+      console.log("cpanelProcess");
       var els = {
         user: document.getElementById("cpanelUser"),
         password: document.getElementById("cpanelPassword")
@@ -331,13 +359,11 @@ var installer = {
           return;
         }
       }
-      console.log("cpanelProcess");
       this.show("db");
     },
     setDb: function() {
-      console.log("setDb");
       var params = installer.getFormData();
-      installer.checkDatabase(params, {
+      installer.fetch("checkDatabase", params, {
         success: function(response, json) {
           installer.writeFormData("db", params);
           installer.actions.show("admin");
@@ -348,12 +374,10 @@ var installer = {
       });
     },
     setAdmin: function() {
-      console.log("setAdmin");
       installer.writeFormData("admin");
       this.show("emails");
     },
     setEmails: function() {
-      console.log("setEmails");
       installer.writeFormData("email");
       this.show("ready");
     },
@@ -363,84 +387,34 @@ var installer = {
     install: function() {
       installer.setBodyInstalling(true);
       installer.data.software = "chevereto-free";
-      console.log("install");
       this.show("installing");
-
-      installer.log(vars.serverStr);
-
+      installer.log(runtime.serverString);
       installer.log(
-        "Trying to download latest `" + installer.data.software + "` release"
+        "Downloading latest `" + installer.data.software + "` release"
       );
-
-      var callback = {
-        always: function(response, json) {
-          installer.log(json.response.message);
-        },
-        error: function() {
-          installer.abortInstall();
-        }
-      };
-
-      // Yo dawg! Again I put a promise on top of a promise so you can promise while you promise!
-      installer.download(
+      installer.fetch(
+        "download",
         {
           software: installer.data.software,
           license: installer.data.license
         },
         {
-          always: callback.always,
-          error: callback.error,
-          success: function(response, json) {
-            installer.log("Trying to extract `" + json.data.fileBasename + "`");
-            installer.extract(
-              { filePath: json.data.filePath },
-              {
-                always: callback.always,
-                error: callback.error,
-                success: function(response, json) {
-                  console.log("EXTRACTION OJ SIMPSON");
-                }
-              }
-            );
-          }
+          always: installer.callbacks.always,
+          error: installer.callbacks.error,
+          success: installer.callbacks.downloaded
         }
       );
-
-      // installer.request("download", downloadParams).then(
-      //   function(response) {
-      //     installer
-      //       .request("extract", {
-      //         fileBasename: response.data.download.fileBasename
-      //       })
-      //       .then(
-      //         function(response) {
-      //           var s = 3;
-      //           var to = isUpgradeToPaid ? "install" : "setup";
-      //           installer.log("Redirecting to " + to + " form in " + s + "s");
-      //           setTimeout(function() {
-      //             installer.log("Redirecting now!");
-      //             installer.setBodyInstalling(false);
-      //             var redirectUrl = rootUrl;
-      //             if (isUpgradeToPaid) {
-      //               redirectUrl += "install";
-      //             }
-      //             window.location.replace(redirectUrl);
-      //           }, 1000 * s);
-      //         },
-      //       );
-      //   },
-      // );
     }
   },
-  /**
-   * @param {string} message
-   */
-  abortInstall: function(message) {
-    this.log(message ? message : "Installation aborted");
-    this.setBodyInstalling(false);
-  },
   setBodyInstalling: function(bool) {
-    body.classList[bool ? "add" : "remove"]("body--installing");
+    document.body.classList[bool ? "add" : "remove"]("body--installing");
+  },
+  isInstalling: function() {
+    return document.body.classList.contains("body--installing");
+  },
+  abortInstall: function(message) {
+    this.log(message ? message : "Process aborted");
+    this.setBodyInstalling(false);
   },
   log: function(message) {
     var date = new Date();

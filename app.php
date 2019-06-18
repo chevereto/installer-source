@@ -95,6 +95,7 @@ const INSTALLER_FILEPATH = __FILE__;
 
 include 'src/functions.php';
 include 'src/Installer.php';
+include 'src/ZipArchiveExt.php';
 include 'src/Logger.php';
 include 'src/Requirements.php';
 include 'src/RequirementsCheck.php';
@@ -158,11 +159,7 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
     $script = file_get_contents('html/script.js');
     $svgLogo = file_get_contents('html/logo.svg');
     $svgCpanelLogo = file_get_contents('html/cPanel_white.svg');
-    $jsVars = [
-        'rootUrl' => $runtime->rootUrl,
-        'installerFile' => $runtime->installerFilename,
-        'serverStr' => $runtime->serverString,
-    ];
+    $jsVars = $runtime;
     ob_start();
     require 'template/content.php';
     $content = ob_get_clean();
@@ -179,7 +176,7 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
   <title><?php echo $doctitle; ?></title>
   <link rel="shortcut icon" type="image/png" href="<?php echo $shortcutIcon; ?>">
   <style><?php echo $css; ?></style>
-  <script>vars = <?php echo json_encode($jsVars); ?></script>
+  <script>const runtime = <?php echo json_encode($jsVars); ?></script>
 </head>
 <body class="body--flex">
   <main>

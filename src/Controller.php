@@ -28,7 +28,7 @@ class Controller
         $action = $this->{$method}($this->params);
     }
 
-    public function licenseCheckAction(array $params)
+    public function checkLicenseAction(array $params)
     {
         $post = $this->curl('https://chevereto.com/api/license/check', [
             CURLOPT_POST => true,
@@ -40,7 +40,7 @@ class Controller
         $this->response = 200 == $this->code ? 'Valid license key' : 'Unable to check license';
     }
 
-    public function dabataseCheckAction(array $params)
+    public function checkDatabaseAction(array $params)
     {
         try {
             $database = new Database(
@@ -95,45 +95,68 @@ class Controller
     {
         $this->code = 400;
         $this->response = 'Pal paico';
-        // $file_path = __ROOT_PATH__.$_REQUEST['fileBasename'];
-        // if (!is_readable($file_path)) {
-        //     throw new Exception(sprintf("Can't read %s", $_REQUEST['fileBasename']), 5002);
-        // }
-        // // Unzip .zip
-        // $ZipArchive = new ZipArchiveExt();
-        // $time_start = microtime(true);
-        // $open = $ZipArchive->open($file_path);
-        // if ($open === true) {
-        //     $num_files = $ZipArchive->numFiles - 1; // because of tl folder
-        //     $folder = $edition->folder;
-        //     if ($_REQUEST['edition'] == 'free') {
-        //         $comment = $ZipArchive->getArchiveComment();
-        //         $folder .= substr($comment, 0, 7);
-        //     }
-        //     $ZipArchive->extractSubdirTo(__ROOT_PATH__, $folder);
-        //     $ZipArchive->close();
-        //     $time_taken = round(microtime(true) - $time_start, 2);
-        //     @unlink($file_path);
-        //     // Also remove some free edition docs
-        //     if ($_REQUEST['edition'] == 'paid') {
-        //         foreach (array('AGPLv3', 'LICENSE', 'README.md') as $v) {
-        //             @unlink(__ROOT_PATH__.$v);
-        //         }
-        //     }
-        // } else {
-        //     throw new Exception(strtr("Can't extract %f - %m", array(
-        //                     '%f' => $file_path,
-        //                     '%m' => 'ZipArchive '.$open.' error',
-        //                 )), 5003);
-        // }
-        // $Output->setResponse(strtr('Extraction completeted (%n files in %ss)', array(
-        //                 '%n' => $num_files,
-        //                 '%s' => $time_taken,
-        //             )));
-        // // My job here is done. My planet needs me.
+
+        if (!$params['software']) {
+            throw new Exception('Missing `software` parameter', 400);
+        } elseif (!isset(APPLICATIONS[$params['software']])) {
+            throw new Exception(sprintf('Unknown software `%s`', $params['software']), 400);
+        }
+
+        $software = APPLICATIONS[$params['software']];
+
+        if (!$params['workingPath']) {
+            throw new Exception('Missing `workingPath` parameter', 400);
+        }
+        $workingPath = $params['workingPath'];
+        if (!is_readable($workingPath)) {
+            throw new Exception(sprintf('Working path `%s` is not readable', $workingPath), 503);
+        }
+
+        $filePath = $params['filePath'];
+        if (!is_readable($filePath)) {
+            throw new Exception(sprintf("Can't read `%s`", basename($filePath)), 503);
+        }
+        $zipExt = new ZipArchiveExt();
+        $timeStart = microtime(true);
+        $zipOpen = $zipExt->open($filePath);
+        if (false === $zipOpen) {
+            throw new Exception(strtr("Can't extract `%f` - %m", array(
+                '%f' => $filePath,
+                '%m' => 'ZipArchive '.$zipOpen.' error',
+            )), 503);
+        }
+        $numFiles = $zipExt->numFiles - 1; // because of top level folder
+        $folder = $software['folder'];
+        if ($params['software'] == 'chevereto-free') {
+            $comment = $zipExt->getArchiveComment();
+            $folder .= substr($comment, 0, 7);
+        }
+        $zipExt->extractSubdirTo($workingPath, $folder);
+        $zipExt->close();
+        $timeTaken = round(microtime(true) - $timeStart, 2);
+        @unlink($filePath);
+        $this->code = 200;
+        $this->response = strtr('Extraction completeted (%n files in %ss)', ['%n' => $numFiles, '%s' => $timeTaken]);
+
         // if (__INSTALLER_FILE__ != 'index.php') {
         //     @unlink(__INSTALLER_FILEPATH__);
         // }
+    }
+
+    /**
+     * Removes the installer file.
+     */
+    public function selfDestructAction()
+    {
+        $filePath = $this->runtime->installerFilepath;
+        // @unlink($filePath);
+        if (true) {
+            $this->code = 200;
+            $this->response = 'Installer removed';
+        } else {
+            $this->code = 503;
+            $this->response = 'Unable to remove installer file at `'.$filePath.'`';
+        }
     }
 
     /**
