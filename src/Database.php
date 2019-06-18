@@ -36,7 +36,7 @@ class Database
         $query = $this->pdo->query("SHOW TABLES FROM `$this->name`;");
         $tables = $query->fetchAll(PDO::FETCH_COLUMN);
         if (!empty($tables)) {
-            throw new Exception(sprintf('Database `%s` is not empty. Use another database or DROP (remove) all the tables in the target database.', $this->name));
+            throw new Exception(sprintf('Database "%s" is not empty. Use another database or DROP (remove) all the tables in the target database.', $this->name));
         }
     }
 
@@ -52,7 +52,7 @@ class Database
             }
         }
         if (!$gotAllPrivileges) {
-            throw new Exception(strtr("Database user `%user%` doesn't have ALL PRIVILEGES on the `%dbName%` database.", [
+            throw new Exception(strtr('Database user "%user%" don\'t have ALL PRIVILEGES on the "%dbName%" database.', [
             '%user%' => $this->user,
             '%dbName%' => $this->name,
           ]));

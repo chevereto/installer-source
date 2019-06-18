@@ -68,8 +68,8 @@ class Runtime
         foreach ($runtimeTable as $k => $v) {
             if (false === $v) {
                 $this->logger->addMessage(strtr($messageTemplate, [
-                    '%k' => "`$k`",
-                    '%v' => '`'.var_export($settings[$k], true).'`',
+                    '%k' => $k,
+                    '%v' => var_export($settings[$k], true),
                 ]));
             }
         }

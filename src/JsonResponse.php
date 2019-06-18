@@ -2,11 +2,14 @@
 
 class JsonResponse
 {
-    /** var array [code => , description =>,]*/
+    /** @var array [code => , description =>,] */
     protected $status;
 
-    /** var array [code => , message =>,]*/
-    public $response;
+    /** @var string */
+    public $code;
+
+    /** @var string */
+    public $message;
 
     const HTTP_CODES = [
         100 => 'Continue',
@@ -64,18 +67,9 @@ class JsonResponse
 
     public function setResponse(string $message, $httpCode = 200)
     {
-        $this->response = array(
-            'code' => $httpCode,
-            'message' => $message,
-        );
-    }
-
-    public function setStatus($httpCode)
-    {
-        $this->status = array(
-            'code' => $httpCode,
-            'description' => $this->getHttpStatusDesc($httpCode),
-        );
+        $this->code = $httpCode;
+        $this->message = $message;
+        $this->status = $this->getHttpStatusDesc($httpCode);
     }
 
     public function getHttpStatusDesc($httpCode)
@@ -113,31 +107,13 @@ class JsonResponse
         header('Cache-Control: no-cache, must-revalidate');
         header('Pragma: no-cache');
         header('Content-type: application/json; charset=UTF-8');
-        if (!isset($this->data) && !isset($this->response)) {
-            $this->setStatus(400);
-        } else {
-            if (!isset($this->status['code']) && $this->getHttpStatusDesc($this->response['code'])) {
-                $code = $this->response['code'];
-            } else {
-                $code = 200;
-            }
-            $this->setStatus($code);
-        }
-        if (!isset($this->response)) {
-            $this->setResponse($this->status['description'], $this->status['code']);
-        } else {
-            if (!isset($this->response['code'])) {
-                $this->response['code'] = $this->status['code'];
-            }
-        }
         $json = json_encode($this, JSON_FORCE_OBJECT);
         if (!$json) {
-            $this->setStatus(500);
             $this->setResponse("Data couldn't be encoded", 500);
             $this->data = null;
         }
-        if (is_int($this->status['code'])) {
-            $this->setStatusCode($this->status['code']);
+        if ($this->code) {
+            $this->setStatusCode($this->code);
         }
         echo $this->data ? $json : json_encode($this, JSON_FORCE_OBJECT);
         die();

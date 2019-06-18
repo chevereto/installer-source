@@ -1,10 +1,7 @@
 var onLeaveMessage =
   "The installation is not yet completed. Are you sure that you want to leave?";
 
-// var title = document.title;
-var html = document.documentElement;
-var page = html.getAttribute("id");
-var wrapper = document.querySelector(".wrapper");
+var page = document.documentElement.getAttribute("id");
 var screenEls = document.querySelectorAll(".screen");
 var screens = {};
 for (let i = 0; i < screenEls.length; i++) {
@@ -43,8 +40,9 @@ var installer = {
   data: {},
   isUpgradeToPaid: locationHasParameter("UpgradeToPaid"),
   process: "install",
-  defaultScreen: "cpanel",
+  defaultScreen: "welcome",
   init: function() {
+    installer.log(runtime.serverString);
     if (this.isUpgradeToPaid) {
       this.process = "upgrade";
       this.defaultScreen = "upgrade";
@@ -198,7 +196,7 @@ var installer = {
    *
    * @param {string} action
    * @param {object} params
-   * @param {object} callback {always: fn(response, json), success: fn(response,json), error: fn(response,json),}
+   * @param {object} callback {always: fn(data), success: fn(data), error: fn(data),}
    */
   fetch: function(action, params, callback) {
     var self = this;
@@ -225,24 +223,32 @@ var installer = {
       method: "POST",
       body: data
     })
-      .then(response => Promise.all([response, response.json()]))
+      .then(function(response) {
+        return response.json();
+      })
       .catch(error => {
         self.pushAlert(error);
       })
-      .then(([response, json]) => {
+      .then(function(data) {
         loader.classList.remove("loader--show");
         for (let disableEl of disableEls) {
           disableEl.disabled = false;
         }
-        if (callback && callback.hasOwnProperty("always")) {
-          callback.always(response, json);
+        if (!callback.hasOwnProperty("always")) {
+          callback.always = installer.callbacks.always;
         }
-        if (response.ok) {
+        callback.always(data);
+        if (200 == data.code) {
           installer.popAlert();
-          callback.success(response, json);
+          if (callback.hasOwnProperty("success")) {
+            callback.success(data);
+          }
         } else {
-          self.pushAlert(json.response.message);
-          callback.error(response, json);
+          self.pushAlert(data.message);
+          if (!callback.hasOwnProperty("error")) {
+            callback.error = installer.callbacks.error;
+          }
+          callback.error(data);
         }
       });
   },
@@ -259,44 +265,44 @@ var installer = {
   },
   callbacks: {
     error: function() {
-      installer.abortInstall();
+      if (installer.isInstalling()) {
+        installer.abortInstall();
+      }
     },
-    always: function(response, json) {
-      installer.log(json.response.message);
+    always: function(data) {
+      installer.log(data.message);
     },
-    downloaded: function(response, json) {
-      installer.log("Extracting `" + json.data.fileBasename + "`");
+    downloaded: function(data) {
+      installer.log("Extracting " + data.data.fileBasename);
       installer.fetch(
         "extract",
         {
           software: installer.data.software,
-          filePath: json.data.filePath,
+          filePath: data.data.filePath,
           workingPath: runtime.absPath + "test/"
         },
         {
-          always: installer.callbacks.always,
-          error: installer.callbacks.error,
+          // always: installer.callbacks.always,
+          // error: installer.callbacks.error,
           success: installer.callbacks.extracted
         }
       );
     },
-    extracted: function(response, json) {
-      installer.log(
-        "Removing installer file at `" + runtime.installerFilepath + "`"
-      );
+    extracted: function(data) {
+      installer.log("Removing installer file at " + runtime.installerFilepath);
       installer.fetch("selfDestruct", null, {
-        always: installer.callbacks.always,
-        error: function(response, json) {
+        // always: installer.callbacks.always,
+        error: function(data) {
           var todo =
-            "Remove the installer file at `" +
+            "Remove the installer file at " +
             runtime.installerFilepath +
-            "` and open " +
+            " and open " +
             runtime.rootUrl +
             " to continue the process.";
           installer.pushAlert(todo);
           installer.abortInstall(false);
         },
-        success: function(response, json) {
+        success: function(data) {
           // installer.setBodyInstalling(false);
           // installer.log("Process completed");
           // setTimeout(function() {
@@ -324,17 +330,18 @@ var installer = {
       installer.checkLicense(license, {
         success: function() {
           installer.data.license = license;
-          installer.actions.setEdition("chevereto");
+          installer.actions.setSoftware("chevereto");
         },
         error: function() {
           installer.data.license = null;
         }
       });
     },
-    setEdition: function(edition) {
+    setSoftware: function(software) {
       document.body.classList.remove("sel--chevereto", "sel--chevereto-free");
-      document.body.classList.add("sel--" + edition);
-      installer.data.software = edition;
+      document.body.classList.add("sel--" + software);
+      installer.data.software = software;
+      installer.log("Software has been set to: " + software);
       this.show("cpanel");
     },
     setUpgrade: function() {
@@ -388,9 +395,8 @@ var installer = {
       installer.setBodyInstalling(true);
       installer.data.software = "chevereto-free";
       this.show("installing");
-      installer.log(runtime.serverString);
       installer.log(
-        "Downloading latest `" + installer.data.software + "` release"
+        "Downloading latest " + installer.data.software + " release"
       );
       installer.fetch(
         "download",
@@ -399,8 +405,8 @@ var installer = {
           license: installer.data.license
         },
         {
-          always: installer.callbacks.always,
-          error: installer.callbacks.error,
+          // always: installer.callbacks.always,
+          // error: installer.callbacks.error,
           success: installer.callbacks.downloaded
         }
       );

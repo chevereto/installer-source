@@ -18,12 +18,12 @@ class Controller
     {
         $this->runtime = $runtime;
         if (!$params['action']) {
-            throw new Exception('Missing `action` parameter', 400);
+            throw new Exception('Missing action parameter', 400);
         }
         $this->params = $params;
         $method = $params['action'].'Action';
         if (!method_exists($this, $method)) {
-            throw new Exception('Invalid action `'.$params['action'].'`', 400);
+            throw new Exception('Invalid action '.$params['action'], 400);
         }
         $action = $this->{$method}($this->params);
     }
@@ -49,7 +49,7 @@ class Controller
             $database->checkEmpty();
             $database->checkPrivileges();
             $this->code = 200;
-            $this->response = 'Database OK';
+            $this->response = sprintf('Database %s OK', $params['name']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage(), 503);
         }
@@ -82,7 +82,7 @@ class Controller
             throw new Exception('[HTTP '.$curl->transfer['http_code'].'] '.$zipball, $curl->transfer['http_code']);
         }
         $fileSize = filesize($filePath);
-        $this->response = strtr('Downloaded `%f` (%w @%s)', array(
+        $this->response = strtr('Downloaded %f (%w @%s)', array(
             '%f' => $fileBasename,
             '%w' => $this->getFormatBytes($fileSize),
             '%s' => $this->getBytesToMb($curl->transfer['speed_download']).'MB/s.',
@@ -97,30 +97,30 @@ class Controller
         $this->response = 'Pal paico';
 
         if (!$params['software']) {
-            throw new Exception('Missing `software` parameter', 400);
+            throw new Exception('Missing software parameter', 400);
         } elseif (!isset(APPLICATIONS[$params['software']])) {
-            throw new Exception(sprintf('Unknown software `%s`', $params['software']), 400);
+            throw new Exception(sprintf('Unknown software %s', $params['software']), 400);
         }
 
         $software = APPLICATIONS[$params['software']];
 
         if (!$params['workingPath']) {
-            throw new Exception('Missing `workingPath` parameter', 400);
+            throw new Exception('Missing workingPath parameter', 400);
         }
         $workingPath = $params['workingPath'];
         if (!is_readable($workingPath)) {
-            throw new Exception(sprintf('Working path `%s` is not readable', $workingPath), 503);
+            throw new Exception(sprintf('Working path %s is not readable', $workingPath), 503);
         }
 
         $filePath = $params['filePath'];
         if (!is_readable($filePath)) {
-            throw new Exception(sprintf("Can't read `%s`", basename($filePath)), 503);
+            throw new Exception(sprintf("Can't read %s", basename($filePath)), 503);
         }
         $zipExt = new ZipArchiveExt();
         $timeStart = microtime(true);
         $zipOpen = $zipExt->open($filePath);
         if (false === $zipOpen) {
-            throw new Exception(strtr("Can't extract `%f` - %m", array(
+            throw new Exception(strtr("Can't extract %f - %m", array(
                 '%f' => $filePath,
                 '%m' => 'ZipArchive '.$zipOpen.' error',
             )), 503);
@@ -155,7 +155,7 @@ class Controller
             $this->response = 'Installer removed';
         } else {
             $this->code = 503;
-            $this->response = 'Unable to remove installer file at `'.$filePath.'`';
+            $this->response = 'Unable to remove installer file at '.$filePath;
         }
     }
 
@@ -170,7 +170,7 @@ class Controller
     {
         $fp = @fopen($filePath, 'wb+');
         if (!$fp) {
-            throw new Exception("Can't open temp file `".$filePath.'` (wb+)');
+            throw new Exception("Can't open temp file ".$filePath.' (wb+)');
         }
         $ops = [
             CURLOPT_FILE => $fp,

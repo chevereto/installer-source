@@ -58,7 +58,7 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
           </div>
           <div>
             <button class="action radius" data-action="setLicense" data-arg="installKey">Enter license key</button>
-            <button class=" radius" data-action="setEdition" data-arg="chevereto-free">Skip – Use Chevereto-Free</button>
+            <button class=" radius" data-action="setSoftware" data-arg="chevereto-free">Skip – Use Chevereto-Free</button>
           </div>
         </div>
       </div>
