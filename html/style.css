@@ -119,10 +119,10 @@ ul>li {
 }
 
 .highlight,
-.alert {
+.alert,
+.install-log {
   font-size: 0.9em;
   padding: 1em;
-  padding-left: 1em;
 }
 
 .highlight:empty,
@@ -334,7 +334,8 @@ code {
   opacity: 0;
 }
 
-.flex-box .loader--show {
+.flex-box .loader--show,
+body.body--installing .flex-box .loader {
   opacity: 1;
 }
 
@@ -433,14 +434,12 @@ code {
   margin-top: 0;
 }
 
-.box--install {
-  background: rgba(255, 255, 255, .94);
-}
-
 .install-log {
-  background: rgba(0, 0, 0, .1);
+  background: #ecf0f1;
   overflow: auto;
-  max-height: 84px;
+  max-height: 10em;
+  margin: 0;
+  padding: 0;
 }
 
 .install-log:empty {
@@ -449,6 +448,11 @@ code {
 
 .install-log p {
   margin: 0;
+  padding: 5px;
+}
+
+.install-log p:nth-child(even) {
+  background: rgba(255, 255, 255, .5);
 }
 
 .radius {

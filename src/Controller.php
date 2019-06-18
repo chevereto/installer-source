@@ -62,21 +62,39 @@ class Controller
         if (file_exists($downloadPath)) {
             @unlink($downloadPath);
         }
-        $post = $this->downloadFile('https://chevereto.com/api/download/latest', $params, $filePath);
-        if ($post->json->error) {
-            throw new Exception($post->json->error->message, $post->json->status_code);
+        $isPost = false;
+        $zipball = APPLICATIONS[$params['software']]['zipball'];
+        if (!$zipball) {
+            throw new Exception('Invalid software parameter', 400);
+        }
+        if ($params['software'] == 'chevereto') {
+            $isPost = true;
+        } else {
+            $params = null;
+        }
+        $curl = $this->downloadFile($zipball, $params, $filePath, $isPost);
+        // Default chevereto.com API handling
+        if ($curl->json->error) {
+            throw new Exception($curl->json->error->message, $curl->json->status_code);
+        }
+        // Everybody else
+        if (200 != $curl->transfer['http_code']) {
+            throw new Exception('[HTTP '.$curl->transfer['http_code'].'] '.$zipball, $curl->transfer['http_code']);
         }
         $fileSize = filesize($filePath);
         $this->response = strtr('Downloaded `%f` (%w @%s)', array(
             '%f' => $fileBasename,
             '%w' => $this->getFormatBytes($fileSize),
-            '%s' => $this->getBytesToMb($post->transfer['speed_download']).'MB/s.',
+            '%s' => $this->getBytesToMb($curl->transfer['speed_download']).'MB/s.',
         ));
-        $this->data['filepath'] = $filePath;
+        $this->data['fileBasename'] = $fileBasename;
+        $this->data['filePath'] = $filePath;
     }
 
     public function extractAction(array $params)
     {
+        $this->code = 400;
+        $this->response = 'Pal paico';
         // $file_path = __ROOT_PATH__.$_REQUEST['fileBasename'];
         // if (!is_readable($file_path)) {
         //     throw new Exception(sprintf("Can't read %s", $_REQUEST['fileBasename']), 5002);
@@ -118,20 +136,32 @@ class Controller
         // }
     }
 
-    public function downloadFile(string $url, array $params = [], string $filePath)
+    /**
+     * @param string $url      Target download URL
+     * @param string $params   Request params
+     * @param string $filePath Location to save the downloaded file
+     * @param bool   $post     TRUE to download using a POST request
+     * @param return curl handle
+     */
+    public function downloadFile(string $url, array $params = null, string $filePath, bool $post = true)
     {
         $fp = @fopen($filePath, 'wb+');
         if (!$fp) {
             throw new Exception("Can't open temp file `".$filePath.'` (wb+)');
         }
-        $post = $this->curl($url, [
-            CURLOPT_POST => true,
+        $ops = [
             CURLOPT_FILE => $fp,
-            CURLOPT_POSTFIELDS => http_build_query($params),
-        ]);
+        ];
+        if ($params) {
+            $ops[CURLOPT_POSTFIELDS] = http_build_query($params);
+        }
+        if ($post) {
+            $ops[CURLOPT_POST] = true;
+        }
+        $curl = $this->curl($url, $ops);
         fclose($fp);
 
-        return $post;
+        return $curl;
     }
 
     /**

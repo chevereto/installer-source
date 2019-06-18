@@ -128,21 +128,6 @@ $runtime->run();
 
 $requirementsCheck = new RequirementsCheck($requirements, $runtime);
 
-if (isset($_REQUEST['action'])) {
-    // if ($requirementsCheck->errors) {
-    //     $Output = new Output();
-    //     $missing = array();
-    //     foreach ($requirementsCheck->errors as $k => $v) {
-    //         $missing[] = $v;
-    //     }
-    //     $Output->addData('missing', $missing);
-    //     $Output->setHttpStatus(500);
-    //     $Output->setResponse('Missing server requirements', 500);
-    //     $Output->exec();
-    // }
-    // $processAction = new processAction();
-}
-
 if ('POST' === $_SERVER['REQUEST_METHOD']) {
     $jsonResponse = new JsonResponse();
     if ($requirementsCheck->errors) {
@@ -170,7 +155,6 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
     $pageId = $requirementsCheck->errors ? 'error' : 'install';
     $doctitle = APP_NAME;
     $css = file_get_contents('html/style.css');
-    $scripts = file_get_contents('html/scripts.js');
     $script = file_get_contents('html/script.js');
     $svgLogo = file_get_contents('html/logo.svg');
     $svgCpanelLogo = file_get_contents('html/cPanel_white.svg');
@@ -201,9 +185,6 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
   <main>
 <?php echo $content; ?>
   </main>
-  <script>
-<?php echo $scripts; ?>
-  </script>
   <script>
 <?php echo $script; ?>
   </script>

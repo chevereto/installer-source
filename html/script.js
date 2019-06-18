@@ -1,11 +1,7 @@
-var Data = {};
-var uid;
 var onLeaveMessage =
   "The installation is not yet completed. Are you sure that you want to leave?";
-var UpgradeToPaid = getParameterByName("UpgradeToPaid") == "";
-Data.process = UpgradeToPaid ? "upgrade" : "install";
 
-var title = document.title;
+// var title = document.title;
 var html = document.documentElement;
 var page = html.getAttribute("id");
 var body = document.getElementsByTagName("body")[0];
@@ -13,20 +9,50 @@ var wrapper = document.querySelector(".wrapper");
 var screenEls = document.querySelectorAll(".screen");
 var screens = {};
 for (let i = 0; i < screenEls.length; i++) {
-  var el = screenEls[i];
+  let el = screenEls[i];
   screens[el.id.replace("screen-", "")] = {
     title: el.querySelector("h1").innerText
   };
 }
 
-console.log(screens);
+/**
+ * This function is case insensitive since Chrome (and maybe others) change the qs case on manual input.
+ * @param {string} name The parameter name in the query string.
+ * @return {boolean} True if the name is present in the query string.
+ */
+function locationHasParameter(name) {
+  var queryString = window.location.search.substring(1);
+  if (queryString) {
+    var paramArray = queryString.split("&");
+    for (let paramPair of paramArray) {
+      var param = paramPair.split("=")[0];
+      console.log(
+        param,
+        "^" + param + "$",
+        new RegExp("^" + param + "$", "i").test(name)
+      );
+      if (new RegExp("^" + param + "$", "i").test(name)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
 var installer = {
+  uid: false,
+  data: {},
+  isUpgradeToPaid: locationHasParameter("UpgradeToPaid"),
+  process: "install",
+  defaultScreen: "ready",
   init: function() {
+    if (this.isUpgradeToPaid) {
+      this.process = "upgrade";
+      this.defaultScreen = "upgrade";
+    }
     var self = this;
-    var defaultScreen = UpgradeToPaid ? "upgrade" : "welcome";
-    this.popScreen(defaultScreen);
-    this.history.replace(defaultScreen);
+    this.popScreen(this.defaultScreen);
+    this.history.replace(this.defaultScreen);
     if (page != "error") {
       this.bindActions();
     }
@@ -47,12 +73,12 @@ var installer = {
       return onLeaveMessage;
     };
     window.onpopstate = function(e) {
-      var isBack = uid > e.state.uid;
+      var isBack = installer.uid > e.state.uid;
       var isForward = !isBack;
-      uid = e.state.uid;
+      installer.uid = e.state.uid;
       console.log("onpopstate", {
         direction: isBack ? "back" : "forward",
-        uid: uid,
+        uid: installer.uid,
         pushState: e.state
       });
       if (body.classList.contains("body--working")) {
@@ -122,7 +148,10 @@ var installer = {
     }
   },
   popAlert: function() {
-    this.getShownScreenEl(".alert").innerHTML = "";
+    var el = this.getShownScreenEl(".alert");
+    if (el) {
+      el.innerHTML = "";
+    }
   },
   getFormData: function() {
     var form = installer.getShownScreenEl("form");
@@ -141,8 +170,8 @@ var installer = {
     return data;
   },
   writeFormData: function(screen, data) {
-    console.log("Data write:" + screen, Data[screen]);
-    Data[screen] = this.getFormData();
+    console.log("Data write:" + screen, installer.data[screen]);
+    installer.data[screen] = this.getFormData();
   },
   bindActions: function() {
     var self = this;
@@ -164,7 +193,7 @@ var installer = {
     },
     writter: function(fn, data) {
       data.uid = new Date().getTime();
-      uid = data.uid;
+      installer.uid = data.uid;
       switch (fn) {
         case "push":
           history.pushState(data, data.view);
@@ -176,6 +205,12 @@ var installer = {
       console.log("history.writter:", fn, data);
     }
   },
+  /**
+   *
+   * @param {string} action
+   * @param {object} params
+   * @param {object} callback {always: fn(response, json), success: fn(response,json), error: fn(response,json),}
+   */
   fetch: function(action, params, callback) {
     var self = this;
     var data = new FormData();
@@ -210,6 +245,9 @@ var installer = {
         for (let disableEl of disableEls) {
           disableEl.disabled = false;
         }
+        if (callback && callback.hasOwnProperty("always")) {
+          callback.always(response, json);
+        }
         if (response.ok) {
           installer.popAlert();
           callback.success(response, json);
@@ -218,12 +256,6 @@ var installer = {
           callback.error(response, json);
         }
       });
-  },
-  checkLicense: function(key, callback) {
-    return this.fetch("licenseCheck", { license: key }, callback);
-  },
-  checkDatabase: function(params, callback) {
-    return this.fetch("dabataseCheck", params, callback);
   },
   popScreen: function(screen) {
     console.log("popScreen:" + screen);
@@ -234,7 +266,18 @@ var installer = {
     });
     document.querySelector("#screen-" + screen).classList.add("screen--show");
   },
-  // Actions wired into HTML
+  checkLicense: function(key, callback) {
+    return this.fetch("licenseCheck", { license: key }, callback);
+  },
+  checkDatabase: function(params, callback) {
+    return this.fetch("dabataseCheck", params, callback);
+  },
+  download: function(params, callback) {
+    return this.fetch("download", params, callback);
+  },
+  extract: function(filePath, callback) {
+    return this.fetch("extract", { filePath: filePath }, callback);
+  },
   actions: {
     show: function(screen) {
       installer.popScreen(screen);
@@ -242,21 +285,21 @@ var installer = {
         installer.history.push(screen);
       }
     },
-    setLicense: function(id) {
-      var keyEl = document.getElementById(id);
-      var key = keyEl.value;
-      if (!key) {
-        keyEl.focus();
-        installer.shakeEl(keyEl);
+    setLicense: function(elId) {
+      var licenseEl = document.getElementById(elId);
+      var license = licenseEl.value;
+      if (!license) {
+        licenseEl.focus();
+        installer.shakeEl(licenseEl);
         return;
       }
-      installer.checkLicense(key, {
+      installer.checkLicense(license, {
         success: function() {
-          Data.key = key;
+          installer.data.license = license;
           installer.actions.setEdition("chevereto");
         },
         error: function() {
-          Data.key = null;
+          installer.data.license = null;
         }
       });
     },
@@ -264,15 +307,15 @@ var installer = {
       console.log("setEdition");
       body.classList.remove("sel--chevereto", "sel--chevereto-free");
       body.classList.add("sel--" + edition);
-      Data.software = edition;
+      installer.data.software = edition;
       this.show("cpanel");
     },
     setUpgrade: function() {
       // console.log("setUpgrade");
       // body.classList.remove("sel--chevereto-free");
       // body.classList.add("sel--chevereto");
-      // Data.key = document.getElementById("upgradeKey").value;
-      // installer.checkLicense(Data.key);
+      // installer.data.license = document.getElementById("upgradeKey").value;
+      // installer.checkLicense(installer.data.license);
       // this.show("complete-upgrade");
     },
     cpanelProcess: function() {
@@ -318,116 +361,86 @@ var installer = {
       this.show("ready");
     },
     install: function() {
+      installer.setBodyInstalling(true);
+      installer.data.software = "chevereto-free";
       console.log("install");
       this.show("installing");
-      return;
-      if (!arg) {
-        return;
-      }
-      if (arg == "paid" && !installer.getKeyValue()) {
-        key.focus();
-        return;
-      }
-      var edition = installer.getActiveEdition();
 
-      body.classList = "";
-      body.classList.add("body--installing", "body--" + edition.id);
+      installer.log(vars.serverStr);
 
-      installer.setWorking(true);
+      installer.log(
+        "Trying to download latest `" + installer.data.software + "` release"
+      );
 
-      if (typeof installer.XHR == typeof undefined) {
-        installer.log(serverStr);
-      }
+      var callback = {
+        always: function(response, json) {
+          installer.log(json.response.message);
+        },
+        error: function() {
+          installer.abortInstall();
+        }
+      };
 
-      // Yo dawg! I put a promise on top of a promise so you can promise while you promise
-      installer.log("Trying to download latest " + edition.label + " release");
-      var downloadParams = { edition: arg };
-      if (edition.id == "paid") {
-        downloadParams.license = installer.getKeyValue();
-      }
-      installer.request("download", downloadParams).then(
-        function(response) {
-          if (response.status.code != 200) {
-            installer.setWorking(false);
-            document.title = "Download failed";
-            installer.log(
-              document.title +
-                ": " +
-                response.response.message +
-                " - Installation aborted"
-            );
-            return;
-          }
-          installer.log(response.response.message);
-          installer.log(
-            "Trying to extract " + response.data.download.fileBasename
-          );
-          installer
-            .request("extract", {
-              fileBasename: response.data.download.fileBasename
-            })
-            .then(
-              function(response) {
-                if (response.status.code != 200) {
-                  installer.setWorking(false);
-                  document.title = "Extraction failed";
-                  installer.log(
-                    document.title +
-                      ": " +
-                      response.response.message +
-                      " - Installation aborted"
-                  );
-                  return;
+      // Yo dawg! Again I put a promise on top of a promise so you can promise while you promise!
+      installer.download(
+        {
+          software: installer.data.software,
+          license: installer.data.license
+        },
+        {
+          always: callback.always,
+          error: callback.error,
+          success: function(response, json) {
+            installer.log("Trying to extract `" + json.data.fileBasename + "`");
+            installer.extract(
+              { filePath: json.data.filePath },
+              {
+                always: callback.always,
+                error: callback.error,
+                success: function(response, json) {
+                  console.log("EXTRACTION OJ SIMPSON");
                 }
-                installer.log(response.response.message);
-                var s = 3;
-                var to = UpgradeToPaid ? "install" : "setup";
-                installer.log("Redirecting to " + to + " form in " + s + "s");
-                setTimeout(function() {
-                  installer.log("Redirecting now!");
-                  installer.setWorking(false);
-                  var redirectUrl = rootUrl;
-                  if (UpgradeToPaid) {
-                    redirectUrl += "install";
-                  }
-                  window.location.replace(redirectUrl);
-                }, 1000 * s);
-              },
-              function(error) {
-                installer.setWorking(false);
-                installer.log(error);
               }
             );
-        },
-        function(error) {
-          installer.setWorking(false);
-          installer.log(error);
+          }
         }
       );
+
+      // installer.request("download", downloadParams).then(
+      //   function(response) {
+      //     installer
+      //       .request("extract", {
+      //         fileBasename: response.data.download.fileBasename
+      //       })
+      //       .then(
+      //         function(response) {
+      //           var s = 3;
+      //           var to = isUpgradeToPaid ? "install" : "setup";
+      //           installer.log("Redirecting to " + to + " form in " + s + "s");
+      //           setTimeout(function() {
+      //             installer.log("Redirecting now!");
+      //             installer.setBodyInstalling(false);
+      //             var redirectUrl = rootUrl;
+      //             if (isUpgradeToPaid) {
+      //               redirectUrl += "install";
+      //             }
+      //             window.location.replace(redirectUrl);
+      //           }, 1000 * s);
+      //         },
+      //       );
+      //   },
+      // );
     }
   },
-  setWorking: function(bool) {
-    body.classList[bool ? "add" : "remove"]("body--working");
+  /**
+   * @param {string} message
+   */
+  abortInstall: function(message) {
+    this.log(message ? message : "Installation aborted");
+    this.setBodyInstalling(false);
   },
-  getKeyValue: function() {
-    return key.value.replace(/\s/g, "");
-  },
-  getOppositeEdition(edition) {
-    return edition.toLowerCase() == "free" ? "paid" : "free";
-  },
-  getActiveEdition: function() {
-    var ret;
-    var edition;
-    for (var k in editions) {
-      ret = body.classList.contains("body--" + k);
-      if (ret) {
-        return {
-          id: k,
-          label: editions[k]
-        };
-      }
-    }
-    return;
+  setBodyInstalling: function(bool) {
+    body.classList[bool ? "add" : "remove"]("body--installing");
   },
   log: function(message) {
     var date = new Date();
@@ -442,38 +455,12 @@ var installer = {
       }
     }
     var time = t.h + ":" + t.m + ":" + t.s;
-    var el = document.querySelector(
-      "." + installer.getActiveEdition().id + "--show .install-log"
-    );
+    var el = document.querySelector(".install-log");
     var p = document.createElement("p");
     var t = document.createTextNode(time + " " + message);
     p.appendChild(t);
     el.appendChild(p);
     el.scrollTop = el.scrollHeight;
-  },
-  request: function(action, args) {
-    return new Promise(function(resolve, reject) {
-      var edition = installer.getActiveEdition();
-      var postData = new FormData();
-      args.action = action;
-      args.edition = edition.id;
-      for (var i in args) {
-        postData.append(i, args[i]);
-      }
-      installer.XHR = new XMLHttpRequest();
-      installer.XHR.responseType = "json";
-      installer.XHR.open("POST", installerFile, true);
-      installer.XHR.addEventListener("load", function(e) {
-        resolve(e.currentTarget.response);
-      });
-      installer.XHR.addEventListener("abort", function(e) {
-        reject("Process aborted by user");
-      });
-      installer.XHR.addEventListener("error", function(e) {
-        reject("Transfer failed");
-      });
-      installer.XHR.send(postData);
-    });
   }
 };
 if ("error" != document.querySelector("html").id) {

@@ -69,12 +69,14 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
       <div class="flex-box col-width">
         <div>
           <h1>Upgrade</h1>
-          <p>All previous uploads won't get altered in any way. The system database schema will change. Don't forget to backup your database.</p>
-          <p>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</p>
+          <p>A license key is required to upgrade to our main edition. You can purchase a license from our <a href="https://chevereto.com/pricing" target="_blank">website</a> if you don't have one yet.</p>
+          <p>The system database schema will change, and the system files will get replaced. Don't forget to backup.</p>
+          <p>Your system settings, previous uploads, and all user-generated content will remain there.</p>
           <p class="p alert"></p>
           <div class="p input-label">
             <label for="upgradeKey">License key</label>
             <input class="radius width-100p" type="text" name="upgradeKey" id="upgradeKey" placeholder="Paste your license key here">
+            <div><small>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</small></div>
           </div>
           <div>
             <button class="action radius" data-action="setLicense" data-arg="upgradeKey">Enter license key</button>
@@ -222,9 +224,8 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
         <div>
           <h1>Installing</h1>
           <p>The software is being installed. Don't close this window until the process gets completed.</p>
-          <div class="install-log p">
-            <p>[T0] Installation process started</p>
-          </div>
+          <p class="p alert"></p>
+          <div class="install-log p"></div>
         </div>
       </div>
     </div>
