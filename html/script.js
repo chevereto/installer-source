@@ -24,7 +24,7 @@ console.log(screens);
 var installer = {
   init: function() {
     var self = this;
-    var defaultScreen = UpgradeToPaid ? "upgrade" : "db";
+    var defaultScreen = UpgradeToPaid ? "upgrade" : "welcome";
     this.popScreen(defaultScreen);
     this.history.replace(defaultScreen);
     if (page != "error") {
