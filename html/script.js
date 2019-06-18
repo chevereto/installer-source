@@ -64,22 +64,21 @@ var installer = {
       }
       var state = e.state;
       var form = installer.getShownScreenEl("form");
-      if (form && isForward) {
-        if (!form.checkValidity()) {
+      if (isForward && form) {
+        if (form.checkValidity()) {
+          console.log("Forward form re-submit action:", form.dataset.trigger);
+          installer.actions[form.dataset.trigger](form.dataset.arg);
+          return;
+        } else {
           history.go(-1);
           var tmpSubmit = document.createElement("button");
           form.appendChild(tmpSubmit);
           tmpSubmit.click();
           form.removeChild(tmpSubmit);
           return;
-        } else {
-          console.log("Form re-submit action:", form.dataset.trigger);
-          installer.actions[form.dataset.trigger](form.dataset.arg);
         }
       }
-      if (isBack) {
-        self.popScreen(state.view);
-      }
+      self.popScreen(state.view);
     };
     var forms = document.querySelectorAll("form");
     for (let i = 0; i < forms.length; i++) {
