@@ -164,6 +164,9 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
     }
     $jsonResponse->send();
 } else {
+    if (isset($_GET['getNginxRules'])) {
+        require 'template/nginx.php';
+    }
     $pageId = $requirementsCheck->errors ? 'error' : 'install';
     $doctitle = APP_NAME;
     $css = file_get_contents('html/style.css');
