@@ -246,7 +246,7 @@ button.action:focus {
 
 button[disabled],
 input[disabled] {
-  cursor: progress;
+  cursor: wait;
 }
 
 input {
