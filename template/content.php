@@ -64,6 +64,18 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
       </div>
     </div>
 
+    <div id="screen-sorry" class="screen animate animate--slow">
+      <div class="flex-box col-width">
+        <div>
+          <h1>No PHP 7.3 support</h1>
+          <p>We're sorry, but Chevereto-Free doesn't support PHP 7.3 yet. Switch to PHP 7.2 or install our paid edition.</p>
+          <div>
+            <button class="radius" data-action="show" data-arg="license">Back</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="screen-upgrade" class="screen animate animate--slow">
       <div class="header flex-item"><?php echo $svgLogo; ?></div>
       <div class="flex-box col-width">

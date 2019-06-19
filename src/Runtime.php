@@ -80,6 +80,7 @@ class Runtime
         if (!isset($this->server)) {
             $this->setServer($_SERVER);
         }
+        $this->php = phpversion();
         $this->absPath = rtrim(str_replace('\\', '/', dirname(INSTALLER_FILEPATH)), '/').'/';
         $this->relPath = rtrim(dirname($this->server['SCRIPT_NAME']), '\/').'/';
         $this->installerFilename = basename(INSTALLER_FILEPATH);

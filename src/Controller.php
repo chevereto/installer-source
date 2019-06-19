@@ -162,20 +162,12 @@ class Controller
         }
         @fclose($fh);
         $this->code = 200;
-        $this->response = sprintf('Settings file %s created', $params['filePath']);
+        $this->response = 'Settings file OK';
     }
 
     public function submitInstallFormAction(array $params)
     {
-        $formData = [
-            'username' => $params['a'],
-            'email' => $params['a'],
-            'password' => $params['a'],
-            'email_from_email' => $params['a'],
-            'email_incoming_email' => $params['a'],
-            'website_mode = community' => $params['a'],
-        ];
-        $post = $this->curl($params['url'], [
+        $post = $this->curl($params['installUrl'], [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query($params),
         ]);
@@ -268,7 +260,6 @@ class Controller
         if (is_resource($fp)) {
             rewind($fp);
             $return->raw = stream_get_contents($fp);
-        // $return->raw = $this->getBytesToMb($transfer['size_download']) < 0.5 ? $return->raw : '<data too big>';
         } else {
             $return->raw = $file_get_contents;
         }

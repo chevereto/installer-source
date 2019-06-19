@@ -252,6 +252,9 @@ var installer = {
         } else {
           installer.pushAlert(data.message);
           callback.error(data);
+          return new Promise(function(resolve, reject) {
+            reject(data);
+          });
         }
       });
   },
@@ -304,7 +307,11 @@ var installer = {
       document.body.classList.add("sel--" + software);
       installer.data.software = software;
       installer.log("Software has been set to: " + software);
-      this.show("cpanel");
+      if("chevereto-free" == software && runtime.php.includes("7.3")) {
+        this.show("sorry");
+      } else {
+        this.show("cpanel");
+      }
     },
     setUpgrade: function() {
       // console.log("setUpgrade");
@@ -355,7 +362,6 @@ var installer = {
     },
     install: function() {
       installer.setBodyInstalling(true);
-      installer.data.software = "chevereto-free";
       this.show("installing");
       installer.log(
         "Downloading latest " + installer.data.software + " release"
@@ -381,6 +387,7 @@ var installer = {
         .then(data => {
           installer.log("Performing system setup");
           let params = {
+            installUrl: runtime.rootUrl + "test/install",
             username: installer.data.admin.username,
             email: installer.data.admin.email,
             password: installer.data.admin.password,
@@ -388,7 +395,7 @@ var installer = {
             email_incoming_email: installer.data.email.emailInbox,
             website_mode: 'community',
           };
-          return installer.fetch("submitInstallForm", params);
+          return installer.fetch("submitInstallForm", params);          
         })
         .then(data => {
           installer.log(
