@@ -90,6 +90,7 @@ class Runtime
         $this->httpProtocol = 'http'.(((!empty($this->server['HTTPS']) && strtolower($this->server['HTTPS']) == 'on') || $this->server['HTTP_X_FORWARDED_PROTO'] == 'https') ? 's' : null);
         $this->rootUrl = $this->httpProtocol.'://'.$this->httpHost.$this->relPath;
         $this->serverString = 'Server '.$this->httpHost.' PHP '.phpversion();
+        $this->emailPattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$";
         $this->setWorkingPaths([INSTALLER_FILEPATH, $this->absPath]);
     }
 

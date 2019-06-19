@@ -174,7 +174,6 @@ class Controller
         if ($post->json->error) {
             throw new Exception($post->json->error->message, $post->json->error->code);
         }
-        // Detect system error
         if (preg_match('/system error/i', $post->raw)) {
             throw new Exception('System error :(', 400);
         }
