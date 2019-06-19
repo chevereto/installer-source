@@ -17,7 +17,7 @@ class Cpanel
     protected $userpwd;
 
     /** @var string */
-    protected $mysqlprefix;
+    protected $mysqlPrefix;
 
     /** @var int */
     protected $mysqlMaxDbNamelength;
@@ -32,7 +32,28 @@ class Cpanel
 
     public function sendRequest(string $action, array $params = [])
     {
-        $endpoint = 'https://127.0.0.1:2083/execute/'.$action;
+        // cPanel UAPI accepts session login (cookie needed).
+        // cPanel API Tokens aren't widely supported yet
+
+        $url = 'https://127.0.0.1:2083';
+
+        // $url = 'https://releasetag.com:2083';
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_NOBODY, 1);
+        curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if (200 != $httpCode) {
+            throw new Exception(strtr('Unable to connect to cPanel at %s [HTTP %c]', [
+                '%s' => $url,
+                '%c' => $httpCode,
+            ]), 503);
+        }
+
+        $endpoint = $url.'/execute/'.$action;
+
         $url = $endpoint.'?'.http_build_query($params);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
@@ -52,7 +73,7 @@ class Cpanel
         curl_close($ch);
         $array = json_decode($result, false);
         if (!$array) {
-            throw new Exception("Can't authenticate in cPanel host (wrong user:password?)", 'login');
+            throw new Exception("Can't authenticate to cPanel host (wrong username:password)", 403);
         }
         $this->action = $action;
         $this->response = $array;
@@ -81,11 +102,11 @@ class Cpanel
             throw new Exception($this->errorMessage);
         }
 
-        $this->mysqlprefix = $this->response->data->prefix;
+        $this->mysqlPrefix = $this->response->data->prefix;
         $this->mysqlMaxDbNamelength = $this->response->data->max_database_name_length;
         $this->mysqlMaxUsernameLength = $this->response->data->max_username_length;
 
-        $dbPrefix = $this->mysqlprefix.$prefix;
+        $dbPrefix = $this->mysqlPrefix.$prefix;
 
         for ($i = 0; $i < 5; ++$i) {
             $dbName = static::getDbRandomName($dbPrefix, $this->mysqlMaxDbNamelength);
@@ -130,9 +151,11 @@ class Cpanel
         }
 
         return [
-            'db_name' => $dbName,
-            'db_user' => $dbUser,
-            'db_user_password' => $dbUserPassword,
+            'host' => 'localhost',
+            'port' => '3306',
+            'name' => $dbName,
+            'user' => $dbUser,
+            'userPassword' => $dbUserPassword,
         ];
     }
 

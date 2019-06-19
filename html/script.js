@@ -38,6 +38,7 @@ function locationHasParameter(name) {
 var installer = {
   uid: false,
   data: {},
+  isCpanelDone: false,
   isUpgradeToPaid: locationHasParameter("UpgradeToPaid"),
   process: "install",
   defaultScreen: "welcome",
@@ -53,7 +54,7 @@ var installer = {
     if (page != "error") {
       var inputEmailEls = document.querySelectorAll("input[type=email]");
       for (let inputEmailEl of inputEmailEls) {
-        inputEmailEl.pattern = runtime.emailPattern;
+        inputEmailEl.pattern = patterns.email_pattern;
       }
       this.bindActions();
     }
@@ -161,7 +162,7 @@ var installer = {
   },
   writeFormData: function(screen, data) {
     console.log("Data write:" + screen, installer.data[screen]);
-    installer.data[screen] = this.getFormData();
+    installer.data[screen] = data ? data : this.getFormData();
   },
   bindActions: function() {
     var self = this;
@@ -311,7 +312,8 @@ var installer = {
       document.body.classList.add("sel--" + software);
       installer.data.software = software;
       installer.log("Software has been set to: " + software);
-      if("chevereto-free" == software && runtime.php.includes("7.3")) {
+      // Note: 7.3 support should be added in the next version
+      if("chevereto-free" == software && runtime.php.indexOf("7.3") == 0) {
         this.show("sorry");
       } else {
         this.show("cpanel");
@@ -326,20 +328,31 @@ var installer = {
       // this.show("complete-upgrade");
     },
     cpanelProcess: function() {
-      console.log("cpanelProcess");
       var els = {
         user: document.getElementById("cpanelUser"),
         password: document.getElementById("cpanelPassword")
       };
+      var params = {};
       for (let key in els) {
         let el = els[key];
         if (!el.value) {
           el.focus();
           installer.shakeEl(el);
           return;
+        } else {
+          params[key] = el.value;
         }
       }
-      this.show("db");
+      installer.fetch("cpanelProcess", params, {
+        error: function(data) {
+          installer.isCpanelDone = false;
+        }
+      })
+      .then(json => {
+        installer.writeFormData("db", json.data.db);
+        installer.isCpanelDone = true;
+        installer.actions.show("admin");
+      });
     },
     setDb: function() {
       var params = installer.getFormData();

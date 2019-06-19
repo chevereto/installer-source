@@ -176,12 +176,12 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
             </div>
             <div class="p input-label">
               <label for="adminUsername">Username</label>
-              <input class="radius width-100p" type="text" name="adminUsername" id="adminUsername" placeholder="admin" pattern="^[\w]{3,16}$" autocomplete="off" minlength="3" maxlength="16" required>
+              <input class="radius width-100p" type="text" name="adminUsername" id="adminUsername" placeholder="admin" pattern="<?php echo $patterns['username_pattern']; ?>" autocomplete="off" required>
               <div><small>3 to 16 characters. Letters, numbers and underscore.</small></div>
             </div>
             <div class="p input-label">
               <label for="adminPassword">Password</label>
-              <input class="radius width-100p" type="password" name="adminPassword" id="adminPassword" placeholder="password" pattern="^.{6,128}$" minlength="6" maxlength="128" autocomplete="off" required>
+              <input class="radius width-100p" type="password" name="adminPassword" id="adminPassword" placeholder="password" pattern="<?php echo $patterns['user_password_pattern']; ?>" autocomplete="off" required>
               <div><small>6 to 128 characters.</small></div>
             </div>
             <div>

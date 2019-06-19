@@ -53,6 +53,12 @@ const APPLICATIONS = [
     ],
 ];
 
+$patterns = [
+    'username_pattern' => '^[\w]{3,16}$',
+    'user_password_pattern' => '^.{6,128}$',
+    'email_pattern' => "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$",
+];
+
 $phpSettings = [
     'error_reporting' => E_ALL ^ E_NOTICE,
     'log_errors' => '1',
@@ -104,10 +110,6 @@ include 'src/Cpanel.php';
 include 'src/JsonResponse.php';
 include 'src/Database.php';
 include 'src/Controller.php';
-
-// $cpanel = new Cpanel('chevereto', ']2YdOVytq@7A');
-// $createDb = $cpanel->setupMysql();
-// dump($createDb);
 
 $logger = new Logger(APP_NAME.' '.APP_VERSION);
 
@@ -176,7 +178,10 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
   <title><?php echo $doctitle; ?></title>
   <link rel="shortcut icon" type="image/png" href="<?php echo $shortcutIcon; ?>">
   <style><?php echo $css; ?></style>
-  <script>const runtime = <?php echo json_encode($jsVars); ?></script>
+  <script>
+    const runtime = <?php echo json_encode($jsVars); ?>;
+    const patterns = <?php echo json_encode($patterns); ?>;
+  </script>
 </head>
 <body class="body--flex">
   <main>

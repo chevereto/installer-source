@@ -55,6 +55,22 @@ class Controller
         }
     }
 
+    public function cPanelProcessAction(array $params)
+    {
+        try {
+            $cpanel = new Cpanel($params['user'], $params['password']);
+            $createDb = $cpanel->setupMysql();
+            $this->code = 200;
+            $this->response = 'cPanel process completed';
+            $this->data['db'] = $createDb;
+            // [name] =>
+            // [user] =>
+            // [user_password] =>
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), 503);
+        }
+    }
+
     public function downloadAction(array $params)
     {
         $fileBasename = 'chevereto-pkg-'.substr(bin2hex(random_bytes(8)), 0, 8).'.zip';
