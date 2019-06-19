@@ -259,6 +259,10 @@ input[disabled] {
   cursor: wait;
 }
 
+input[data-disabled] {
+  cursor: not-allowed;
+}
+
 input {
   background: #FFF;
 }

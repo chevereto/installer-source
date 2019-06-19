@@ -124,6 +124,9 @@ class Controller
             throw new Exception('Missing workingPath parameter', 400);
         }
         $workingPath = $params['workingPath'];
+        if (!file_exists($workingPath) && !@mkdir($workingPath)) {
+            throw new Exception(sprintf("Working path %s doesn't exists and can't be created", $workingPath), 503);
+        }
         if (!is_readable($workingPath)) {
             throw new Exception(sprintf('Working path %s is not readable', $workingPath), 503);
         }

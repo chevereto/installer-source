@@ -35,12 +35,14 @@ class Cpanel
         // cPanel UAPI accepts session login (cookie needed).
         // cPanel API Tokens aren't widely supported yet
 
-        $url = 'https://127.0.0.1:2083';
-
-        // $url = 'https://releasetag.com:2083';
-
+        $url = 'https://localhost:2083';
+        $url = 'https://releasetag.com:2083';
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_NOBODY, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);

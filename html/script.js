@@ -41,7 +41,7 @@ var installer = {
   isCpanelDone: false,
   isUpgradeToPaid: locationHasParameter("UpgradeToPaid"),
   process: "install",
-  defaultScreen: "welcome",
+  defaultScreen: "cpanel",
   init: function() {
     installer.log(runtime.serverString);
     if (this.isUpgradeToPaid) {
@@ -209,7 +209,7 @@ var installer = {
     for (var key in params) {
       data.append(key, params[key]);
     }
-    var disableEls = document.querySelectorAll("button, input");
+    var disableEls = document.querySelectorAll("button, input:not([data-disabled])");
     for (let disableEl of disableEls) {
       disableEl.disabled = true;
     }
@@ -328,6 +328,10 @@ var installer = {
       // this.show("complete-upgrade");
     },
     cpanelProcess: function() {
+      if(installer.isCpanelDone) {
+        installer.actions.show("admin");
+        return;
+      }
       var els = {
         user: document.getElementById("cpanelUser"),
         password: document.getElementById("cpanelPassword")
@@ -349,6 +353,10 @@ var installer = {
         }
       })
       .then(json => {
+        for (let key in els) {
+          els[key].setAttribute("data-disabled", "");
+          els[key].disabled = true;
+        }
         installer.writeFormData("db", json.data.db);
         installer.isCpanelDone = true;
         installer.actions.show("admin");
@@ -434,9 +442,9 @@ var installer = {
         .then(data => {
           installer.setBodyInstalling(false);
           installer.log("Process completed");
-          // setTimeout(function() {
-          //   installer.actions.show("complete");
-          // }, 1000);
+          setTimeout(function() {
+            installer.actions.show("complete");
+          }, 1000);
         });
     }
   },
