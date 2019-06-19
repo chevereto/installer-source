@@ -196,10 +196,9 @@ var installer = {
    *
    * @param {string} action
    * @param {object} params
-   * @param {object} callback {always: fn(data), success: fn(data), error: fn(data),}
+   * @param {object} callback {success: fn(data), error: fn(data),}
    */
-  fetch: function(action, params, callback) {
-    var self = this;
+  fetch: function(action, params, callback = {}) {
     var data = new FormData();
     data.append("action", action);
     for (var key in params) {
@@ -219,6 +218,13 @@ var installer = {
     setTimeout(function() {
       loader.classList.add("loader--show");
     }, 1);
+    ["always", "error"].forEach(function(value) {
+      if (!(value in callback)) {
+        let callbackFn =
+          "fetchOn" + value.charAt(0).toUpperCase() + value.slice(1);
+        callback[value] = installer[callbackFn];
+      }
+    });
     return fetch(runtime.installerFilename, {
       method: "POST",
       body: data
@@ -227,27 +233,24 @@ var installer = {
         return response.json();
       })
       .catch(error => {
-        self.pushAlert(error);
+        installer.pushAlert(error);
       })
       .then(function(data) {
         loader.classList.remove("loader--show");
         for (let disableEl of disableEls) {
           disableEl.disabled = false;
         }
-        if (!callback.hasOwnProperty("always")) {
-          callback.always = installer.callbacks.always;
-        }
         callback.always(data);
         if (200 == data.code) {
           installer.popAlert();
-          if (callback.hasOwnProperty("success")) {
+          if ("success" in callback) {
             callback.success(data);
           }
+          return new Promise(function(resolve, reject) {
+            resolve(data);
+          });
         } else {
-          self.pushAlert(data.message);
-          if (!callback.hasOwnProperty("error")) {
-            callback.error = installer.callbacks.error;
-          }
+          installer.pushAlert(data.message);
           callback.error(data);
         }
       });
@@ -263,54 +266,13 @@ var installer = {
   checkLicense: function(key, callback) {
     return this.fetch("checkLicense", { license: key }, callback);
   },
-  callbacks: {
-    error: function() {
-      if (installer.isInstalling()) {
-        installer.abortInstall();
-      }
-    },
-    always: function(data) {
-      installer.log(data.message);
-    },
-    downloaded: function(data) {
-      installer.log("Extracting " + data.data.fileBasename);
-      installer.fetch(
-        "extract",
-        {
-          software: installer.data.software,
-          filePath: data.data.filePath,
-          workingPath: runtime.absPath + "test/"
-        },
-        {
-          // always: installer.callbacks.always,
-          // error: installer.callbacks.error,
-          success: installer.callbacks.extracted
-        }
-      );
-    },
-    extracted: function(data) {
-      installer.log("Removing installer file at " + runtime.installerFilepath);
-      installer.fetch("selfDestruct", null, {
-        // always: installer.callbacks.always,
-        error: function(data) {
-          var todo =
-            "Remove the installer file at " +
-            runtime.installerFilepath +
-            " and open " +
-            runtime.rootUrl +
-            " to continue the process.";
-          installer.pushAlert(todo);
-          installer.abortInstall(false);
-        },
-        success: function(data) {
-          // installer.setBodyInstalling(false);
-          // installer.log("Process completed");
-          // setTimeout(function() {
-          //   installer.actions.show("complete");
-          // }, 1000);
-        }
-      });
+  fetchOnError: function(data) {
+    if (installer.isInstalling()) {
+      installer.abortInstall();
     }
+  },
+  fetchOnAlways: function(data) {
+    installer.log(data.message);
   },
   actions: {
     show: function(screen) {
@@ -398,18 +360,60 @@ var installer = {
       installer.log(
         "Downloading latest " + installer.data.software + " release"
       );
-      installer.fetch(
-        "download",
-        {
+      installer
+        .fetch("download", {
           software: installer.data.software,
           license: installer.data.license
-        },
-        {
-          // always: installer.callbacks.always,
-          // error: installer.callbacks.error,
-          success: installer.callbacks.downloaded
-        }
-      );
+        })
+        .then(data => {
+          installer.log("Extracting " + data.data.fileBasename);
+          return installer.fetch("extract", {
+            software: installer.data.software,
+            filePath: data.data.filePath,
+            workingPath: runtime.absPath + "test/"
+          });
+        })
+        .then(data => {
+          installer.log("Creating app/settings.php file");
+          let = params = Object.assign({filePath: runtime.absPath + "test/app/settings.php"}, installer.data.db)
+          return installer.fetch("createSettings", params);
+        })
+        .then(data => {
+          installer.log("Performing system setup");
+          let params = {
+            username: installer.data.admin.username,
+            email: installer.data.admin.email,
+            password: installer.data.admin.password,
+            email_from_email: installer.data.email.emailNoreply,
+            email_incoming_email: installer.data.email.emailInbox,
+            website_mode: 'community',
+          };
+          return installer.fetch("submitInstallForm", params);
+        })
+        .then(data => {
+          installer.log(
+            "Removing installer file at " + runtime.installerFilepath
+          );
+          return installer.fetch("selfDestruct", null, {
+            error: function(data) {
+              var todo =
+                "Remove the installer file at " +
+                runtime.installerFilepath +
+                " and open " +
+                runtime.rootUrl +
+                " to continue the process.";
+              installer.pushAlert(todo);
+              installer.abortInstall(false);
+            }
+          });
+        })
+        .then(data => {
+          installer.setBodyInstalling(false);
+          installer.log("Process completed");
+          // setTimeout(function() {
+          //   installer.actions.show("complete");
+          // }, 1000);
+        });
     }
   },
   setBodyInstalling: function(bool) {

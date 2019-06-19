@@ -41,7 +41,7 @@ const APPLICATIONS = [
         'url' => 'https://chevereto.com',
         'zipball' => 'https://chevereto.com/api/download/latest',
         'folder' => 'chevereto',
-        'vendor' => VENDORS['chevereto'],
+        'vendor' => VENDOR,
     ],
     'chevereto-free' => [
         'name' => 'Chevereto-Free',
@@ -49,7 +49,7 @@ const APPLICATIONS = [
         'url' => 'https://github.com/Chevereto/Chevereto-Free',
         'zipball' => 'https://api.github.com/repos/Chevereto/Chevereto-Free/zipball',
         'folder' => 'Chevereto-Chevereto-Free-',
-        'vendor' => VENDORS['chevereto'],
+        'vendor' => VENDOR,
     ],
 ];
 

@@ -137,15 +137,62 @@ class Controller
         @unlink($filePath);
         $this->code = 200;
         $this->response = strtr('Extraction completeted (%n files in %ss)', ['%n' => $numFiles, '%s' => $timeTaken]);
-
-        // if (__INSTALLER_FILE__ != 'index.php') {
-        //     @unlink(__INSTALLER_FILEPATH__);
-        // }
     }
 
-    /**
-     * Removes the installer file.
-     */
+    public function createSettingsAction(array $params)
+    {
+        $settings = [];
+        foreach ($params as $k => $v) {
+            $settings["%$k%"] = $v;
+        }
+        $template = "<?php
+\$settings['db_host'] = '%host%';
+\$settings['db_port'] = '%port%';
+\$settings['db_name'] = '%name%';
+\$settings['db_user'] = '%user%';
+\$settings['db_pass'] = '%userPassword%';
+\$settings['db_table_prefix'] = 'chv_';
+\$settings['db_driver'] = 'mysql';
+\$settings['db_pdo_attrs'] = [];
+\$settings['debug_level'] = 1;";
+        $php = strtr($template, $settings);
+        $fh = @fopen($params['filePath'], 'w');
+        if (!$fh || !fwrite($fh, $php)) {
+            throw new Exception(sprintf('Unable to create %s file', $params['filePath']));
+        }
+        @fclose($fh);
+        $this->code = 200;
+        $this->response = sprintf('Settings file %s created', $params['filePath']);
+    }
+
+    public function submitInstallFormAction(array $params)
+    {
+        $formData = [
+            'username' => $params['a'],
+            'email' => $params['a'],
+            'password' => $params['a'],
+            'email_from_email' => $params['a'],
+            'email_incoming_email' => $params['a'],
+            'website_mode = community' => $params['a'],
+        ];
+        $post = $this->curl($params['url'], [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query($params),
+        ]);
+        if ($post->json->error) {
+            throw new Exception($post->json->error->message, $post->json->error->code);
+        }
+        // Detect system error
+        if (preg_match('/system error/i', $post->raw)) {
+            throw new Exception('System error :(', 400);
+        }
+        if (preg_match('/<p class="highlight\s.*">(.*)<\/p>/', $post->raw, $post_errors)) {
+            throw new Exception(strip_tags(str_replace('<br><br>', ' ', $post_errors[1])), 400);
+        }
+        $this->code = 200;
+        $this->response = 'Setup complete';
+    }
+
     public function selfDestructAction()
     {
         $filePath = $this->runtime->installerFilepath;
