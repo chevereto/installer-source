@@ -273,7 +273,7 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
           <p>Chevereto has been installed. You can now login to your dashboard panel to configure your website to fit your needs.</p>
           <p class="highlight">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
           <p>Take note on the installation details below.</p>
-          <div class="install-details p highlight force-select font-size-80p"></div>
+          <div class="install-details p highlight font-size-80p"></div>
           <p>Hope you enjoy using Chevereto as much I care in creating it. Help development by providing feedback and recommend my software.</p>
           <div>
             <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>dashboard" target="_blank">Open dashboard</a>
