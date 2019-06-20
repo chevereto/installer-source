@@ -533,6 +533,7 @@ body.body--installing .flex-box .loader {
 }
 
 .install-details pre {
+  margin: 0;
   font-family: inherit;
 }
 
