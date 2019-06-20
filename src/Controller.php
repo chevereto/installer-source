@@ -193,6 +193,8 @@ class Controller
         if ($post->json->error) {
             throw new Exception($post->json->error->message, $post->json->error->code);
         }
+        dump($post);
+        die();
         if (preg_match('/system error/i', $post->raw)) {
             throw new Exception('System error :(', 400);
         }

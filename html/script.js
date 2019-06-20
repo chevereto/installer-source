@@ -41,7 +41,7 @@ var installer = {
   isCpanelDone: false,
   isUpgradeToPaid: locationHasParameter("UpgradeToPaid"),
   process: "install",
-  defaultScreen: "cpanel",
+  defaultScreen: "welcome",
   init: function() {
     installer.log(runtime.serverString);
     if (this.isUpgradeToPaid) {
@@ -67,13 +67,6 @@ var installer = {
       },
       false
     );
-    // window.onbeforeunload = function(e) {
-    //   if (!installer.isInstalling()) {
-    //     return;
-    //   }
-    //   e.returnValue = onLeaveMessage;
-    //   return onLeaveMessage;
-    // };
     window.onpopstate = function(e) {
       var isBack = installer.uid > e.state.uid;
       var isForward = !isBack;
@@ -83,7 +76,6 @@ var installer = {
       var form = installer.getShownScreenEl("form");
       if (isForward && form) {
         if (form.checkValidity()) {
-          console.log("Forward form re-submit action:", form.dataset.trigger);
           installer.actions[form.dataset.trigger](form.dataset.arg);
           return;
         } else {
@@ -102,7 +94,6 @@ var installer = {
       forms[i].addEventListener(
         "submit",
         function(e) {
-          console.log("Form submit event: " + forms[i].dataset.trigger);
           e.preventDefault();
           e.stopPropagation();
           installer.actions[forms[i].dataset.trigger](forms[i].dataset.arg);
@@ -149,7 +140,6 @@ var installer = {
     if (!form) {
       return;
     }
-    console.log("GET active form data", form);
     var screen = this.getCurrentScreen();
     var inputEls = form.getElementsByTagName("input");
     var data = {};
@@ -161,7 +151,6 @@ var installer = {
     return data;
   },
   writeFormData: function(screen, data) {
-    console.log("Data write:" + screen, installer.data[screen]);
     installer.data[screen] = data ? data : this.getFormData();
   },
   bindActions: function() {
@@ -282,6 +271,44 @@ var installer = {
   fetchOnAlways: function(data) {
     installer.log(data.message);
   },
+  fillInstallDetails: function(data) {
+    // data.software = 'chevereto';
+
+    // data.admin = {
+    //   email: 'adminemail',
+    //   username: 'adminusername',
+    //   password: 'adminpassword'
+    // };
+      
+    // data.db = {
+    //   host: 'host',
+    //   port: 'port',
+    //   name: 'name',
+    //   user: 'user',
+    //   userPassword: 'userPassword',
+    // };
+
+    let text = "+===================================+" + "\n" +
+    "| Chevereto installation            |" + "\n" +
+    "+===================================+" + "\n" +
+    "| URL: " + runtime.rootUrl + "\n" +
+    "| Software: " + data.software + "\n" +
+    "| --" + "\n" +
+    "| Email: " + data.admin.email + "\n" +
+    "| Username: " + data.admin.username +  "\n" +
+    "| Password: " + data.admin.password + "\n" +
+    "| --" + "\n" +
+    "| Database" + "\n" +
+    "| Host: " + data.db.host + "\n" +
+    "| Port: " + data.db.port + "\n" +
+    "| Name: " + data.db.name + "\n" +
+    "| User: " + data.db.user + "\n" +
+    "| User password: " + data.db.userPassword + "\n" +
+    "+===================================+";
+    let el = document.createElement("pre");
+    el.innerHTML = text;
+    document.querySelector(".install-details").appendChild(el);
+  },
   actions: {
     show: function(screen) {
       installer.popScreen(screen);
@@ -320,12 +347,20 @@ var installer = {
       }
     },
     setUpgrade: function() {
-      // console.log("setUpgrade");
-      // document.body.classList.remove("sel--chevereto-free");
-      // document.body.classList.add("sel--chevereto");
-      // installer.data.license = document.getElementById("upgradeKey").value;
-      // installer.checkLicense(installer.data.license);
-      // this.show("complete-upgrade");
+      console.log("setUpgrade");
+      document.body.classList.remove("sel--chevereto-free");
+      document.body.classList.add("sel--chevereto");
+      var license = document.getElementById("upgradeKey").value;
+      installer.checkLicense(license, {
+        success: function() {
+          installer.data.license = license;
+          installer.actions.setSoftware("chevereto");
+          installer.actions.show("ready-upgrade");
+        },
+        error: function() {
+          installer.data.license = null;
+        }
+      });
     },
     cpanelProcess: function() {
       if(installer.isCpanelDone) {
@@ -382,8 +417,56 @@ var installer = {
       installer.writeFormData("email");
       this.show("ready");
     },
+    setReadyUpgrade() {
+      this.show("ready-upgrade");
+    },
     setReady: function() {
       this.show("ready");
+    },
+    upgrade: function() {
+      installer.setBodyInstalling(true);
+      this.show("upgrading");
+      // Software has been set to: chevereto
+      installer.log(
+        "Downloading latest " + installer.data.software + " release"
+      );
+      installer
+        .fetch("download", {
+          software: installer.data.software,
+          license: installer.data.license
+        })
+        .then(data => {
+          installer.log("Extracting " + data.data.fileBasename);
+          return installer.fetch("extract", {
+            software: installer.data.software,
+            filePath: data.data.filePath,
+            workingPath: runtime.absPath + "test/"
+          });
+        })
+        .then(data => {
+          installer.log(
+            "Removing installer file at " + runtime.installerFilepath
+          );
+          return installer.fetch("selfDestruct", null, {
+            error: function(data) {
+              var todo =
+                "Remove the installer file at " +
+                runtime.installerFilepath +
+                " and open " +
+                runtime.rootUrl +
+                " to continue the process.";
+              installer.pushAlert(todo);
+              installer.abortInstall(false);
+            }
+          });
+        })
+        .then(data => {
+          installer.setBodyInstalling(false);
+          installer.log("Upgrade completed");
+          setTimeout(function() {
+            installer.actions.show("complete-upgrade");
+          }, 1000);
+        });
     },
     install: function() {
       installer.setBodyInstalling(true);
@@ -441,7 +524,8 @@ var installer = {
         })
         .then(data => {
           installer.setBodyInstalling(false);
-          installer.log("Process completed");
+          installer.log("Installation completed");
+          installer.fillInstallDetails(installer.data);
           setTimeout(function() {
             installer.actions.show("complete");
           }, 1000);
@@ -471,7 +555,7 @@ var installer = {
       }
     }
     var time = t.h + ":" + t.m + ":" + t.s;
-    var el = document.querySelector(".install-log");
+    var el = document.querySelector(".log--" + (installer.isUpgradeToPaid ? "upgrade" : "install"));
     var p = document.createElement("p");
     var t = document.createTextNode(time + " " + message);
     p.appendChild(t);

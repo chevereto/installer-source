@@ -91,7 +91,7 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
             <div><small>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</small></div>
           </div>
           <div>
-            <button class="action radius" data-action="setLicense" data-arg="upgradeKey">Enter license key</button>
+            <button class="action radius" data-action="setUpgrade" data-arg="upgradeKey">Enter license key</button>
           </div>
         </div>
       </div>
@@ -231,13 +231,37 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
       </div>
     </div>
 
+    <div id="screen-ready-upgrade" class="screen animate animate--slow">
+      <div class="flex-box col-width">
+        <div>
+          <h1>Ready to upgrade</h1>
+          <p>The installer is ready to download and upgrade to the latest Chevereto release in <code><?php echo $runtime->absPath; ?></code></p>
+          <p class="highlight">By upgrading is understood that you accept the <a href="https://chevereto.com/license" target="_blank">Chevereto EULA</a>.</p>
+          <div>
+            <button class="action radius" data-action="upgrade">Upgrade Chevereto</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="screen-installing" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
           <h1>Installing</h1>
           <p>The software is being installed. Don't close this window until the process gets completed.</p>
           <p class="p alert"></p>
-          <div class="install-log p"></div>
+          <div class="log log--install p"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-upgrading" class="screen animate animate--slow">
+      <div class="flex-box col-width">
+        <div>
+          <h1>Upgrading</h1>
+          <p>The software is being upgraded. Don't close this window until the process gets completed.</p>
+          <p class="p alert"></p>
+          <div class="log log--upgrade p"></div>
         </div>
       </div>
     </div>
@@ -247,32 +271,10 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
         <div>
           <h1>Installation completed</h1>
           <p>Chevereto has been installed. You can now login to your dashboard panel to configure your website to fit your needs.</p>
-          <p>The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
+          <p class="highlight">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
           <p>Take note on the installation details below.</p>
-          <div class="install-details p highlight force-select font-size-80p">
-            <pre>Chevereto installation
-==========================
-
-UTC 2019-11-06 22:18:37
-
-URL: https://localhost:8888/
-Edition: Chevereto-Free
-
-#Administrator
-Email: email@domain.com
-Username: admin
-Password: password
-
-#Database
-db_host: localhost
-db_port: 3306
-db_name: chevereto_c4f2h3
-db_user: chevereto_87gnI
-db_user_passwd: &8300f(**&39)
-</pre>
-          </div>
-           
-          <p>Hope you enjoy using Chevereto as much we care in creating it. Help us by providing us feedback and recommend our software.</pp>
+          <div class="install-details p highlight force-select font-size-80p"></div>
+          <p>Hope you enjoy using Chevereto as much I care in creating it. Help development by providing feedback and recommend my software.</p>
           <div>
             <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>dashboard" target="_blank">Open dashboard</a>
             <a class="button radius" href="<?php echo $runtime->rootUrl; ?>" target="_blank">Open homepage</a>
@@ -284,13 +286,11 @@ db_user_passwd: &8300f(**&39)
     <div id="screen-complete-upgrade" class="screen animate animate--slow">
       <div class="flex-box col-width">
         <div>
-          <h1>Upgrade completed</h1>
-          <p>Chevereto has been upgraded. You can now login to your dashboard panel to configure your website to fit your needs.</p>
-          <p>The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>     
-          <p>Hope you enjoy the software and many thanks for support our work.</p>     
+          <h1>Upgrade prepared</h1>
+          <p>TThe system files have been upgraded. You can now install the upgrade which will perform the database changes needed and complete the process.</p>
+          <p class="highlight">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>     
           <div>
-            <button class="action radius" data-action="goTo" data-arg="dashboard">Open dashboard</button>
-            <button class="radius" data-action="goTo" data-arg="homepage">Open homepage</button>
+            <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>install">Install upgrade</a>
           </div>
         </div>
       </div>

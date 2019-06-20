@@ -120,7 +120,7 @@ ul>li {
 
 .highlight,
 .alert,
-.install-log {
+.log {
   font-size: 0.9em;
   padding: 1em;
 }
@@ -448,7 +448,7 @@ body.body--installing .flex-box .loader {
   margin-top: 0;
 }
 
-.install-log {
+.log {
   background: #ecf0f1;
   overflow: auto;
   max-height: 10em;
@@ -456,16 +456,16 @@ body.body--installing .flex-box .loader {
   padding: 0;
 }
 
-.install-log:empty {
+.log:empty {
   display: none;
 }
 
-.install-log p {
+.log p {
   margin: 0;
   padding: 5px;
 }
 
-.install-log p:nth-child(even) {
+.log p:nth-child(even) {
   background: rgba(255, 255, 255, .5);
 }
 
