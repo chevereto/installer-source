@@ -529,7 +529,7 @@ body.body--installing .flex-box .loader {
 
 .install-details {
   font-size: 0.9em;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: monospace;
 }
 
 .install-details pre {

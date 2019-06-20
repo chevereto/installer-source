@@ -294,11 +294,12 @@ var installer = {
     "| URL: " + runtime.rootUrl + "\n" +
     "| Software: " + data.software + "\n" +
     "| --" + "\n" +
+    "| # Admin" + "\n" +
     "| Email: " + data.admin.email + "\n" +
     "| Username: " + data.admin.username +  "\n" +
     "| Password: " + data.admin.password + "\n" +
     "| --" + "\n" +
-    "| Database" + "\n" +
+    "| # Database" + "\n" +
     "| Host: " + data.db.host + "\n" +
     "| Port: " + data.db.port + "\n" +
     "| Name: " + data.db.name + "\n" +

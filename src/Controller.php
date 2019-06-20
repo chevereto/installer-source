@@ -186,6 +186,9 @@ class Controller
 
     public function submitInstallFormAction(array $params)
     {
+        if (0 === strpos($this->runtime->server['SERVER_SOFTWARE'], 'PHP')) {
+            throw new Exception('Unable to submit the installation form under PHP development server. Go to '.$this->runtime->rootUrl.'install to complete the process.', 501);
+        }
         $post = $this->curl($params['installUrl'], [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query($params),
@@ -193,8 +196,6 @@ class Controller
         if ($post->json->error) {
             throw new Exception($post->json->error->message, $post->json->error->code);
         }
-        dump($post);
-        die();
         if (preg_match('/system error/i', $post->raw)) {
             throw new Exception('System error :(', 400);
         }
@@ -254,6 +255,7 @@ class Controller
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
         curl_setopt($ch, CURLOPT_TIMEOUT, 120);
@@ -291,6 +293,12 @@ class Controller
             }
         }
         $this->code = $transfer['http_code'];
+        if (200 != $this->code && !isset($return->json)) {
+            $return->json = new stdClass();
+            $return->json->error = new stdClass();
+            $return->json->error->message = 'Error performing HTTP request';
+            $return->json->error->code = $this->code;
+        }
         $return->transfer = $transfer;
 
         return $return;
