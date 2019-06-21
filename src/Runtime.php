@@ -57,8 +57,8 @@ class Runtime
     protected function applyPHPSettings(array $settings)
     {
         $runtimeTable = [
-            'log_errors' => ini_set('log_errors', $settings['log_errors']),
-            'display_errors' => ini_set('display_errors', $settings['display_errors']),
+            'log_errors' => ini_set('log_errors', (string) $settings['log_errors']),
+            'display_errors' => ini_set('display_errors', (string) $settings['display_errors']),
             'error_log' => ini_set('error_log', $settings['error_log']),
             'set_time_limit' => set_time_limit($settings['time_limit']),
             'ini_set' => ini_set('default_charset', $settings['default_charset']),

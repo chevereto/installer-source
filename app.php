@@ -61,8 +61,8 @@ $patterns = [
 
 $phpSettings = [
     'error_reporting' => E_ALL ^ E_NOTICE,
-    'log_errors' => '1',
-    'display_errors' => '1',
+    'log_errors' => true,
+    'display_errors' => true,
     'error_log' => __DIR__.'/installer.error.log',
     'time_limit' => 0,
     'default_charset' => 'utf-8',
@@ -100,9 +100,9 @@ $shortcutIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAMAAABOo
 const INSTALLER_FILEPATH = __FILE__;
 
 include 'src/functions.php';
+include 'src/Logger.php';
 include 'src/Installer.php';
 include 'src/ZipArchiveExt.php';
-include 'src/Logger.php';
 include 'src/Requirements.php';
 include 'src/RequirementsCheck.php';
 include 'src/Runtime.php';

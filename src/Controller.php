@@ -75,8 +75,8 @@ class Controller
     {
         $fileBasename = 'chevereto-pkg-'.substr(bin2hex(random_bytes(8)), 0, 8).'.zip';
         $filePath = $this->runtime->absPath.$fileBasename;
-        if (file_exists($downloadPath)) {
-            @unlink($downloadPath);
+        if (file_exists($filePath)) {
+            @unlink($filePath);
         }
         $isPost = false;
         $zipball = APPLICATIONS[$params['software']]['zipball'];

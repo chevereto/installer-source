@@ -99,7 +99,7 @@ class JsonResponse
 
     public function send()
     {
-        @ini_set('display_errors', false);
+        @ini_set('display_errors', '0');
         if (ob_get_level() === 0 and !ob_start('ob_gzhandler')) {
             ob_start();
         }
