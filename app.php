@@ -4,7 +4,7 @@
     Chevereto Installer
     http://chevereto.com/
 
-    @version 2.0.0
+    @version 2.0.0.beta.1
     @author	Rodolfo Berrios A. <http://rodolfoberrios.com/>
 
       /$$$$$$  /$$                                                           /$$
@@ -102,7 +102,6 @@ const INSTALLER_FILEPATH = __FILE__;
 
 include 'src/functions.php';
 include 'src/Logger.php';
-include 'src/Installer.php';
 include 'src/ZipArchiveExt.php';
 include 'src/Requirements.php';
 include 'src/RequirementsCheck.php';
