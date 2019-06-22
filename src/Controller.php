@@ -30,7 +30,7 @@ class Controller
 
     public function checkLicenseAction(array $params)
     {
-        $post = $this->curl('https://chevereto.com/api/license/check', [
+        $post = $this->curl(VENDOR['apiLicense'], [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query(['license' => $params['license']]),
         ]);
@@ -255,7 +255,7 @@ class Controller
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
         curl_setopt($ch, CURLOPT_TIMEOUT, 120);

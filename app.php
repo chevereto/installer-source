@@ -26,12 +26,13 @@ const APP_VERSION = '2.0.0';
 const APP_URL = 'https://github.com/Chevereto/Installer';
 
 const PHP_VERSION_MIN = '7.0';
-const PHP_VERSION_RECOMMENDED = '7.2';
+const PHP_VERSION_RECOMMENDED = '7.3';
 
 const VENDOR = [
     'name' => 'Chevereto',
     'url' => 'https://chevereto.com',
     'apiUrl' => 'https://chevereto.com/api',
+    'apiLicense' => 'https://chevereto.com/api/license/check',
 ];
 
 const APPLICATIONS = [

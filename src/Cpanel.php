@@ -36,7 +36,6 @@ class Cpanel
         // cPanel API Tokens aren't widely supported yet
 
         $url = 'https://localhost:2083';
-        $url = 'https://releasetag.com:2083';
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_NOBODY, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -89,8 +88,6 @@ class Cpanel
      * Creates a MySQL database, its user and set privileges.
      *
      * @param string $prefix vendor prefix
-     *
-     * @return array ['db_name' =>, 'db_user' =>, 'db_user_password' =>,]
      */
     public function setupMysql(string $prefix = null)
     {
