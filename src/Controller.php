@@ -164,7 +164,7 @@ class Controller
         foreach ($params as $k => $v) {
             $settings["%$k%"] = $v;
         }
-        $template = "<?php
+        $template = '<'."?php
 \$settings['db_host'] = '%host%';
 \$settings['db_port'] = '%port%';
 \$settings['db_name'] = '%name%';
