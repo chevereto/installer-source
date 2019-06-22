@@ -34,8 +34,8 @@ class Make
 
     public function __construct(string $sourceFilepath, string $targetFilepath)
     {
-        $this->sourceFilepath = realpath($sourceFilepath);
-        $this->targetFilepath = realpath($targetFilepath);
+        $this->sourceFilepath = $sourceFilepath;
+        $this->targetFilepath = $targetFilepath;
         $this->contents = file_get_contents($sourceFilepath);
         $this->putTemplate('template/content.php');
         $this->replacePHPFile("/include '(.*)';/");
