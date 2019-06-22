@@ -441,7 +441,7 @@ var installer = {
           return installer.fetch("extract", {
             software: installer.data.software,
             filePath: data.data.filePath,
-            workingPath: runtime.absPath + "test/"
+            workingPath: runtime.absPath
           });
         })
         .then(data => {
@@ -485,18 +485,18 @@ var installer = {
           return installer.fetch("extract", {
             software: installer.data.software,
             filePath: data.data.filePath,
-            workingPath: runtime.absPath + "test/"
+            workingPath: runtime.absPath
           });
         })
         .then(data => {
           installer.log("Creating app/settings.php file");
-          let = params = Object.assign({filePath: runtime.absPath + "test/app/settings.php"}, installer.data.db)
+          let = params = Object.assign({filePath: runtime.absPath + "app/settings.php"}, installer.data.db)
           return installer.fetch("createSettings", params);
         })
         .then(data => {
           installer.log("Performing system setup");
           let params = {
-            installUrl: runtime.rootUrl + "test/install",
+            installUrl: runtime.rootUrl + "install",
             username: installer.data.admin.username,
             email: installer.data.admin.email,
             password: installer.data.admin.password,

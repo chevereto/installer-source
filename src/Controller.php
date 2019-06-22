@@ -209,8 +209,9 @@ class Controller
     public function selfDestructAction()
     {
         $filePath = $this->runtime->installerFilepath;
-        // @unlink($filePath);
-        if (true) {
+        $basename = basename($filePath);
+        $isDone = 'app.php' == $basename ?: @unlink($filePath);
+        if ($isDone) {
             $this->code = 200;
             $this->response = 'Installer removed';
         } else {
