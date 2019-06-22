@@ -109,9 +109,6 @@ class Controller
 
     public function extractAction(array $params)
     {
-        $this->code = 400;
-        $this->response = 'Pal paico';
-
         if (!$params['software']) {
             throw new Exception('Missing software parameter', 400);
         } elseif (!isset(APPLICATIONS[$params['software']])) {
@@ -186,10 +183,11 @@ class Controller
 
     public function submitInstallFormAction(array $params)
     {
+        $installUrl = $this->runtime->rootUrl.'install';
         if (0 === strpos($this->runtime->server['SERVER_SOFTWARE'], 'PHP')) {
-            throw new Exception('Unable to submit the installation form under PHP development server. Go to '.$this->runtime->rootUrl.'install to complete the process.', 501);
+            throw new Exception('Unable to submit the installation form under PHP development server. Go to '.$installUrl.' to complete the process.', 501);
         }
-        $post = $this->curl($params['installUrl'], [
+        $post = $this->curl($installUrl, [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query($params),
         ]);

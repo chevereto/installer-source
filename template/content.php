@@ -33,7 +33,7 @@
           <p>Confirm that the above details match to where you want to install Chevereto and that there's no other software installed.</p>
 <?php
 if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
-          <p>Add the following <a href="<?php echo $runtime->rootUrl.$runtime->installerFilename.'?getNginxRules'; ?>" target="_blank">server rules</a> to your <a href="https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts" target="_blank">nginx.conf</a> server block. Restart the server to apply changes. Once done, come back here and continue the process.</p>
+          <p class="alert">Add the following <a href="<?php echo $runtime->rootUrl.$runtime->installerFilename.'?getNginxRules'; ?>" target="_blank">server rules</a> to your <a href="https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts" target="_blank">nginx.conf</a> server block. <b>Restart the server to apply changes</b>. Once done, come back here and continue the process.</p>
 <?php } ?>
           <div>
             <button class="action radius" data-action="show" data-arg="license">Continue</button>

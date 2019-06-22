@@ -496,7 +496,6 @@ var installer = {
         .then(data => {
           installer.log("Performing system setup");
           let params = {
-            installUrl: runtime.rootUrl + "install",
             username: installer.data.admin.username,
             email: installer.data.admin.email,
             password: installer.data.admin.password,
