@@ -287,7 +287,7 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
       <div class="flex-box col-width">
         <div>
           <h1>Upgrade prepared</h1>
-          <p>TThe system files have been upgraded. You can now install the upgrade which will perform the database changes needed and complete the process.</p>
+          <p>The system files have been upgraded. You can now install the upgrade which will perform the database changes needed and complete the process.</p>
           <p class="alert">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>     
           <div>
             <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>install">Install upgrade</a>
