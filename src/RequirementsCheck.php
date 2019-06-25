@@ -219,9 +219,15 @@ class RequirementsCheck
 
     public function checkSourceAPI()
     {
-        $headers = @get_headers(VENDOR['apiUrl'], 1);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, VENDOR['apiUrl']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_NOBODY, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        $headers = curl_exec($ch);
+        $http_statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
         if ($headers) {
-            $http_statusCode = substr($headers[0], 9, 3);
             if ($http_statusCode != 200) {
                 $http_error_link = '<a href="https://en.wikipedia.org/wiki/HTTP_'.$http_statusCode.'" target="_blank">HTTP '.$http_statusCode.'</a>';
                 $this->addMissing('Chevereto API', VENDOR['apiUrl'], "An $http_error_link error occurred when trying to connect to %l");

@@ -118,7 +118,7 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
             <input class="radius width-100p" type="password" name="cpanelPassword" id="cpanelPassword" placeholder="password" autocomplete="off">
           </div>
           <div>
-            <button class="action radius" data-action="cpanelProcess">Connect to cPanel</button>
+            <button class="action radius" data-action="cPanelProcess">Connect to cPanel</button>
             <button class="radius" data-action="show" data-arg="db">Skip</button>
           </div>
         </div>
@@ -271,7 +271,7 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
         <div>
           <h1>Installation completed</h1>
           <p>Chevereto has been installed. You can now login to your dashboard panel to configure your website to fit your needs.</p>
-          <p class="highlight">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
+          <p class="alert">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
           <p>Take note on the installation details below.</p>
           <div class="install-details p highlight font-size-80p"></div>
           <p>Hope you enjoy using Chevereto as much I care in creating it. Help development by providing feedback and recommend my software.</p>
@@ -288,7 +288,7 @@ if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
         <div>
           <h1>Upgrade prepared</h1>
           <p>TThe system files have been upgraded. You can now install the upgrade which will perform the database changes needed and complete the process.</p>
-          <p class="highlight">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>     
+          <p class="alert">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>     
           <div>
             <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>install">Install upgrade</a>
           </div>

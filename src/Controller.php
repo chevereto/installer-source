@@ -71,6 +71,23 @@ class Controller
         }
     }
 
+    public function cPanelHtaccessHandlersAction(array $params)
+    {
+        try {
+            $handlers = Cpanel::getHtaccessHandlers($this->runtime->absPath.'.htaccess');
+            if ($handlers) {
+                $this->code = 200;
+                $this->response = 'cPanel .htaccess handlers found';
+                $this->data['handlers'] = trim($handlers);
+            } else {
+                $this->code = 404;
+                $this->response = 'No cPanel .htaccess handlers found';
+            }
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), 503);
+        }
+    }
+
     public function downloadAction(array $params)
     {
         $fileBasename = 'chevereto-pkg-'.substr(bin2hex(random_bytes(8)), 0, 8).'.zip';
@@ -151,6 +168,12 @@ class Controller
         $zipExt->close();
         $timeTaken = round(microtime(true) - $timeStart, 2);
         @unlink($filePath);
+
+        $htaccessFiepath = $workingPath.'.htaccess';
+        if ($params['appendHtaccess'] && file_exists($htaccessFiepath)) {
+            file_put_contents($htaccessFiepath, "\n\n".$params['appendHtaccess'], FILE_APPEND | LOCK_EX);
+        }
+
         $this->code = 200;
         $this->response = strtr('Extraction completeted (%n files in %ss)', ['%n' => $numFiles, '%s' => $timeTaken]);
     }

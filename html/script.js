@@ -235,20 +235,23 @@ var installer = {
           disableEl.disabled = false;
         }
         callback.always(data);
+        let callbackRes;
         if (200 == data.code) {
           installer.popAlert();
           if ("success" in callback) {
-            callback.success(data);
+            callbackRes = callback.success(data);
           }
           return new Promise(function(resolve, reject) {
             resolve(data);
           });
         } else {
-          installer.pushAlert(data.message);
-          callback.error(data);
-          return new Promise(function(resolve, reject) {
-            reject(data);
-          });
+          callbackRes = callback.error(data);
+          if(true !== callbackRes) {
+            installer.pushAlert(data.message);
+            return new Promise(function(resolve, reject) {
+              reject(data);
+            });
+          }
         }
       });
   },
@@ -363,7 +366,7 @@ var installer = {
         }
       });
     },
-    cpanelProcess: function() {
+    cPanelProcess: function() {
       if(installer.isCpanelDone) {
         installer.actions.show("admin");
         return;
@@ -383,7 +386,7 @@ var installer = {
           params[key] = el.value;
         }
       }
-      installer.fetch("cpanelProcess", params, {
+      installer.fetch("cPanelProcess", params, {
         error: function(data) {
           installer.isCpanelDone = false;
         }
@@ -427,7 +430,6 @@ var installer = {
     upgrade: function() {
       installer.setBodyInstalling(true);
       this.show("upgrading");
-      // Software has been set to: chevereto
       installer.log(
         "Downloading latest " + installer.data.software + " release"
       );
@@ -458,6 +460,7 @@ var installer = {
                 " to continue the process.";
               installer.pushAlert(todo);
               installer.abortInstall(false);
+              return false;
             }
           });
         })
@@ -472,20 +475,29 @@ var installer = {
     install: function() {
       installer.setBodyInstalling(true);
       this.show("installing");
-      installer.log(
-        "Downloading latest " + installer.data.software + " release"
-      );
+
+      installer.log("Detecting existing cPanel .htaccess handlers");
       installer
-        .fetch("download", {
-          software: installer.data.software,
-          license: installer.data.license
+        .fetch("cPanelHtaccessHandlers")
+        .then(json => {
+          installer.data.cPanelHtaccessHandlers = "data" in json ? json.data.handlers : null;
+        })
+        .then(data => {
+          installer.log(
+            "Downloading latest " + installer.data.software + " release"
+          );
+          return installer.fetch("download", {
+            software: installer.data.software,
+            license: installer.data.license
+          })
         })
         .then(data => {
           installer.log("Extracting " + data.data.fileBasename);
           return installer.fetch("extract", {
             software: installer.data.software,
             filePath: data.data.filePath,
-            workingPath: runtime.absPath
+            workingPath: runtime.absPath,
+            appendHtaccess: installer.data.cPanelHtaccessHandlers,
           });
         })
         .then(data => {
@@ -519,6 +531,7 @@ var installer = {
                 " to continue the process.";
               installer.pushAlert(todo);
               installer.abortInstall(false);
+              return false;
             }
           });
         })

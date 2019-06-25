@@ -158,6 +158,15 @@ class Cpanel
         ];
     }
 
+    public static function getHtaccessHandlers(string $filepath)
+    {
+        $contents = file_get_contents($filepath);
+        preg_match_all('/# php -- BEGIN cPanel-generated handler, do not edit[\s\S]+# php -- END cPanel-generated handler, do not edit/', $contents, $matches);
+        if ($matches) {
+            return $matches[0][0];
+        }
+    }
+
     public static function getDbRandomName(string $prefix, int $maxLength)
     {
         $maxRandomLength = $maxLength - strlen($prefix);
