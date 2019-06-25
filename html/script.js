@@ -274,23 +274,31 @@ var installer = {
   fetchOnAlways: function(data) {
     installer.log(data.message);
   },
+  fetchCommonInit: function() {
+    this.log("Detecting existing cPanel .htaccess handlers");
+    return this
+      .fetch("cPanelHtaccessHandlers")
+      .then(json => {
+        installer.data.cPanelHtaccessHandlers = "data" in json ? json.data.handlers : null;
+      })
+      .then(json => {
+        installer.log("Downloading latest " + installer.data.software + " release");
+        return installer.fetch("download", {
+          software: installer.data.software,
+          license: installer.data.license
+        });
+      })
+      .then(json => {
+        installer.log("Extracting " + json.data.fileBasename);
+        return installer.fetch("extract", {
+          software: installer.data.software,
+          filePath: json.data.filePath,
+          workingPath: runtime.absPath,
+          appendHtaccess: installer.data.cPanelHtaccessHandlers,
+        });
+      });
+  },
   fillInstallDetails: function(data) {
-    // data.software = 'chevereto';
-
-    // data.admin = {
-    //   email: 'adminemail',
-    //   username: 'adminusername',
-    //   password: 'adminpassword'
-    // };
-      
-    // data.db = {
-    //   host: 'host',
-    //   port: 'port',
-    //   name: 'name',
-    //   user: 'user',
-    //   userPassword: 'userPassword',
-    // };
-
     let text = "+===================================+" + "\n" +
     "| Chevereto installation            |" + "\n" +
     "+===================================+" + "\n" +
@@ -434,18 +442,7 @@ var installer = {
         "Downloading latest " + installer.data.software + " release"
       );
       installer
-        .fetch("download", {
-          software: installer.data.software,
-          license: installer.data.license
-        })
-        .then(data => {
-          installer.log("Extracting " + data.data.fileBasename);
-          return installer.fetch("extract", {
-            software: installer.data.software,
-            filePath: data.data.filePath,
-            workingPath: runtime.absPath
-          });
-        })
+        .fetchCommonInit()
         .then(data => {
           installer.log(
             "Removing installer file at " + runtime.installerFilepath
@@ -476,30 +473,8 @@ var installer = {
       installer.setBodyInstalling(true);
       this.show("installing");
 
-      installer.log("Detecting existing cPanel .htaccess handlers");
       installer
-        .fetch("cPanelHtaccessHandlers")
-        .then(json => {
-          installer.data.cPanelHtaccessHandlers = "data" in json ? json.data.handlers : null;
-        })
-        .then(data => {
-          installer.log(
-            "Downloading latest " + installer.data.software + " release"
-          );
-          return installer.fetch("download", {
-            software: installer.data.software,
-            license: installer.data.license
-          })
-        })
-        .then(data => {
-          installer.log("Extracting " + data.data.fileBasename);
-          return installer.fetch("extract", {
-            software: installer.data.software,
-            filePath: data.data.filePath,
-            workingPath: runtime.absPath,
-            appendHtaccess: installer.data.cPanelHtaccessHandlers,
-          });
-        })
+        .fetchCommonInit()
         .then(data => {
           installer.log("Creating app/settings.php file");
           let = params = Object.assign({filePath: runtime.absPath + "app/settings.php"}, installer.data.db)
