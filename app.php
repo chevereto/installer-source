@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 /* --- Begins: Dev editable --- */
 const APP_NAME = 'Chevereto Installer';
-const APP_VERSION = '2.0.0.beta.1';
+const APP_VERSION = '2.0.0.beta.3';
 const APP_URL = 'https://github.com/Chevereto/Installer';
 
 const PHP_VERSION_MIN = '7.0';
@@ -98,26 +98,8 @@ $shortcutIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAMAAABOo
 
 /* --- Ends: Dev editable --- */
 
+define('ERROR_LOG_FILEPATH', $phpSettings['error_log']);
 const INSTALLER_FILEPATH = __FILE__;
-// const ERROR_LOG_FILEPATH = $phpSettings['error_log'];
-
-const ERROR_TABLE = [
-    E_ERROR => 'Fatal error',
-    E_WARNING => 'Warning',
-    E_PARSE => 'Parse error',
-    E_NOTICE => 'Notice',
-    E_CORE_ERROR => 'Core error',
-    E_CORE_WARNING => 'Core warning',
-    E_COMPILE_ERROR => 'Compile error',
-    E_COMPILE_WARNING => 'Compile warning',
-    E_USER_ERROR => 'Fatal error',
-    E_USER_WARNING => 'Warning',
-    E_USER_NOTICE => 'Notice',
-    E_STRICT => 'Strict standars',
-    E_RECOVERABLE_ERROR => 'Recoverable error',
-    E_DEPRECATED => 'Deprecated',
-    E_USER_DEPRECATED => 'Deprecated',
-];
 
 include 'src/functions.php';
 include 'src/setErrorExceptionHandler.php';
@@ -166,11 +148,12 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
             if ($controller->data) {
                 $jsonResponse->setData($controller->data);
             }
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $jsonResponse->setResponse($e->getMessage(), $e->getCode());
         }
     }
     $jsonResponse->send();
+    die();
 } else {
     if (isset($_GET['getNginxRules'])) {
         require 'template/nginx.php';
@@ -202,6 +185,7 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
         <?php echo $css; ?>
     </style>
     <script>
+        const appUrl = <?php echo json_encode(APP_URL); ?>;
         const runtime = <?php echo json_encode($jsVars); ?>;
         const patterns = <?php echo json_encode($patterns); ?>;
     </script>

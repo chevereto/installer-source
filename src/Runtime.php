@@ -35,10 +35,6 @@ class Runtime
     public function __construct(Logger $logger)
     {
         $this->logger = $logger;
-
-        trigger_error('Quedo algo malo!', E_USER_ERROR);
-
-        throw new Exception('Duh!!');
     }
 
     public function setSettings(array $settings)
@@ -91,7 +87,13 @@ class Runtime
         $this->installerFilepath = INSTALLER_FILEPATH;
         $this->httpHost = $this->server['HTTP_HOST'];
         $this->serverSoftware = $this->server['SERVER_SOFTWARE'];
-        $this->httpProtocol = 'http' . (((!empty($this->server['HTTPS']) && strtolower($this->server['HTTPS']) == 'on') || $this->server['HTTP_X_FORWARDED_PROTO'] == 'https') ? 's' : null);
+        $httpProtocol = 'http';
+        $isHttpsOn = !empty($this->server['HTTPS']) && strtolower($this->server['HTTPS']) == 'on';
+        $isHttpsX = isset($this->server['HTTP_X_FORWARDED_PROTO']) && $this->server['HTTP_X_FORWARDED_PROTO'] == 'https';
+        if ($isHttpsOn || $isHttpsX) {
+            $httpProtocol .= 's';
+        }
+        $this->httpProtocol = $httpProtocol;
         $this->rootUrl = $this->httpProtocol . '://' . $this->httpHost . $this->relPath;
         $this->serverString = 'Server ' . $this->httpHost . ' PHP ' . phpversion();
         $this->setWorkingPaths([INSTALLER_FILEPATH, $this->absPath]);

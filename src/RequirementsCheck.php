@@ -59,7 +59,7 @@ class RequirementsCheck
     public function checkPHPVersion(array $phpVersions)
     {
         if (version_compare(PHP_VERSION, $phpVersions[0], '<')) {
-            $this->addMissing('PHP', 'https://php.net', 'Use a newer %l version (%c '.$phpVersions[0].' required, '.$phpVersions[1].' recommended)');
+            $this->addMissing('PHP', 'https://php.net', 'Use a newer %l version (%c ' . $phpVersions[0] . ' required, ' . $phpVersions[1] . ' recommended)');
         }
     }
 
@@ -88,12 +88,12 @@ class RequirementsCheck
                     $v = strtolower($v);
                 }
             } else {
-                $function = create_function('$var', 'return @'.$core_check[1].'($var);');
+                $function = create_function('$var', 'return @' . $core_check[1] . '($var);');
             }
             foreach ($array as $k => $v) {
-                if (($loaded && !in_array(strtolower($k), $loaded)) || ($function && $function($k))) {
+                if (($loaded && !in_array(strtolower($k), $loaded)) || (isset($function) && $function($k))) {
                     $missing['c'][] = $k;
-                    $missing['l'][] = 'http://www.php.net/manual/'.$v.'.php';
+                    $missing['l'][] = 'http://www.php.net/manual/' . $v . '.php';
                 }
             }
             if ($missing) {
@@ -106,10 +106,10 @@ class RequirementsCheck
                     $this->addMissing($missing['c'][0], $missing['l'][0], $message);
                 } else {
                     foreach ($missing['l'] as $k => $v) {
-                        $l[] = '%l'.$k;
+                        $l[] = '%l' . $k;
                     }
                     $last = array_pop($l);
-                    $missing_strtr['%l'] = implode(', ', $l).' and '.$last;
+                    $missing_strtr['%l'] = implode(', ', $l) . ' and ' . $last;
                     $missing_strtr['%n'] = $n[1];
                     $message = strtr($message, $missing_strtr);
                     $this->addBundleMissing($missing['c'], $missing['l'], $message);
@@ -124,7 +124,7 @@ class RequirementsCheck
             $tz = @date_default_timezone_get();
             $dtz = @date_default_timezone_set($tz);
             if (!$dtz && !@date_default_timezone_set('America/Santiago')) {
-                $this->addMissing(array('timezone', 'date.timezone'), array('http://php.net/manual/en/timezones.php', 'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'), '<b>'.$tz.'</b> is not a valid %l0 identifier in %l1');
+                $this->addMissing(array('timezone', 'date.timezone'), array('http://php.net/manual/en/timezones.php', 'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'), '<b>' . $tz . '</b> is not a valid %l0 identifier in %l1');
             }
         }
     }
@@ -141,7 +141,7 @@ class RequirementsCheck
                 $session_errors[] = $k;
             }
             if (isset($session_errors)) {
-                $this->addMissing(array('session', 'session.save_path'), array($session_link, 'http://php.net/manual/en/session.configuration.php#ini.session.save-path'), str_replace('%s', implode('/', $session_errors), 'Missing PHP <b>%s</b> permission in <b>'.$session_save_path.'</b> (%l1)'));
+                $this->addMissing(array('session', 'session.save_path'), array($session_link, 'http://php.net/manual/en/session.configuration.php#ini.session.save-path'), str_replace('%s', implode('/', $session_errors), 'Missing PHP <b>%s</b> permission in <b>' . $session_save_path . '</b> (%l1)'));
             }
         }
         $_SESSION['chevereto-installer'] = true;
@@ -161,8 +161,8 @@ class RequirementsCheck
             }
             if (isset($permissions_errors)) {
                 $error = implode('/', $permissions_errors);
-                $component = $var.' '.$error.' permission'.(count($permissions_errors) > 1 ? 's' : null);
-                $message = "PHP don't have  %l permission in <code>".$var.'</code>';
+                $component = $var . ' ' . $error . ' permission' . (count($permissions_errors) > 1 ? 's' : null);
+                $message = "PHP don't have  %l permission in <code>" . $var . '</code>';
                 $this->addMissing($error, 'https://unix.stackexchange.com/questions/35711/giving-php-permission-to-write-to-files-and-folders', $message);
                 unset($permissions_errors);
             }
@@ -175,8 +175,8 @@ class RequirementsCheck
             $this->addMissing('GD Library', 'http://php.net/manual/en/book.image.php', 'Enable %l');
         } else {
             foreach (array('PNG', 'GIF', 'JPG', 'WBMP') as $k => $v) {
-                if (!imagetypes() & constant('IMG_'.$v)) {
-                    $this->addMissing('GD Library', 'http://php.net/manual/en/book.image.php', 'Enable %l '.$v.' image support');
+                if (!imagetypes() & constant('IMG_' . $v)) {
+                    $this->addMissing('GD Library', 'http://php.net/manual/en/book.image.php', 'Enable %l ' . $v . ' image support');
                 }
             }
         }
@@ -202,7 +202,7 @@ class RequirementsCheck
         foreach (array('utf8_encode', 'utf8_decode') as $v) {
             if (!function_exists($v)) {
                 $utf8_errors['c'][] = $v;
-                $utf8_errors['l'][] = 'http://php.net/manual/en/function.'.str_replace('_', '-', $v).'.php';
+                $utf8_errors['l'][] = 'http://php.net/manual/en/function.' . str_replace('_', '-', $v) . '.php';
             }
         }
         if ($utf8_errors) {
@@ -229,12 +229,12 @@ class RequirementsCheck
         curl_close($ch);
         if ($headers) {
             if ($http_statusCode != 200) {
-                $http_error_link = '<a href="https://en.wikipedia.org/wiki/HTTP_'.$http_statusCode.'" target="_blank">HTTP '.$http_statusCode.'</a>';
+                $http_error_link = '<a href="https://en.wikipedia.org/wiki/HTTP_' . $http_statusCode . '" target="_blank">HTTP ' . $http_statusCode . '</a>';
                 $this->addMissing('Chevereto API', VENDOR['apiUrl'], "An $http_error_link error occurred when trying to connect to %l");
             }
         } else {
             $api_parse_url = parse_url(VENDOR['apiUrl']);
-            $api_offline_link = '<a href="https://isitdownorjust.me/'.$api_parse_url['host'].'" target="_blank">offline</a>';
+            $api_offline_link = '<a href="https://isitdownorjust.me/' . $api_parse_url['host'] . '" target="_blank">offline</a>';
             $this->addMissing('Chevereto API', VENDOR['apiUrl'], "Can't connect to %l. Check for any outgoing network blocking or maybe our server is $api_offline_link at this time");
         }
     }
@@ -262,8 +262,8 @@ class RequirementsCheck
         $placeholders = array();
         foreach ($components as $k => $v) {
             $this->missed[] = $v;
-            $placeholders['%c'.$k] = $v;
-            $placeholders['%l'.$k] = '<a href="'.$urls[$k].'" target="_blank">'.$v.'</a>';
+            $placeholders['%c' . $k] = $v;
+            $placeholders['%l' . $k] = '<a href="' . $urls[$k] . '" target="_blank">' . $v . '</a>';
         }
         $message = strtr($msgtpl, $placeholders);
         $this->errors[] = $message;

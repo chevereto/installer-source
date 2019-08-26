@@ -21,15 +21,18 @@ class Controller
             throw new Exception('Missing action parameter', 400);
         }
         $this->params = $params;
-        $method = $params['action'].'Action';
+        $method = $params['action'] . 'Action';
         if (!method_exists($this, $method)) {
-            throw new Exception('Invalid action '.$params['action'], 400);
+            throw new Exception('Invalid action ' . $params['action'], 400);
         }
-        $action = $this->{$method}($this->params);
+        $this->{$method}($this->params);
     }
 
     public function checkLicenseAction(array $params)
     {
+        // die('failureeeee');
+        // throw new Exception('eeeeeeeeeeeee', 123);
+        // trigger_error('No anda bien hehe');
         $post = $this->curl(VENDOR['apiLicense'], [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query(['license' => $params['license']]),
@@ -44,7 +47,11 @@ class Controller
     {
         try {
             $database = new Database(
-                $params['host'], $params['port'], $params['name'], $params['user'], $params['userPassword']
+                $params['host'],
+                $params['port'],
+                $params['name'],
+                $params['user'],
+                $params['userPassword']
             );
             $database->checkEmpty();
             $database->checkPrivileges();
@@ -73,7 +80,7 @@ class Controller
 
     public function cPanelHtaccessHandlersAction(array $params)
     {
-        $filePath = $this->runtime->absPath.'.htaccess';
+        $filePath = $this->runtime->absPath . '.htaccess';
         if (!@is_readable($filePath)) {
             $this->code = 404;
             $this->response = 'No .htaccess found';
@@ -96,8 +103,8 @@ class Controller
 
     public function downloadAction(array $params)
     {
-        $fileBasename = 'chevereto-pkg-'.substr(bin2hex(random_bytes(8)), 0, 8).'.zip';
-        $filePath = $this->runtime->absPath.$fileBasename;
+        $fileBasename = 'chevereto-pkg-' . substr(bin2hex(random_bytes(8)), 0, 8) . '.zip';
+        $filePath = $this->runtime->absPath . $fileBasename;
         if (file_exists($filePath)) {
             @unlink($filePath);
         }
@@ -118,13 +125,13 @@ class Controller
         }
         // Everybody else
         if (200 != $curl->transfer['http_code']) {
-            throw new Exception('[HTTP '.$curl->transfer['http_code'].'] '.$zipball, $curl->transfer['http_code']);
+            throw new Exception('[HTTP ' . $curl->transfer['http_code'] . '] ' . $zipball, $curl->transfer['http_code']);
         }
         $fileSize = filesize($filePath);
         $this->response = strtr('Downloaded %f (%w @%s)', array(
             '%f' => $fileBasename,
             '%w' => $this->getFormatBytes($fileSize),
-            '%s' => $this->getBytesToMb($curl->transfer['speed_download']).'MB/s.',
+            '%s' => $this->getBytesToMb($curl->transfer['speed_download']) . 'MB/s.',
         ));
         $this->data['fileBasename'] = $fileBasename;
         $this->data['filePath'] = $filePath;
@@ -161,7 +168,7 @@ class Controller
         if (false === $zipOpen) {
             throw new Exception(strtr("Can't extract %f - %m", array(
                 '%f' => $filePath,
-                '%m' => 'ZipArchive '.$zipOpen.' error',
+                '%m' => 'ZipArchive ' . $zipOpen . ' error',
             )), 503);
         }
         $numFiles = $zipExt->numFiles - 1; // because of top level folder
@@ -175,9 +182,9 @@ class Controller
         $timeTaken = round(microtime(true) - $timeStart, 2);
         @unlink($filePath);
 
-        $htaccessFiepath = $workingPath.'.htaccess';
+        $htaccessFiepath = $workingPath . '.htaccess';
         if ($params['appendHtaccess'] && file_exists($htaccessFiepath)) {
-            file_put_contents($htaccessFiepath, "\n\n".$params['appendHtaccess'], FILE_APPEND | LOCK_EX);
+            file_put_contents($htaccessFiepath, "\n\n" . $params['appendHtaccess'], FILE_APPEND | LOCK_EX);
         }
 
         $this->code = 200;
@@ -190,7 +197,7 @@ class Controller
         foreach ($params as $k => $v) {
             $settings["%$k%"] = $v;
         }
-        $template = '<'."?php
+        $template = '<' . "?php
 \$settings['db_host'] = '%host%';
 \$settings['db_port'] = '%port%';
 \$settings['db_name'] = '%name%';
@@ -212,9 +219,9 @@ class Controller
 
     public function submitInstallFormAction(array $params)
     {
-        $installUrl = $this->runtime->rootUrl.'install';
+        $installUrl = $this->runtime->rootUrl . 'install';
         if (0 === strpos($this->runtime->server['SERVER_SOFTWARE'], 'PHP')) {
-            throw new Exception('Unable to submit the installation form under PHP development server. Go to '.$installUrl.' to complete the process.', 501);
+            throw new Exception('Unable to submit the installation form under PHP development server. Go to ' . $installUrl . ' to complete the process.', 501);
         }
         $post = $this->curl($installUrl, [
             CURLOPT_POST => true,
@@ -243,7 +250,7 @@ class Controller
             $this->response = 'Installer removed';
         } else {
             $this->code = 503;
-            $this->response = 'Unable to remove installer file at '.$filePath;
+            $this->response = 'Unable to remove installer file at ' . $filePath;
         }
     }
 
@@ -258,7 +265,7 @@ class Controller
     {
         $fp = @fopen($filePath, 'wb+');
         if (!$fp) {
-            throw new Exception("Can't open temp file ".$filePath.' (wb+)');
+            throw new Exception("Can't open temp file " . $filePath . ' (wb+)');
         }
         $ops = [
             CURLOPT_FILE => $fp,
@@ -303,7 +310,7 @@ class Controller
         if (curl_errno($ch)) {
             $curl_error = curl_error($ch);
             curl_close($ch);
-            throw new Exception('Curl error '.$curl_error, 503);
+            throw new Exception('Curl error ' . $curl_error, 503);
         }
         curl_close($ch);
         $return = new stdClass();

@@ -99,11 +99,14 @@ class JsonResponse
 
     public function send()
     {
+        // if (headers_sent()) {
+        //     throw new Exception('Headers have been already sent.');
+        // }
         @ini_set('display_errors', '0');
         if (ob_get_level() === 0 and !ob_start('ob_gzhandler')) {
             ob_start();
         }
-        header('Last-Modified: '.gmdate('D, d M Y H:i:s').'GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . 'GMT');
         header('Cache-Control: no-cache, must-revalidate');
         header('Pragma: no-cache');
         header('Content-type: application/json; charset=UTF-8');
@@ -112,10 +115,10 @@ class JsonResponse
             $this->setResponse("Data couldn't be encoded", 500);
             $this->data = null;
         }
-        if ($this->code) {
+        if (isset($this->code) and isset(static::HTTP_CODES[$this->code])) {
             $this->setStatusCode($this->code);
         }
-        echo $this->data ? $json : json_encode($this, JSON_FORCE_OBJECT);
+        echo isset($this->data) ? $json : json_encode($this, JSON_FORCE_OBJECT);
         die();
     }
 }

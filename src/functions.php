@@ -14,7 +14,7 @@ function dump()
     }
     echo '</pre>';
 }
-function put(string $filename, string $contents)
+function append(string $filename, string $contents)
 {
     if (!file_exists($filename)) {
         $dirname = dirname($filename);
@@ -22,7 +22,7 @@ function put(string $filename, string $contents)
             createPath($dirname);
         }
     }
-    if (false === @file_put_contents($filename, $contents)) {
+    if (false === @file_put_contents($filename, $contents, FILE_APPEND)) {
         throw new RuntimeException('Unable to write content to file ' . $filename);
     }
 }

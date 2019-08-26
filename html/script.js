@@ -118,7 +118,6 @@ var installer = {
     }, 500);
   },
   pushAlert: function(message) {
-    console.error(message);
     var pushiInnerHTML =
       "<span>" + message + '</span><a class="alert-close"></a>';
     var el = this.getShownScreenEl(".alert");
@@ -224,11 +223,20 @@ var installer = {
       body: data
     })
       .then(function(response) {
-        return response.json();
+        return response.text();
+      })
+      .then(text => {
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            console.log(text)
+            throw Error("Unable to parse server response. The installer is expecting a JSON response, but your server thrown this:<pre>" + text + "</pre> This is not normal and you should report it to our <a href='"+appUrl+"' target='_blank'>GitHub repository</a>.");
+        }
       })
       .catch(error => {
         installer.pushAlert(error);
       })
+      
       .then(function(data) {
         loader.classList.remove("loader--show");
         for (let disableEl of disableEls) {
@@ -256,6 +264,9 @@ var installer = {
           });
         }
       });
+      // .catch(error => {
+      //   installer.pushAlert(error);
+      // });
   },
   popScreen: function(screen) {
     console.log("popScreen:" + screen);
