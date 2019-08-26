@@ -64,7 +64,7 @@ $phpSettings = [
     'error_reporting' => E_ALL ^ E_NOTICE,
     'log_errors' => true,
     'display_errors' => true,
-    'error_log' => __DIR__.'/installer.error.log',
+    'error_log' => __DIR__ . '/installer.error.log',
     'time_limit' => 0,
     'default_charset' => 'utf-8',
     'LC_ALL' => 'en_US.UTF8',
@@ -99,8 +99,28 @@ $shortcutIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAMAAABOo
 /* --- Ends: Dev editable --- */
 
 const INSTALLER_FILEPATH = __FILE__;
+// const ERROR_LOG_FILEPATH = $phpSettings['error_log'];
+
+const ERROR_TABLE = [
+    E_ERROR => 'Fatal error',
+    E_WARNING => 'Warning',
+    E_PARSE => 'Parse error',
+    E_NOTICE => 'Notice',
+    E_CORE_ERROR => 'Core error',
+    E_CORE_WARNING => 'Core warning',
+    E_COMPILE_ERROR => 'Compile error',
+    E_COMPILE_WARNING => 'Compile warning',
+    E_USER_ERROR => 'Fatal error',
+    E_USER_WARNING => 'Warning',
+    E_USER_NOTICE => 'Notice',
+    E_STRICT => 'Strict standars',
+    E_RECOVERABLE_ERROR => 'Recoverable error',
+    E_DEPRECATED => 'Deprecated',
+    E_USER_DEPRECATED => 'Deprecated',
+];
 
 include 'src/functions.php';
+include 'src/setErrorExceptionHandler.php';
 include 'src/Logger.php';
 include 'src/ZipArchiveExt.php';
 include 'src/Requirements.php';
@@ -111,7 +131,7 @@ include 'src/JsonResponse.php';
 include 'src/Database.php';
 include 'src/Controller.php';
 
-$logger = new Logger(APP_NAME.' '.APP_VERSION);
+$logger = new Logger(APP_NAME . ' ' . APP_VERSION);
 
 $requirements = new Requirements([PHP_VERSION_MIN, PHP_VERSION_RECOMMENDED]);
 $requirements->setPHPExtensions($phpExtensions);
@@ -169,26 +189,31 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
 ?>
 <!DOCTYPE html>
 <html lang="en" id="<?php echo $pageId; ?>">
+
 <head>
-  <meta name="generator" content="<?php echo APP_NAME.' v'.APP_VERSION; ?>">
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="<?php echo $themeColor; ?>">
-  <title><?php echo $doctitle; ?></title>
-  <link rel="shortcut icon" type="image/png" href="<?php echo $shortcutIcon; ?>">
-  <style><?php echo $css; ?></style>
-  <script>
-    const runtime = <?php echo json_encode($jsVars); ?>;
-    const patterns = <?php echo json_encode($patterns); ?>;
-  </script>
+    <meta name="generator" content="<?php echo APP_NAME . ' v' . APP_VERSION; ?>">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="<?php echo $themeColor; ?>">
+    <title><?php echo $doctitle; ?></title>
+    <link rel="shortcut icon" type="image/png" href="<?php echo $shortcutIcon; ?>">
+    <style>
+        <?php echo $css; ?>
+    </style>
+    <script>
+        const runtime = <?php echo json_encode($jsVars); ?>;
+        const patterns = <?php echo json_encode($patterns); ?>;
+    </script>
 </head>
+
 <body class="body--flex">
-  <main>
-<?php echo $content; ?>
-  </main>
-  <script>
-<?php echo $script; ?>
-  </script>
+    <main>
+        <?php echo $content; ?>
+    </main>
+    <script>
+        <?php echo $script; ?>
+    </script>
 </body>
+
 </html>
