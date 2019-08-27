@@ -124,7 +124,7 @@ class RequirementsCheck
             $tz = @date_default_timezone_get();
             $dtz = @date_default_timezone_set($tz);
             if (!$dtz && !@date_default_timezone_set('America/Santiago')) {
-                $this->addMissing(array('timezone', 'date.timezone'), array('http://php.net/manual/en/timezones.php', 'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'), '<b>' . $tz . '</b> is not a valid %l0 identifier in %l1');
+                $this->addBundleMissing(array('timezone', 'date.timezone'), array('http://php.net/manual/en/timezones.php', 'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'), '<b>' . $tz . '</b> is not a valid %l0 identifier in %l1');
             }
         }
     }
@@ -141,7 +141,7 @@ class RequirementsCheck
                 $session_errors[] = $k;
             }
             if (isset($session_errors)) {
-                $this->addMissing(array('session', 'session.save_path'), array($session_link, 'http://php.net/manual/en/session.configuration.php#ini.session.save-path'), str_replace('%s', implode('/', $session_errors), 'Missing PHP <b>%s</b> permission in <b>' . $session_save_path . '</b> (%l1)'));
+                $this->addBundleMissing(array('session', 'session.save_path'), array($session_link, 'http://php.net/manual/en/session.configuration.php#ini.session.save-path'), str_replace('%s', implode('/', $session_errors), 'Missing PHP <b>%s</b> permission in <b>' . $session_save_path . '</b> (%l1)'));
             }
         }
         $_SESSION['chevereto-installer'] = true;
@@ -161,7 +161,7 @@ class RequirementsCheck
             }
             if (isset($permissions_errors)) {
                 $error = implode('/', $permissions_errors);
-                $component = $var . ' ' . $error . ' permission' . (count($permissions_errors) > 1 ? 's' : null);
+                // $component = $var . ' ' . $error . ' permission' . (count($permissions_errors) > 1 ? 's' : null);
                 $message = "PHP don't have  %l permission in <code>" . $var . '</code>';
                 $this->addMissing($error, 'https://unix.stackexchange.com/questions/35711/giving-php-permission-to-write-to-files-and-folders', $message);
                 unset($permissions_errors);
