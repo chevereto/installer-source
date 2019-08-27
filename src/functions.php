@@ -16,16 +16,29 @@ function dump()
 }
 function append(string $filename, string $contents)
 {
+    prepareDirFor($filename);
+    if (false === @file_put_contents($filename, $contents, FILE_APPEND)) {
+        throw new RuntimeException('Unable to append content to file ' . $filename);
+    }
+}
+function put(string $filename, string $contents)
+{
+    prepareDirFor($filename);
+    if (false === @file_put_contents($filename, $contents)) {
+        throw new RuntimeException('Unable to put content to file ' . $filename);
+    }
+}
+
+function prepareDirFor(string $filename)
+{
     if (!file_exists($filename)) {
         $dirname = dirname($filename);
         if (!file_exists($dirname)) {
             createPath($dirname);
         }
     }
-    if (false === @file_put_contents($filename, $contents, FILE_APPEND)) {
-        throw new RuntimeException('Unable to write content to file ' . $filename);
-    }
 }
+
 function createPath(string $path): string
 {
     if (!mkdir($path, 0777, true)) {

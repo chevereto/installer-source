@@ -208,11 +208,7 @@ class Controller
 \$settings['db_pdo_attrs'] = [];
 \$settings['debug_level'] = 1;";
         $php = strtr($template, $settings);
-        $fh = @fopen($params['filePath'], 'w');
-        if (!$fh || !fwrite($fh, $php)) {
-            throw new Exception(sprintf('Unable to create %s file', $params['filePath']));
-        }
-        @fclose($fh);
+        put($params['filePath'], $php);
         $this->code = 200;
         $this->response = 'Settings file OK';
     }

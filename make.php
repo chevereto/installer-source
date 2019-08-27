@@ -95,15 +95,7 @@ class Make
 
     protected function writeFile(string $filepath, string $contents)
     {
-        if (!file_exists($filepath)) {
-            $dirname = dirname($filepath);
-            if (!file_exists($dirname)) {
-                mkdir($dirname, 0777, true);
-            }
-        }
-        if (false === @file_put_contents($filepath, $contents)) {
-            trigger_error(sprintf('Unable to put contents to %s file', $filepath));
-        }
+        put($filepath, $contents);
         echo '[OK] ' . $filepath . "\n";
         exit(1);
     }
