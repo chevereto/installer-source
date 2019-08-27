@@ -22,10 +22,12 @@
     This make is very basic and doesn't work with sub-includes and is very sensitive to quotes and whatnot.
 
   --------------------------------------------------------------------- */
-declare(strict_types=1);
-new Make('app.php', 'build/installer.php');
 
-// $appContents = str_replace("require 'template/content.php';", )
+declare(strict_types=1);
+
+include 'src/functions.php';
+
+new Make('app.php', 'build/installer.php');
 
 class Make
 {
@@ -47,16 +49,16 @@ class Make
     protected function putTemplate(string $templateFilepath)
     {
         $find = [
-          'ob_start();',
-          "require '$templateFilepath';",
-          '$content = ob_get_clean();',
-          '<?php echo $content; ?>',
+            'ob_start();',
+            "require '$templateFilepath';",
+            '$content = ob_get_clean();',
+            '<?php echo $content; ?>',
         ];
         $replace = [
-          null,
-          null,
-          null,
-          file_get_contents($templateFilepath),
+            null,
+            null,
+            null,
+            file_get_contents($templateFilepath),
         ];
         $this->contents = str_replace($find, $replace, $this->contents);
     }
@@ -75,7 +77,7 @@ class Make
         preg_match_all($regex, $this->contents, $files);
         foreach ($files[0] as $k => $find) {
             $fileContents = $this->getFileContents($files[1][$k]);
-            $this->contents = str_replace($find, var_export($fileContents, true).';', $this->contents);
+            $this->contents = str_replace($find, var_export($fileContents, true) . ';', $this->contents);
         }
     }
 
@@ -93,10 +95,16 @@ class Make
 
     protected function writeFile(string $filepath, string $contents)
     {
-        $fh = fopen($filepath, 'w');
-        if (!$fh || !fwrite($fh, $contents)) {
-            trigger_error(sprintf('Unable to create %s file', $filepath));
+        if (!file_exists($filepath)) {
+            $dirname = dirname($filepath);
+            if (!file_exists($dirname)) {
+                mkdir($dirname, 0777, true);
+            }
         }
-        fclose($fh);
+        if (false === @file_put_contents($filepath, $contents)) {
+            trigger_error(sprintf('Unable to put contents to %s file', $filepath));
+        }
+        echo '[OK] ' . $filepath . "\n";
+        exit(1);
     }
 }
