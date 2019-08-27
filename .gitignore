@@ -1,4 +1,4 @@
-/test
+/build
 *.log
 .htaccess
 installer.php
