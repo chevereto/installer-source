@@ -23,20 +23,20 @@ class ZipArchiveExt extends ZipArchive
                 if (mb_strlen($relativePath, 'UTF-8') > 0) {
                     if (substr($filename, -1) == '/') { // Directory
                         // New dir
-                        if (!is_dir($destination.$relativePath)) {
-                            if (!@mkdir($destination.$relativePath, 0755, true)) {
+                        if (!is_dir($destination . $relativePath)) {
+                            if (!@mkdir($destination . $relativePath, 0755, true)) {
                                 $errors[$i] = $filename;
                             }
                         }
                     } else {
                         if (dirname($relativePath) != '.') {
-                            if (!is_dir($destination.dirname($relativePath))) {
+                            if (!is_dir($destination . dirname($relativePath))) {
                                 // New dir (for file)
-                                @mkdir($destination.dirname($relativePath), 0755, true);
+                                @mkdir($destination . dirname($relativePath), 0755, true);
                             }
                         }
                         // New file
-                        if (@file_put_contents($destination.$relativePath, $this->getFromIndex($i)) === false) {
+                        if (@file_put_contents($destination . $relativePath, $this->getFromIndex($i)) === false) {
                             $errors[$i] = $filename;
                         }
                     }

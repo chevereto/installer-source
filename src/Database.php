@@ -53,9 +53,9 @@ class Database
         }
         if (!$gotAllPrivileges) {
             throw new Exception(strtr('Database user "%user%" don\'t have ALL PRIVILEGES on the "%dbName%" database.', [
-            '%user%' => $this->user,
-            '%dbName%' => $this->name,
-          ]));
+                '%user%' => $this->user,
+                '%dbName%' => $this->name,
+            ]));
         }
     }
 }

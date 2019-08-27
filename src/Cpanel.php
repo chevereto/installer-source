@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A PHP client for cPanel UAPI.
  */
@@ -53,9 +54,9 @@ class Cpanel
             ]), 503);
         }
 
-        $endpoint = $url.'/execute/'.$action;
+        $endpoint = $url . '/execute/' . $action;
 
-        $url = $endpoint.'?'.http_build_query($params);
+        $url = $endpoint . '?' . http_build_query($params);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($ch, CURLOPT_USERPWD, $this->userpwd);
@@ -69,7 +70,7 @@ class Cpanel
         curl_setopt($ch, CURLOPT_URL, $url);
         $result = curl_exec($ch);
         if ($result == false) {
-            throw new Exception('curl_exec threw error "'.curl_error($ch)."\" for $action");
+            throw new Exception('curl_exec threw error "' . curl_error($ch) . "\" for $action");
         }
         curl_close($ch);
         $array = json_decode($result, false);
@@ -105,7 +106,7 @@ class Cpanel
         $this->mysqlMaxDbNamelength = $this->response->data->max_database_name_length;
         $this->mysqlMaxUsernameLength = $this->response->data->max_username_length;
 
-        $dbPrefix = $this->mysqlPrefix.$prefix;
+        $dbPrefix = $this->mysqlPrefix . $prefix;
 
         for ($i = 0; $i < 5; ++$i) {
             $dbName = static::getDbRandomName($dbPrefix, $this->mysqlMaxDbNamelength);
@@ -175,6 +176,6 @@ class Cpanel
         }
         $randomLength = min(5, $maxRandomLength);
 
-        return $prefix.substr(bin2hex(random_bytes($randomLength)), 0, $randomLength);
+        return $prefix . substr(bin2hex(random_bytes($randomLength)), 0, $randomLength);
     }
 }
