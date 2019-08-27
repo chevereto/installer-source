@@ -2,6 +2,8 @@
 
 class Database
 {
+    const PRIVILEGES = ['ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'SELECT', 'TRIGGER', 'UPDATE'];
+
     /** @var string */
     protected $host;
 
@@ -42,18 +44,19 @@ class Database
 
     public function checkPrivileges()
     {
-        $query = $this->pdo->query('SHOW GRANTS;');
-        $tables = $query->fetchAll(PDO::FETCH_COLUMN);
-        $gotAllPrivileges = false;
-        foreach ($tables as $v) {
-            if (strpos(strtoupper($v), 'GRANT ALL PRIVILEGES') !== false) {
-                $gotAllPrivileges = true;
-                break;
+        $query = $this->pdo->query('SELECT * FROM INFORMATION_SCHEMA.USER_PRIVILEGES WHERE IS_GRANTABLE = "YES"');
+        $tables = $query->fetchAll(PDO::FETCH_COLUMN, 2); // PRIVILEGE_TYPE
+        $tables = array_unique($tables);
+        $missed = [];
+        foreach (static::PRIVILEGES as $k => $op) {
+            if (!in_array($op, $tables)) {
+                $missed[] = $op;
             }
         }
-        if (!$gotAllPrivileges) {
-            throw new Exception(strtr('Database user "%user%" don\'t have ALL PRIVILEGES on the "%dbName%" database.', [
+        if (!empty($missed)) {
+            throw new Exception(strtr('Database user `%user%` don\'t have %privilege% privilege on the `%dbName%` database.', [
                 '%user%' => $this->user,
+                '%privilege%' => implode(', ', $missed),
                 '%dbName%' => $this->name,
             ]));
         }
