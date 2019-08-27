@@ -117,6 +117,8 @@ class Controller
             $isPost = true;
         } else {
             $params = null;
+            $get = $this->curl($zipball);
+            $zipball = $get->json->zipball_url;
         }
         $curl = $this->downloadFile($zipball, $params, $filePath, $isPost);
         // Default chevereto.com API handling
@@ -175,7 +177,7 @@ class Controller
         $folder = $software['folder'];
         if ($params['software'] == 'chevereto-free') {
             $comment = $zipExt->getArchiveComment();
-            $folder .= substr($comment, 0, 7);
+            $folder = str_replace('/', '-', $folder) . substr($comment, 0, 7);
         }
         $zipExt->extractSubdirTo($workingPath, $folder);
         $zipExt->close();

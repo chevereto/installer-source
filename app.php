@@ -23,7 +23,7 @@ declare(strict_types=1);
 /* --- Begins: Dev editable --- */
 const APP_NAME = 'Chevereto Installer';
 const APP_VERSION = '2.0.0.beta.3';
-const APP_URL = 'https://github.com/Chevereto/Installer';
+const APP_URL = 'https://github.com/chevereto/installer';
 
 const PHP_VERSION_MIN = '7.0';
 const PHP_VERSION_RECOMMENDED = '7.3';
@@ -47,9 +47,9 @@ const APPLICATIONS = [
     'chevereto-free' => [
         'name' => 'Chevereto-Free',
         'license' => 'Open Source',
-        'url' => 'https://github.com/Chevereto/Chevereto-Free',
-        'zipball' => 'https://api.github.com/repos/Chevereto/Chevereto-Free/zipball',
-        'folder' => 'Chevereto-Chevereto-Free-',
+        'url' => 'https://github.com/chevereto/chevereto-free',
+        'zipball' => 'https://api.github.com/repos/Chevereto/Chevereto-Free/releases/latest',
+        'folder' => 'Chevereto/Chevereto-Free-',
         'vendor' => VENDOR,
     ],
 ];
