@@ -35,6 +35,15 @@ function locationHasParameter(name) {
   return false;
 }
 
+function escapeHtml(unsafe) {
+  return unsafe
+       .replace(/&/g, "&amp;")
+       .replace(/</g, "&lt;")
+       .replace(/>/g, "&gt;")
+       .replace(/"/g, "&quot;")
+       .replace(/'/g, "&#039;");
+}
+
 var installer = {
   uid: false,
   data: {},
@@ -229,8 +238,7 @@ var installer = {
         try {
             return JSON.parse(text);
         } catch (e) {
-            console.log(text)
-            throw Error("Unable to parse server response. The installer is expecting a JSON response, but your server thrown this:<pre>" + text + "</pre> This is not normal and you should report it to our <a href='"+appUrl+"' target='_blank'>GitHub repository</a>.");
+            throw Error("Unable to parse server response. The installer is expecting a JSON response, but your server thrown this:<pre><code>" + escapeHtml(text) + "</code></pre> This is not normal and you should report it to our <a href='"+appUrl+"' target='_blank'>GitHub repository</a>.");
         }
       })
       .catch(error => {

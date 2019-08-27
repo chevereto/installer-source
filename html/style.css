@@ -142,8 +142,17 @@ ul>li {
   padding-right: 2em;
 }
 
+.alert pre {
+  overflow: auto;
+}
+
+.alert pre,
 .alert code {
   background: rgba(241, 196, 15, .3);
+}
+
+.alert pre code {
+  background: transparent;
 }
 
 .shake {

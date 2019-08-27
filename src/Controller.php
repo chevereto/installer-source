@@ -30,9 +30,6 @@ class Controller
 
     public function checkLicenseAction(array $params)
     {
-        // die('failureeeee');
-        // throw new Exception('eeeeeeeeeeeee', 123);
-        // trigger_error('No anda bien hehe');
         $post = $this->curl(VENDOR['apiLicense'], [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query(['license' => $params['license']]),
