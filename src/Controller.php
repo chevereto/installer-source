@@ -164,10 +164,11 @@ class Controller
         $zipExt = new ZipArchiveExt();
         $timeStart = microtime(true);
         $zipOpen = $zipExt->open($filePath);
-        if (false === $zipOpen) {
-            throw new Exception(strtr("Can't extract %f - %m", array(
+        if (true !== $zipOpen) {
+            throw new Exception(strtr("Can't extract %f - %m (ZipArchive #%z)", array(
                 '%f' => $filePath,
                 '%m' => 'ZipArchive ' . $zipOpen . ' error',
+                '%z' => $zipOpen,
             )), 503);
         }
         $numFiles = $zipExt->numFiles - 1; // because of top level folder
@@ -176,7 +177,10 @@ class Controller
             $comment = $zipExt->getArchiveComment();
             $folder = str_replace('/', '-', $folder) . substr($comment, 0, 7);
         }
-        $zipExt->extractSubdirTo($workingPath, $folder);
+        $extraction = $zipExt->extractSubdirTo($workingPath, $folder);
+        if (!empty($extraction)) {
+            throw new Exception(implode(', ', $extraction));
+        }
         $zipExt->close();
         $timeTaken = round(microtime(true) - $timeStart, 2);
         @unlink($filePath);
