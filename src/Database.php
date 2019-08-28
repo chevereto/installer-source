@@ -46,6 +46,7 @@ class Database
     {
         $query = $this->pdo->query('SHOW GRANTS FOR CURRENT_USER;');
         $tables = $query->fetchAll(PDO::FETCH_COLUMN, 0);
+
         foreach ($tables as $v) {
             if (false === preg_match_all('#^GRANT ([\w\,\s]*) ON (.*)\.(.*) TO *#', $v, $matches)) {
                 continue;
@@ -68,26 +69,20 @@ class Database
                         $missed[] = $privilege;
                     }
                 }
-                if (!empty($missed)) {
-                    throw new Exception(strtr('Database user `%user%` doesn\'t have %privilege% privilege on the `%dbName%` database.', [
-                        '%user%' => $this->user,
-                        '%privilege%' => implode(', ', $missed),
-                        '%dbName%' => $this->name,
-                    ]));
-                } else {
+                if (empty($missed)) {
                     return;
                 }
             }
         }
-        throw new Exception(strtr('Unable to detect SHOW GRANTS FOR CURRENT_USER (`%user%`) for the `%dbName%` database. Grants: %grants%', [
+        throw new Exception(strtr('Database user `%user%` doesn\'t have %privilege% privilege on the `%dbName%` database.', [
             '%user%' => $this->user,
+            '%privilege%' => implode(', ', $missed),
             '%dbName%' => $this->name,
-            '%grants%' => implode('; ', $tables),
         ]));
     }
 
     private function unquote(string $quoted)
     {
-        return str_replace(['`', "'"], '', $quoted);
+        return str_replace(['`', "'"], '', stripslashes($quoted));
     }
 }
