@@ -44,21 +44,43 @@ class Database
 
     public function checkPrivileges()
     {
-        $query = $this->pdo->query('SELECT * FROM INFORMATION_SCHEMA.USER_PRIVILEGES WHERE IS_GRANTABLE = "YES"');
-        $tables = $query->fetchAll(PDO::FETCH_COLUMN, 2); // PRIVILEGE_TYPE
-        $tables = array_unique($tables);
-        $missed = [];
-        foreach (static::PRIVILEGES as $k => $op) {
-            if (!in_array($op, $tables)) {
-                $missed[] = $op;
+        $query = $this->pdo->query('SHOW GRANTS FOR CURRENT_USER;');
+        $tables = $query->fetchAll(PDO::FETCH_COLUMN, 0);
+        foreach ($tables as &$v) {
+            if (false === preg_match_all('#^GRANT ([\w\,\s]*) ON (.*)\.(.*) TO *#', $v, $matches)) {
+                continue;
+            }
+            $database = $this->unquote($matches[2][0]);
+            if (in_array($database, ['%', '*'])) {
+                $database = $this->name;
+            }
+            if ($database != $this->name) {
+                continue;
+            }
+            $privileges = $matches[1][0];
+            if ($privileges == 'ALL PRIVILEGES') {
+                break;
+            } else {
+                $missed = [];
+                $privileges = explode(', ', $matches[1][0]);
+                foreach (static::PRIVILEGES as $k => $privilege) {
+                    if (!in_array($privilege, $privileges)) {
+                        $missed[] = $privilege;
+                    }
+                }
+                if (!empty($missed)) {
+                    throw new Exception(strtr('Database user `%user%` doesn\'t have %privilege% privilege on the `%dbName%` database.', [
+                        '%user%' => $this->user,
+                        '%privilege%' => implode(', ', $missed),
+                        '%dbName%' => $this->name,
+                    ]));
+                }
             }
         }
-        if (!empty($missed)) {
-            throw new Exception(strtr('Database user `%user%` don\'t have %privilege% privilege on the `%dbName%` database.', [
-                '%user%' => $this->user,
-                '%privilege%' => implode(', ', $missed),
-                '%dbName%' => $this->name,
-            ]));
-        }
+    }
+
+    private function unquote(string $quoted)
+    {
+        return str_replace(['`', "'"], '', $quoted);
     }
 }

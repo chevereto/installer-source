@@ -51,7 +51,7 @@ class Controller
                 $params['userPassword']
             );
             $database->checkEmpty();
-            // $database->checkPrivileges();
+            $database->checkPrivileges();
             $this->code = 200;
             $this->response = sprintf('Database %s OK', $params['name']);
         } catch (Exception $e) {
