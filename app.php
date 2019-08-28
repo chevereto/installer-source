@@ -4,7 +4,6 @@
     Chevereto Installer
     http://chevereto.com/
 
-    @version 2.0.0.beta.3
     @author	Rodolfo Berrios A. <http://rodolfoberrios.com/>
 
       /$$$$$$  /$$                                                           /$$
@@ -22,7 +21,7 @@ declare(strict_types=1);
 
 /* --- Begins: Dev editable --- */
 const APP_NAME = 'Chevereto Installer';
-const APP_VERSION = '2.0.0.beta.3';
+const APP_VERSION = '2.0.0';
 const APP_URL = 'https://github.com/chevereto/installer';
 
 const PHP_VERSION_MIN = '7.0';
