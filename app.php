@@ -21,11 +21,11 @@ declare(strict_types=1);
 
 /* --- Begins: Dev editable --- */
 const APP_NAME = 'Chevereto Installer';
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.0.1';
 const APP_URL = 'https://github.com/chevereto/installer';
 
-const PHP_VERSION_MIN = '7.0';
-const PHP_VERSION_RECOMMENDED = '7.3';
+const PHP_VERSION_MIN = '7.2';
+const PHP_VERSION_RECOMMENDED = '7.4';
 
 const VENDOR = [
     'name' => 'Chevereto',
