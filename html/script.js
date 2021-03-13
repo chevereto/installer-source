@@ -296,7 +296,7 @@ var installer = {
         installer.log(data.message);
     },
     fetchCommonInit: function () {
-        this.log("Detecting existing cPanel .htaccess handlers");
+        this.log("Trying to detect cPanel .htaccess handlers (if any)");
         return this
             .fetch("cPanelHtaccessHandlers", null, {
                 error: function () {
