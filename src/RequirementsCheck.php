@@ -43,10 +43,7 @@ class RequirementsCheck
         $this->errors = array();
         $this->checkPHPVersion($requirements->phpVersions);
         $this->checkPHPProfile($requirements->phpExtensions, $requirements->phpClasses);
-        $this->checkTimezone();
-        $this->checkSessions();
         $this->checkWorkingPaths($runtime->workingPaths);
-        $this->checkImageLibrary();
         $this->checkFileUploads();
         $this->checkApacheModRewrite();
         $this->checkUtf8Functions();
@@ -118,38 +115,6 @@ class RequirementsCheck
         }
     }
 
-    public function checkTimezone()
-    {
-        if (function_exists('date_default_timezone_get')) {
-            $tz = @date_default_timezone_get();
-            $dtz = @date_default_timezone_set($tz);
-            if (!$dtz && !@date_default_timezone_set('America/Santiago')) {
-                $this->addBundleMissing(array('timezone', 'date.timezone'), array('http://php.net/manual/en/timezones.php', 'http://php.net/manual/en/datetime.configuration.php#ini.date.timezone'), '<b>' . $tz . '</b> is not a valid %l0 identifier in %l1');
-            }
-        }
-    }
-
-    public function checkSessions()
-    {
-        $session_link = 'http://php.net/manual/en/book.session.php';
-        if (session_status() == PHP_SESSION_DISABLED) {
-            $this->addMissing('sessions', $session_link, 'Enable %l support (session_start)');
-        }
-        $session_save_path = @realpath(@session_save_path());
-        if ($session_save_path) {
-            if (!is_writable($session_save_path)) {
-                $session_errors[] = $k;
-            }
-            if (isset($session_errors)) {
-                $this->addBundleMissing(array('session', 'session.save_path'), array($session_link, 'http://php.net/manual/en/session.configuration.php#ini.session.save-path'), str_replace('%s', implode('/', $session_errors), 'Missing PHP <b>%s</b> permission in <b>' . $session_save_path . '</b> (%l1)'));
-            }
-        }
-        $_SESSION['chevereto-installer'] = true;
-        if (!$_SESSION['chevereto-installer']) {
-            $this->addMissing('sessions', $session_link, 'Any server setting related to %l support (%c are not working)');
-        }
-    }
-
     public function checkWorkingPaths(array $workingPaths)
     {
         $rw_fn = array('read' => 'is_readable', 'write' => 'is_writeable');
@@ -165,19 +130,6 @@ class RequirementsCheck
                 $message = "PHP don't have  %l permission in <code>" . $var . '</code>';
                 $this->addMissing($error, 'https://unix.stackexchange.com/questions/35711/giving-php-permission-to-write-to-files-and-folders', $message);
                 unset($permissions_errors);
-            }
-        }
-    }
-
-    public function checkImageLibrary()
-    {
-        if (!@extension_loaded('gd') && !function_exists('gd_info')) {
-            $this->addMissing('GD Library', 'http://php.net/manual/en/book.image.php', 'Enable %l');
-        } else {
-            foreach (array('PNG', 'GIF', 'JPG', 'WBMP') as $k => $v) {
-                if (!imagetypes() & constant('IMG_' . $v)) {
-                    $this->addMissing('GD Library', 'http://php.net/manual/en/book.image.php', 'Enable %l ' . $v . ' image support');
-                }
             }
         }
     }
