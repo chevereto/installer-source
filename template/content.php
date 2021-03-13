@@ -14,7 +14,6 @@
             } ?>
         </ul>
         <p>If you already fixed your web server then make sure to restart it to apply changes. If the problem persists, contact your server administrator.</p>
-        <p>Check our <a href="https://chevereto.com/hosting" target="_blank">hosting</a> offer if you don't want to worry about this.</p>
         <p class="error-box-code">Server <?php echo $_SERVER['SERVER_SOFTWARE']; ?></p>
       </div>
     </div>
@@ -46,10 +45,10 @@
     <div class="flex-box col-width">
       <div>
         <h1>Enter license key</h1>
-        <p>A license key is required to install our main edition. You can purchase a license from our <a href="https://chevereto.com/pricing" target="_blank">website</a> if you don't have one yet.</p>
+        <p>A license key is required to install our main edition. You can <a href="https://chevereto.com/pricing" target="_blank">purchase a license</a> if you don't have one yet.</p>
         <p></p>
-        <p>Skip this to install <a href="https://chevereto.com/free" target="_blank">Chevereto-Free</a>, which is our Open Source edition.</p>
-        <p class="highlight">The paid edition has more features, gets more frequent updates, and provides additional support assistance.</p>
+        <p>Skip this to install <a href="https://chevereto.com/free" target="_blank">Chevereto-Free</a>, which is the Open Source fork.</p>
+        <p class="highlight">The paid edition has more features, gets more frequent updates, and keeps the developer happy.</p>
         <p class="p alert"></p>
         <div class="p input-label">
           <label for="installKey">License key</label>
