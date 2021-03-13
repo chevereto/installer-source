@@ -11,7 +11,7 @@ class RequirementsCheck
     /** @var array Error messages */
     public $errors;
 
-    /** @var array Missed compontents array used for internal awareness */
+    /** @var array Missed components array used for internal awareness */
     public $missed;
 
     /** @var array Maps PHP extension name to its documentation identifier */

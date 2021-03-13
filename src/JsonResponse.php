@@ -97,7 +97,7 @@ class JsonResponse
         $this->data->{$key} = $var;
     }
 
-    public function send()
+    public function send(int $exitCode)
     {
         // if (headers_sent()) {
         //     throw new Exception('Headers have been already sent.');
@@ -119,6 +119,6 @@ class JsonResponse
             $this->setStatusCode($this->code);
         }
         echo isset($this->data) ? $json : json_encode($this, JSON_FORCE_OBJECT);
-        die();
+        die($exitCode);
     }
 }

@@ -30,4 +30,3 @@ location ' . $runtime->relPath . ' {
 
 # END Chevereto NGINX rules
 ');
-die();

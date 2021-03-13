@@ -21,9 +21,9 @@ class Controller
             throw new Exception('Missing action parameter', 400);
         }
         $this->params = $params;
-        $method = $params['action'] . 'Action';
+        $method = $this->params['action'] . 'Action';
         if (!method_exists($this, $method)) {
-            throw new Exception('Invalid action ' . $params['action'], 400);
+            throw new Exception('Invalid action ' . $this->params['action'], 400);
         }
         $this->{$method}($this->params);
     }
@@ -34,7 +34,7 @@ class Controller
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query(['license' => $params['license']]),
         ]);
-        if ($post->json->error) {
+        if (isset($post->json->error)) {
             throw new Exception($post->json->error->message, 403);
         }
         $this->response = 200 == $this->code ? 'Valid license key' : 'Unable to check license';
@@ -67,9 +67,6 @@ class Controller
             $this->code = 200;
             $this->response = 'cPanel process completed';
             $this->data['db'] = $createDb;
-            // [name] =>
-            // [user] =>
-            // [user_password] =>
         } catch (Exception $e) {
             throw new Exception($e->getMessage(), 503);
         }
@@ -281,10 +278,7 @@ class Controller
         return $curl;
     }
 
-    /**
-     * @return array [transfer =>, tmp_file_path =>, raw =>, json =>,]
-     */
-    public function curl(string $url, array $curlOpts = [])
+    public function curl(string $url, array $curlOpts = []): object
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -298,6 +292,7 @@ class Controller
         curl_setopt($ch, CURLOPT_FAILONERROR, 0);
         curl_setopt($ch, CURLOPT_VERBOSE, 0);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Chevereto Installer');
+        $fp = false;
         foreach ($curlOpts as $k => $v) {
             if (CURLOPT_FILE == $k) {
                 $fp = $v;

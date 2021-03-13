@@ -48,7 +48,7 @@ set_exception_handler(function (Throwable $e) {
     $retrace = [];
     foreach ($trace as $k => $v) {
         $args = [];
-        foreach ($v['args'] as $ak => $av) {
+        foreach (($v['args'] ?? []) as $ak => $av) {
             $arg = var_export($av, true);
             $args[] = strtr($argsTemplate, [
                 '%k%' => $ak,

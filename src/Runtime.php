@@ -85,8 +85,8 @@ class Runtime
         $this->relPath = rtrim(dirname($this->server['SCRIPT_NAME']), '\/') . '/';
         $this->installerFilename = basename(INSTALLER_FILEPATH);
         $this->installerFilepath = INSTALLER_FILEPATH;
-        $this->httpHost = $this->server['HTTP_HOST'];
-        $this->serverSoftware = $this->server['SERVER_SOFTWARE'];
+        $this->httpHost = $this->server['HTTP_HOST'] ?? 'n/a';
+        $this->serverSoftware = $this->server['SERVER_SOFTWARE'] ?? 'n/a';
         $httpProtocol = 'http';
         $isHttpsOn = !empty($this->server['HTTPS']) && strtolower($this->server['HTTPS']) == 'on';
         $isHttpsX = isset($this->server['HTTP_X_FORWARDED_PROTO']) && $this->server['HTTP_X_FORWARDED_PROTO'] == 'https';
