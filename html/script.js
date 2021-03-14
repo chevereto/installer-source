@@ -376,7 +376,7 @@ var installer = {
             document.body.classList.add("sel--" + software);
             installer.data.software = software;
             installer.log("Software has been set to: " + software);
-            this.show("cpanel");
+            this.show(useCpanel ? "cpanel" : "db");
         },
         setUpgrade: function () {
             console.log("setUpgrade");

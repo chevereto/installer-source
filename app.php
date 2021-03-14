@@ -179,6 +179,7 @@ if (isset($params)) {
         const appUrl = <?php echo json_encode(APP_URL); ?>;
         const runtime = <?php echo json_encode($jsVars); ?>;
         const patterns = <?php echo json_encode($patterns); ?>;
+        const useCpanel = <?php echo json_encode(isset($_GET['cpanel'])); ?>;
     </script>
 </head>
 <body class="body--flex">
