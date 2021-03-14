@@ -107,7 +107,7 @@ $runtime->run();
 $opts = getopt('a:') ?? null;
 if(!empty($_POST)) {
     $params = $_POST;
-} else if(isset($opts)) {
+} else if(!empty($opts)) {
     $action = $opts['a'];
     $params = ['action' => $action];
     switch($action) {
@@ -147,7 +147,7 @@ if (isset($params)) {
         require 'template/nginx.php';
         die();
     }
-    if(isset($opts)) {
+    if(!empty($opts)) {
         die();
     }
     $pageId = $requirementsCheck->errors ? 'error' : 'install';

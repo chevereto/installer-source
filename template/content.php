@@ -116,33 +116,67 @@
     <div class="flex-box col-width">
       <div>
         <h1>Database</h1>
-        <p>Chevereto requires a MySQL 8 (MySQL 5.6 min) database. It will also work with MariaDB 10.</p>
+        <p>Chevereto requires a MariaDB 10.</p>
+        <?php
+            function echoDatabaseEnv(string $env, string $default): void {
+                echo 'placeholder="' . $default . '" ';
+                if(isset($_ENV[$env])) {
+                    echo 'value="' . $_ENV[$env] .'" readonly';
+                }
+            }
+        ?>
         <form method="post" name="database" data-trigger="setDb" autocomplete="off">
           <p class="p alert"></p>
           <div class="p input-label">
             <label for="dbHost">Host</label>
-            <input class="radius width-100p" type="text" name="dbHost" id="dbHost" placeholder="localhost" value="localhost" required>
+            <input class="radius width-100p" type="text" name="dbHost" id="dbHost"
+            <?php
+                echoDatabaseEnv('CHEVERETO_DB_HOST', 'localhost');
+            ?>
+            required>
             <div><small>If you are using Docker, enter the MySQL/MariaDB container hostname or its IP.</small></div>
           </div>
           <div class="p input-label">
             <label for="dbPort">Port</label>
-            <input class="radius width-100p" type="number" name="dbPort" id="dbPort" value="3306" placeholder="3306" required>
+            <input class="radius width-100p" type="number" name="dbPort" id="dbPort"
+            <?php
+                echoDatabaseEnv('CHEVERETO_DB_PORT', '3306');
+            ?>
+            required>
           </div>
           <div class="p input-label">
             <label for="dbName">Name</label>
-            <input class="radius width-100p" type="text" name="dbName" id="dbName" placeholder="mydatabase" required>
+            <input class="radius width-100p" type="text" name="dbName" id="dbName"
+            <?php
+                echoDatabaseEnv('CHEVERETO_DB_NAME', 'database');
+            ?>
+            required>
           </div>
           <div class="p input-label">
             <label for="dbUser">User</label>
-            <input class="radius width-100p" type="text" name="dbUser" id="dbUser" placeholder="username" required>
+            <input class="radius width-100p" type="text" name="dbUser" id="dbUser"
+            <?php
+                echoDatabaseEnv('CHEVERETO_DB_USER', 'username');
+            ?>
+            required>
             <div><small>The database user must have ALL PRIVILEGES on the target database.</small></div>
           </div>
           <div class="p input-label">
             <label for="dbUserPassword">User password</label>
-            <input class="radius width-100p" type="password" name="dbUserPassword" id="dbUserPassword" placeholder="password">
+            <input class="radius width-100p" type="password" name="dbUserPassword" id="dbUserPassword"
+            <?php
+                echoDatabaseEnv('CHEVERETO_DB_PASS', 'password');
+            ?>
+            >
           </div>
           <div>
-            <button class="action radius">Set database</button>
+            <button class="action radius">
+            <?php 
+                echo ($_ENV['CHEVERETO_SERVICING'] ?? null) === 'docker'
+                    ? 'Check'
+                    : 'Set';
+            ?> Database
+            </button>
           </div>
         </form>
       </div>
