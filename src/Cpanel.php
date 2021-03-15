@@ -163,8 +163,8 @@ class Cpanel
     {
         $contents = file_get_contents($filepath);
         preg_match_all('/# php -- BEGIN cPanel-generated handler, do not edit[\s\S]+# php -- END cPanel-generated handler, do not edit/', $contents, $matches);
-        if ($matches) {
-            return $matches[0][0];
+        if (!empty($matches)) {
+            return $matches[0][0] ?? null;
         }
     }
 

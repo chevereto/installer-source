@@ -86,7 +86,7 @@ class Make
         $ext = pathinfo($filepath, PATHINFO_EXTENSION);
         $fileContents = file_get_contents($filepath);
         if ('php' == $ext) {
-            $fileContents = str_replace('<?php', null, $fileContents);
+            $fileContents = str_replace('<?php', '', $fileContents);
         }
         $fileContents = trim($fileContents);
 

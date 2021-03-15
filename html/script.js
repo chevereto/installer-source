@@ -304,13 +304,13 @@ var installer = {
                 }
             })
             .then(json => {
-                installer.data.cPanelHtaccessHandlers = "data" in json ? json.data.handlers : "";
+                installer.data.cPanelHtaccessHandlers = "data" in json && "handlers" in json.data ? json.data.handlers : '';
             })
             .then(json => {
                 installer.log("Downloading latest " + installer.data.software + " release");
                 return installer.fetch("download", {
                     software: installer.data.software,
-                    license: installer.data.license
+                    license: "data" in installer && "license" in installer.data ? installer.data.license : ''
                 });
             })
             .then(json => {

@@ -123,6 +123,9 @@ class JsonResponse
             $this->setStatusCode($this->code);
         }
         echo isset($this->data) ? $json : json_encode($this, JSON_FORCE_OBJECT);
+        if(PHP_SAPI === 'cli') {
+            echo "\n";
+        }
         die($exitCode);
     }
 }

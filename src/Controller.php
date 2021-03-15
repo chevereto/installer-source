@@ -30,12 +30,15 @@ class Controller
 
     public function checkLicenseAction(array $params)
     {
+        if(!isset($params['license'])) {
+            throw new InvalidArgumentException('Missing license parameter');
+        }
         $post = $this->curl(VENDOR['apiLicense'], [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query(['license' => $params['license']]),
         ]);
         if (isset($post->json->error)) {
-            throw new Exception($post->json->error->message, 403);
+            throw new Exception($post->raw, 403);
         }
         $this->response = 200 == $this->code ? 'Valid license key' : 'Unable to check license';
     }
@@ -81,17 +84,14 @@ class Controller
 
             return;
         }
-        try {
-            if ($handlers = Cpanel::getHtaccessHandlers($filePath)) {
-                $this->code = 200;
-                $this->response = 'cPanel .htaccess handlers found';
-                $this->data['handlers'] = trim($handlers);
-            } else {
-                $this->code = 404;
-                $this->response = 'No cPanel .htaccess handlers found';
-            }
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage(), 503);
+        $handlers = Cpanel::getHtaccessHandlers($filePath);
+        if (isset($handlers)) {
+            $this->code = 200;
+            $this->response = 'cPanel .htaccess handlers found';
+            $this->data['handlers'] = trim($handlers);
+        } else {
+            $this->code = 404;
+            $this->response = 'No cPanel .htaccess handlers found';
         }
     }
 
@@ -189,10 +189,9 @@ class Controller
         @unlink($filePath);
 
         $htaccessFiepath = $workingPath . '.htaccess';
-        if (isset($params['appendHtaccess']) && file_exists($htaccessFiepath)) {
+        if (!empty($params['appendHtaccess']) && file_exists($htaccessFiepath)) {
             file_put_contents($htaccessFiepath, "\n\n" . $params['appendHtaccess'], FILE_APPEND | LOCK_EX);
         }
-
         $this->code = 200;
         $this->response = strtr('Extraction completeted (%n files in %ss)', ['%n' => $numFiles, '%s' => $timeTaken]);
     }
@@ -224,15 +223,25 @@ class Controller
 
     public function submitInstallFormAction(array $params)
     {
-        $installUrl = $this->runtime->rootUrl . 'install';
-        if (0 === strpos($this->runtime->server['SERVER_SOFTWARE'], 'PHP')) {
-            throw new Exception('Unable to submit the installation form under PHP development server. Go to ' . $installUrl . ' to complete the process.', 501);
+        $missing = [];
+        foreach(['username', 'email', 'password', 'email_from_email', 'email_incoming_email', 'website_mode'] as $param) {
+            if(!isset($params[$param])) {
+                $missing[] = $param;
+            }
         }
+        if($missing !== []) {
+            throw new InvalidArgumentException(sprintf('Missing %s', implode(', ', $missing)));
+        }
+        $installUrl = $this->runtime->rootUrl;
+        if(isDocker()) {
+            $installUrl = 'http://localhost/';
+        }
+        $installUrl .= 'install';
         $post = $this->curl($installUrl, [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query($params),
         ]);
-        if ($post->json->error) {
+        if (!empty($post->json->error)) {
             throw new Exception($post->json->error->message, $post->json->error->code);
         }
         if (preg_match('/system error/i', $post->raw)) {
@@ -251,6 +260,9 @@ class Controller
         $basename = basename($filePath);
         $isDone = 'app.php' == $basename ?: @unlink($filePath);
         if ($isDone) {
+            if(file_exists(ERROR_LOG_FILEPATH)) {
+                @unlink(ERROR_LOG_FILEPATH);
+            }
             $this->code = 200;
             $this->response = 'Installer removed';
         } else {
@@ -291,8 +303,8 @@ class Controller
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);

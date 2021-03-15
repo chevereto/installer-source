@@ -1,89 +1,82 @@
 <?php
-
-const ERROR_TABLE = [
-    E_ERROR => 'Fatal error',
-    E_WARNING => 'Warning',
-    E_PARSE => 'Parse error',
-    E_NOTICE => 'Notice',
-    E_CORE_ERROR => 'Core error',
-    E_CORE_WARNING => 'Core warning',
-    E_COMPILE_ERROR => 'Compile error',
-    E_COMPILE_WARNING => 'Compile warning',
-    E_USER_ERROR => 'Fatal error',
-    E_USER_WARNING => 'Warning',
-    E_USER_NOTICE => 'Notice',
-    E_STRICT => 'Strict standars',
-    E_RECOVERABLE_ERROR => 'Recoverable error',
-    E_DEPRECATED => 'Deprecated',
-    E_USER_DEPRECATED => 'Deprecated',
-];
-
 set_error_handler(function (int $severity, string $message, string $file, int $line) {
     throw new ErrorException($message, 0, $severity, $file, $line);
 }, $phpSettings['error_reporting']);
 
 set_exception_handler(function (Throwable $e) {
-    $trace = $e->getTrace();
-    $traceTemplate = "#%k% %file%:%line%\n%class%%type%%function%%args%";
-    $argsTemplate = "Arg#%k%\n%arg%";
-
-    switch (true) {
-        case $e instanceof ErrorException:
-            $type = ERROR_TABLE[$e->getSeverity()];
-            $thrown = $e->getMessage();
-
-            array_shift($trace);
-            array_shift($trace);
-            break;
-        case $e instanceof Error:
-            $type = 'PHP';
-            $thrown = $e->getMessage();
-            break;
-        default:
-            $type = 'Exception';
-            $thrown = $type . ' thrown';
-            break;
-    }
-    $message = 'in ' . $e->getFile() . ':' . $e->getLine();
-    $retrace = [];
-    foreach ($trace as $k => $v) {
-        $args = [];
-        foreach (($v['args'] ?? []) as $ak => $av) {
-            $arg = var_export($av, true);
-            $args[] = strtr($argsTemplate, [
-                '%k%' => $ak,
-                '%arg%' => $arg,
-            ]);
-        }
-        $retrace[] = strtr($traceTemplate, [
-            '%k%' => $k,
-            '%file%' => $v['file'] ?? '',
-            '%line%' => $v['line'] ?? '',
-            '%class%' => $v['class'] ?? '',
-            '%type%' => $v['type'] ?? '',
-            '%function%' => $v['function'] ?? '',
-            '%args%' => empty($args) ? '' : ("\n--\n" . implode("\n--\n", $args)),
-        ]);
-    }
-    $cols = 80;
-    $hypens = str_repeat('-', $cols);
-    $halfHypens = substr($hypens, 0, $cols / 2);
-    $stack = implode("\n$halfHypens\n", $retrace);
-    $tags = [
-        '%type%' => $type,
-        '%datetime%' => date('Y-m-d H:i:s'),
-        '%thrown%' => $thrown,
-        '%message%' => $message,
-        '%stack%' => $stack,
-        '%trace%' => empty($retrace) ? '' : "Trace:\n"
+    $device = isDocker() ? 'stderr' : 'error_log';
+    $debug_level = 3;
+    $internal_code = 500;
+    $internal_error = '<b>Aw, snap!</b>';
+    $table = [
+        0 => "debug is disabled",
+        1 => "debug @ $device",
+        2 => "debug @ print",
+        3 => "debug @ print,$device",
     ];
-    $screenTpl = '<h1>[%type%] %thrown%</h1><p>%message%</p>' . "\n\n" . "%trace%<pre><code>%stack%</code></pre>";
-    $textTpl = "%datetime% [%type%] %thrown%: %message%\n\n%trace%%stack%";
+    $internal_error .= ' [' . $table[$debug_level] . '] - https://v3-docs.chevereto.com/setup/debug.html';
+    $message = [$internal_error];
+    $message[] = '';
+    $message[] = '<b>Fatal error [' . $e->getCode() . ']:</b> ' . strip_tags($e->getMessage());
+    $message[] = 'Triggered in ' . $e->getFile() . ':' . $e->getLine() . "\n";
+    $message[] = '<b>Stack trace:</b>';
+    $rtn = '';
+    $count = 0;
+    foreach ($e->getTrace() as $frame) {
+        $args = '';
+        if (isset($frame['args'])) {
+            $args = array();
+            foreach ($frame['args'] as $arg) {
+                switch (true) {
+                    case is_string($arg):
+                        $args[] = "'" . $arg . "'";
+                        break;
+                    case is_array($arg):
+                        $args[] = 'Array';
+                        break;
+                    case is_null($arg):
+                        $args[] = 'NULL';
+                        break;
+                    case is_bool($arg):
+                        $args[] = ($arg) ? 'true' : 'false';
+                        break;
+                    case is_object($arg):
+                        $args[] = get_class($arg);
+                        break;
+                    case is_resource($arg):
+                        $args[] = get_resource_type($arg);
+                        break;
+                    default:
+                        $args[] = $arg;
+                        break;
+                }
+            }
+            $args = join(', ', $args);
+        }
+        $rtn .= sprintf(
+            "#%s %s(%s): %s(%s)\n",
+            $count,
+            $frame['file'] ?? 'unknown file',
+            $frame['line'] ?? 'unknown line',
+            (isset($frame['class'])) ? $frame['class'] . $frame['type'] . $frame['function'] : $frame['function'],
+            $args
+        );
+        ++$count;
+    }
+    $message[] = $rtn;
+    $message = implode("\n", $message);
+    $newLines = nl2br($message);
+    $plainLines = "\n" . strip_tags($newLines);
+    set_status_header($internal_code);
+    if(in_array($debug_level, [2, 3])) {
+        echo PHP_SAPI !== 'cli'  ? $newLines : $plainLines;
+    }
+    if(in_array($debug_level, [1, 3]) && $device === 'error_log') {
+        error_log($plainLines);
+    }
+    if($isDocker) {
+        writeToStderr($plainLines);
+    }
 
-    $text = "$hypens\n" . strtr($textTpl, $tags) . "\n$hypens\n\n";
-
-    append(ERROR_LOG_FILEPATH, $text);
-
-    echo strtr($screenTpl, $tags);
-    die();
+    die(255);
 });

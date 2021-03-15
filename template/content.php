@@ -172,9 +172,7 @@
           <div>
             <button class="action radius">
             <?php 
-                echo ($_ENV['CHEVERETO_SERVICING'] ?? null) === 'docker'
-                    ? 'Check'
-                    : 'Set';
+                echo isDocker() ? 'Check' : 'Set';
             ?> Database
             </button>
           </div>
@@ -295,7 +293,7 @@
         <p class="alert">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
         <p>Take note on the installation details below.</p>
         <div class="install-details p highlight font-size-80p"></div>
-        <p>Hope you enjoy using Chevereto as much I care in creating it. Help development by providing feedback and recommend my software.</p>
+        <p>❤ Hope you enjoy using Chevereto.</p>
         <div>
           <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>dashboard" target="_blank">Open dashboard</a>
           <a class="button radius" href="<?php echo $runtime->rootUrl; ?>" target="_blank">Open homepage</a>

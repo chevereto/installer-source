@@ -149,7 +149,7 @@ if(!empty($_POST)) {
             $params['filePath'] = $opts['f'] ?? null;
             break;
         case 'submitInstallForm':            
-            $opts = getopt('a:u:e:x:f:m:');
+            $opts = getopt('a:u:e:x:f:i:m:');
             $params['username'] = $opts['u'] ?? null;
             $params['email'] = $opts['e'] ?? null;
             $params['password'] = $opts['x'] ?? null;
@@ -164,7 +164,7 @@ if(!empty($_POST)) {
 $requirementsCheck = new RequirementsCheck($requirements, $runtime);
 if (isset($params)) {
     $jsonResponse = new JsonResponse();
-    if ($requirementsCheck->errors) {
+    if (!empty($requirementsCheck->errors)) {
         $errorsPlain = array_map(function ($v) {
             return trim(strip_tags($v));
         }, $requirementsCheck->errors);
@@ -174,11 +174,11 @@ if (isset($params)) {
         try {
             $controller = new Controller($params, $runtime);
             $jsonResponse->setResponse($controller->response, $controller->code);
-            if ($controller->data) {
+            if (!empty($controller->data)) {
                 $jsonResponse->setData($controller->data);
             }
         } catch (Throwable $e) {
-            error_log($e->getMessage() . '-' . $e->getFile() . ':' . $e->getLine());
+            error_log($e->getMessage() . '***' . $e->getTraceAsString());
             $jsonResponse->setResponse($e->getMessage(), $e->getCode());
             $jsonResponse->send(255);
         }
