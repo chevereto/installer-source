@@ -17,7 +17,7 @@ class Controller
     public function __construct(array $params, Runtime $runtime)
     {
         $this->runtime = $runtime;
-        if (!$params['action']) {
+        if (!isset($params['action'])) {
             throw new Exception('Missing action parameter', 400);
         }
         $this->params = $params;
@@ -97,14 +97,17 @@ class Controller
 
     public function downloadAction(array $params)
     {
+        if(!isset($params['software'])) {
+            throw new InvalidArgumentException('Missing software');
+        }
         $fileBasename = 'chevereto-pkg-' . substr(bin2hex(random_bytes(8)), 0, 8) . '.zip';
         $filePath = $this->runtime->absPath . $fileBasename;
         if (file_exists($filePath)) {
             @unlink($filePath);
         }
         $isPost = false;
-        $zipball = APPLICATIONS[$params['software']]['zipball'];
-        if (!$zipball) {
+        $zipball = APPLICATIONS[$params['software']]['zipball'] ?? null;
+        if (!isset($zipball)) {
             throw new Exception('Invalid software parameter', 400);
         }
         if ($params['software'] == 'chevereto') {
@@ -112,16 +115,19 @@ class Controller
         } else {
             $params = null;
             $get = $this->curl($zipball);
+            if(!isset($get->json->zipball_url)) {
+                throw new RuntimeException('No zipball for ' . $params['software']);
+            }
             $zipball = $get->json->zipball_url;
         }
         $curl = $this->downloadFile($zipball, $params, $filePath, $isPost);
         // Default chevereto.com API handling
-        if ($curl->json->error) {
-            throw new Exception($curl->json->error->message, $curl->json->status_code);
+        if (isset($curl->json->error)) {
+            throw new RuntimeException($curl->json->error->message, $curl->json->status_code);
         }
         // Everybody else
         if (200 != $curl->transfer['http_code']) {
-            throw new Exception('[HTTP ' . $curl->transfer['http_code'] . '] ' . $zipball, $curl->transfer['http_code']);
+            throw new RuntimeException('[HTTP ' . $curl->transfer['http_code'] . '] ' . $zipball, $curl->transfer['http_code']);
         }
         $fileSize = filesize($filePath);
         $this->response = strtr('Downloaded %f (%w @%s)', array(
@@ -135,7 +141,7 @@ class Controller
 
     public function extractAction(array $params)
     {
-        if (!$params['software']) {
+        if (!isset($params['software'])) {
             throw new Exception('Missing software parameter', 400);
         } elseif (!isset(APPLICATIONS[$params['software']])) {
             throw new Exception(sprintf('Unknown software %s', $params['software']), 400);
@@ -143,7 +149,7 @@ class Controller
 
         $software = APPLICATIONS[$params['software']];
 
-        if (!$params['workingPath']) {
+        if (!isset($params['workingPath'])) {
             throw new Exception('Missing workingPath parameter', 400);
         }
         $workingPath = $params['workingPath'];
@@ -183,7 +189,7 @@ class Controller
         @unlink($filePath);
 
         $htaccessFiepath = $workingPath . '.htaccess';
-        if ($params['appendHtaccess'] && file_exists($htaccessFiepath)) {
+        if (isset($params['appendHtaccess']) && file_exists($htaccessFiepath)) {
             file_put_contents($htaccessFiepath, "\n\n" . $params['appendHtaccess'], FILE_APPEND | LOCK_EX);
         }
 
@@ -193,6 +199,9 @@ class Controller
 
     public function createSettingsAction(array $params)
     {
+        if(!isset($params['filePath'])) {
+            throw new InvalidArgumentException('Missing filePath');
+        }
         $settings = [];
         foreach ($params as $k => $v) {
             $settings["%$k%"] = $v;
@@ -282,16 +291,20 @@ class Controller
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_FAILONERROR, 0);
         curl_setopt($ch, CURLOPT_VERBOSE, 0);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Chevereto Installer');
+        if(PHP_SAPI === 'cli') {
+            curl_setopt($ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback');
+            curl_setopt($ch, CURLOPT_NOPROGRESS, 0);
+        }
         $fp = false;
         foreach ($curlOpts as $k => $v) {
             if (CURLOPT_FILE == $k) {
@@ -299,7 +312,9 @@ class Controller
             }
             curl_setopt($ch, $k, $v);
         }
+        logger("Fetching $url\n");
         $file_get_contents = @curl_exec($ch);
+        logger("\n");
         $transfer = curl_getinfo($ch);
         if (curl_errno($ch)) {
             $curl_error = curl_error($ch);

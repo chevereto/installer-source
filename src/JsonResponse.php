@@ -11,6 +11,8 @@ class JsonResponse
     /** @var string */
     public $message;
 
+    public $data;
+
     const HTTP_CODES = [
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -65,6 +67,11 @@ class JsonResponse
         510 => 'Not Extended',
     ];
 
+    public function __construct()
+    {
+        $this->data = new stdClass();
+    }
+
     public function setResponse(string $message, $httpCode = 200)
     {
         $this->code = $httpCode;
@@ -91,9 +98,6 @@ class JsonResponse
 
     public function addData($key, $var = null)
     {
-        if (!isset($this->data)) {
-            $this->data = new stdClass();
-        }
         $this->data->{$key} = $var;
     }
 

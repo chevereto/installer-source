@@ -13,7 +13,6 @@ class ZipArchiveExt extends ZipArchive
         }
         $inputSubdir = $subdir;
         $subdir = rtrim($subdir, '/') . '/';
-        // Extract files
         $folderExists = false;
         for ($i = 0; $i < $this->numFiles; ++$i) {
             $filename = $this->getNameIndex($i);

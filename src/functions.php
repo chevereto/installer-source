@@ -46,3 +46,25 @@ function createPath(string $path): string
     }
     return $path;
 }
+
+function logger(string $message)
+{
+    if(PHP_SAPI !== 'cli') {
+        return;
+    }
+    fwrite(fopen('php://stdout', 'r+'), $message);
+}
+
+function progressCallback($resource, $download_size = 0, $downloaded = 0, $upload_size = 0, $uploaded = 0)
+{
+    if($download_size == 0) {
+        return;
+    }
+    logger(progress_bar($downloaded, $download_size, ' download'));
+}
+
+function progress_bar($done, $total, $info="", $width=50) {
+    $perc = round(($done * 100) / $total);
+    $bar = round(($width * $perc) / 100);
+    return sprintf("  %s%%[%s>%s]%s\r", $perc, str_repeat("=", $bar), str_repeat(" ", $width-$bar), $info);
+}
