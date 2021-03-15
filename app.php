@@ -113,9 +113,51 @@ if(!empty($_POST)) {
     switch($action) {
         case 'checkLicense':
             $opts = getopt('a:l:');
-            $params['license'] = $opts['l'];
+            $params['license'] = $opts['l'] ?? null;
             break;
         case 'checkDatabase':
+            $opts = getopt('a:h:p:n:u:x:');
+            $params['host'] = $opts['h'] ?? null;
+            $params['port'] = $opts['p'] ?? null;
+            $params['name'] = $opts['n'] ?? null;
+            $params['user'] = $opts['u'] ?? null;
+            $params['userPassword'] = $opts['x'] ?? null;
+            break;
+        case 'cPanelProcess':
+            $opts = getopt('a:u:p:');
+            $params['user'] = $opts['u'] ?? null;
+            $params['password'] = $opts['p'] ?? null;
+            break;
+        case 'download':            
+            $opts = getopt('a:s:l::');
+            $params['software'] = $opts['s'] ?? null;
+            $params['license'] = $opts['l'] ?? null;
+            break;
+        case 'extract':            
+            $opts = getopt('a:s:p:f:');
+            $params['software'] = $opts['s'] ?? null;
+            $params['workingPath'] = $opts['p'] ?? null;
+            $params['filePath'] = $opts['f'] ?? null;
+            break;
+        case 'createSettings':            
+            $opts = getopt('a:h:p:n:u:x:f:');
+            $params['host'] = $opts['h'] ?? null;
+            $params['port'] = $opts['p'] ?? null;
+            $params['name'] = $opts['n'] ?? null;
+            $params['user'] = $opts['u'] ?? null;
+            $params['userPassword'] = $opts['x'] ?? null;
+            $params['filePath'] = $opts['f'] ?? null;
+            break;
+        case 'submitInstallForm':            
+            $opts = getopt('a:u:e:x:f:m:');
+            $params['username'] = $opts['u'] ?? null;
+            $params['email'] = $opts['e'] ?? null;
+            $params['password'] = $opts['x'] ?? null;
+            $params['email_from_email'] = $opts['f'] ?? null;
+            $params['email_incoming_email'] = $opts['i'] ?? null;
+            $params['website_mode'] = $opts['m'] ?? null;
+            break;
+        case 'selfDestruct':
             break;
     }
 }
@@ -136,7 +178,7 @@ if (isset($params)) {
                 $jsonResponse->setData($controller->data);
             }
         } catch (Throwable $e) {
-            error_log($e->getTraceAsString());
+            error_log($e->getMessage() . '-' . $e->getFile() . ':' . $e->getLine());
             $jsonResponse->setResponse($e->getMessage(), $e->getCode());
             $jsonResponse->send(255);
         }
