@@ -74,7 +74,7 @@ set_exception_handler(function (Throwable $e) {
     if(in_array($debug_level, [1, 3]) && $device === 'error_log') {
         error_log($plainLines);
     }
-    if($isDocker) {
+    if(isDocker()) {
         writeToStderr($plainLines);
     }
 
