@@ -38,7 +38,7 @@ class Database
         $query = $this->pdo->query("SHOW TABLES FROM `$this->name`;");
         $tables = $query->fetchAll(PDO::FETCH_COLUMN);
         if (!empty($tables)) {
-            throw new Exception(sprintf('Database "%s" is not empty. Use another database or DROP (remove) all the tables in the target database.', $this->name));
+            throw new LogicException(sprintf('Database "%s" is not empty.', $this->name));
         }
     }
 
