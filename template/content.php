@@ -32,7 +32,7 @@
         <p>Confirm that the above details match to where you want to install Chevereto and that there's no other software installed.</p>
         <?php
           if (preg_match('/nginx/i', $runtime->serverSoftware)) { ?>
-          <p class="alert">Add the following <a href="<?php echo $runtime->rootUrl . $runtime->installerFilename . '?getNginxRules'; ?>" target="_blank">server rules</a> to your <a href="https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts" target="_blank">nginx.conf</a> server block. <b>Restart the server to apply changes</b>. Once done, come back here and continue the process.</p>
+          <p class="highlight">✍ Take note on the <a href="<?php echo $runtime->rootUrl . $runtime->installerFilename . '?getNginxRules'; ?>" target="_blank">nginx server rules</a> that should be already applied to your <code>nginx.conf</code> server block. If those aren't provided this installer will fail to complete the process.</p>
         <?php } ?>
         <div>
           <button class="action radius" data-action="show" data-arg="license">Continue</button>
@@ -45,10 +45,8 @@
     <div class="flex-box col-width">
       <div>
         <h1>Enter license key</h1>
-        <p>A license key is required to install our main edition. You can <a href="https://chevereto.com/pricing" target="_blank">purchase a license</a> if you don't have one yet.</p>
-        <p></p>
-        <p>Skip this to install <a href="https://chevereto.com/free" target="_blank">Chevereto-Free</a>, which is the Open Source fork.</p>
-        <p class="highlight">The paid edition has more features, gets more frequent updates, and keeps the developer happy.</p>
+        <p>A license key is required to install Chevereto. You can <a href="https://chevereto.com/pricing" target="_blank">get a license</a> if you don't have one yet.</p>
+        <p class="highlight">💎 The paid edition has more features, gets more frequent updates, and keeps the developer eating.</p>
         <p class="p alert"></p>
         <div class="p input-label">
           <label for="installKey">License key</label>
@@ -91,10 +89,10 @@
         <h1>cPanel access</h1>
         <p>This installer can connect to a cPanel backend using the <a href="https://documentation.cpanel.net/display/DD/Guide+to+UAPI" target="_blank">cPanel UAPI</a> to create the database, its user, and grant database privileges.</p>
         <?php if ('https' == $runtime->httpProtocol) { ?>
-          <p class="highlight">You are not browsing using HTTPS. For extra security, change your cPanel password once the installation gets completed.</p>
+          <p class="highlight">⛔ You are not browsing using HTTPS. For extra security, change your cPanel password once the installation gets completed.</p>
         <?php } ?>
         <p>The cPanel credentials won't be stored either transmitted to anyone.</p>
-        <p class="highlight">Skip this if you don't run cPanel or if you want to setup the database requirements manually.</p>
+        <p class="highlight">⏩ Skip this if you don't run cPanel or if you want to setup the database requirements manually.</p>
         <p class="p alert"></p>
         <div class="p input-label">
           <label for="cpanelUser">User</label>
@@ -116,7 +114,10 @@
     <div class="flex-box col-width">
       <div>
         <h1>Database</h1>
-        <p>Chevereto requires a MariaDB 10.</p>
+        <p>Chevereto requires a SQL database, ideally MariaDB 10.</p>
+        <?php if(isDocker()) { ?>
+        <p class="highlight">✨ Database values are being provided using environment variables.</p>
+        <?php } ?>
         <?php
             function echoDatabaseEnv(string $env, string $default): void {
                 echo 'placeholder="' . $default . '" ';
@@ -135,7 +136,6 @@
                 echoDatabaseEnv('CHEVERETO_DB_HOST', 'localhost');
             ?>
             required>
-            <div><small>If you are using Docker, enter the MySQL/MariaDB container hostname or its IP.</small></div>
           </div>
           <div class="p input-label">
             <label for="dbPort">Port</label>
