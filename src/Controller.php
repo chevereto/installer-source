@@ -38,7 +38,7 @@ class Controller
             CURLOPT_POSTFIELDS => http_build_query(['license' => $params['license']]),
         ]);
         if (isset($post->json->error)) {
-            throw new Exception($post->raw, 403);
+            throw new Exception($post->json->error->message, 403);
         }
         $this->response = 200 == $this->code ? 'Valid license key' : 'Unable to check license';
     }
