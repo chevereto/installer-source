@@ -150,5 +150,5 @@ function writeToStderr(string $message) {
 }
 
 function isDocker(): bool {
-    return ($_ENV['CHEVERETO_SERVICING'] ?? null) == 'docker';
+    return getenv('CHEVERETO_SERVICING') == 'docker';
 }

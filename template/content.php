@@ -120,8 +120,8 @@
         <?php
             function echoDatabaseEnv(string $env, string $default): void {
                 echo 'placeholder="' . $default . '" ';
-                if(isset($_ENV[$env])) {
-                    echo 'value="' . $_ENV[$env] .'" readonly';
+                if(getenv($env) !== '') {
+                    echo 'value="' . getenv($env) .'" readonly';
                 }
             }
         ?>
