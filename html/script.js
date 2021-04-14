@@ -238,7 +238,7 @@ var installer = {
                 try {
                     return JSON.parse(text);
                 } catch (e) {
-                    throw Error("Unable to parse server response. The installer is expecting a JSON response, but your server thrown this:<pre><code>" + escapeHtml(text) + "</code></pre> This is not normal and you should report it to our <a href='" + appUrl + "' target='_blank'>GitHub repository</a>.");
+                    throw Error("Unable to parse server response. The installer is expecting a JSON response, but your server thrown this:<pre><code>" + escapeHtml(text) + "</code></pre>");
                 }
             })
             .catch(error => {
@@ -463,24 +463,6 @@ var installer = {
             installer
                 .fetchCommonInit()
                 .then(data => {
-                    installer.log(
-                        "Removing installer file at " + runtime.installerFilepath
-                    );
-                    return installer.fetch("selfDestruct", null, {
-                        error: function (data) {
-                            var todo =
-                                "Remove the installer file at " +
-                                runtime.installerFilepath +
-                                " and open " +
-                                runtime.rootUrl +
-                                " to continue the process.";
-                            installer.pushAlert(todo);
-                            installer.abortInstall(false);
-                            return false;
-                        }
-                    });
-                })
-                .then(data => {
                     installer.setBodyInstalling(false);
                     installer.log("Upgrade completed");
                     setTimeout(function () {
@@ -510,24 +492,6 @@ var installer = {
                         website_mode: 'community',
                     };
                     return installer.fetch("submitInstallForm", params);
-                })
-                .then(data => {
-                    installer.log(
-                        "Removing installer file at " + runtime.installerFilepath
-                    );
-                    return installer.fetch("selfDestruct", null, {
-                        error: function (data) {
-                            var todo =
-                                "Remove the installer file at " +
-                                runtime.installerFilepath +
-                                " and open " +
-                                runtime.rootUrl +
-                                " to continue the process.";
-                            installer.pushAlert(todo);
-                            installer.abortInstall(false);
-                            return false;
-                        }
-                    });
                 })
                 .then(data => {
                     installer.setBodyInstalling(false);
