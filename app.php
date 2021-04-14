@@ -104,6 +104,7 @@ $requirements->setPHPClasses($phpClasses);
 $runtime = new Runtime($logger);
 $runtime->setSettings($phpSettings);
 $runtime->run();
+include 'src/lock-check.php';
 $opts = getopt('a:') ?? null;
 if(!empty($_POST)) {
     $params = $_POST;
