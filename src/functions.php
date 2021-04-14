@@ -152,3 +152,39 @@ function writeToStderr(string $message) {
 function isDocker(): bool {
     return getenv('CHEVERETO_SERVICING') == 'docker';
 }
+
+function get_ini_bytes($size)
+{
+    return get_bytes($size, -1);
+}
+
+function get_bytes($size, $cut = null)
+{
+    if ($cut == null) {
+        $suffix = substr($size, -3);
+        $suffix = preg_match('/([A-Za-z]){3}/', $suffix) ? $suffix : substr($size, -2);
+    } else {
+        $suffix = substr($size, $cut);
+    }
+    $number = (int) str_replace($suffix, '', $size);
+    $suffix = strtoupper($suffix);
+
+    $units = ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']; // Default dec units
+
+    if (strlen($suffix) == 3) { // Convert units to bin
+        foreach ($units as &$unit) {
+            $split = str_split($unit);
+            $unit = $split[0] . 'I' . $split[1];
+        }
+    }
+
+    if (strlen($suffix) == 1) {
+        $suffix .= 'B'; // Adds missing "B" for shorthand ini notation (Turns 1G into 1GB)
+    }
+    if (!in_array($suffix, $units)) {
+        return $number;
+    }
+    $pow_factor = array_search($suffix, $units) + 1;
+
+    return $number * pow(strlen($suffix) == 2 ? 1000 : 1024, $pow_factor);
+}

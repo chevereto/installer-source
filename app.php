@@ -87,6 +87,7 @@ $shortcutIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAMAAABOo
 define('ERROR_LOG_FILEPATH', $phpSettings['error_log']);
 const INSTALLER_FILEPATH = __FILE__;
 include 'src/functions.php';
+include 'src/ini-set.php';
 include 'src/setErrorExceptionHandler.php';
 include 'src/Logger.php';
 include 'src/ZipArchiveExt.php';
@@ -157,8 +158,6 @@ if(!empty($_POST)) {
             $params['email_from_email'] = $opts['f'] ?? null;
             $params['email_incoming_email'] = $opts['i'] ?? null;
             $params['website_mode'] = $opts['m'] ?? null;
-            break;
-        case 'selfDestruct':
             break;
     }
 }
