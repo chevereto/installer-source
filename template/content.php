@@ -291,7 +291,7 @@
       <div>
         <h1>Installation completed</h1>
         <p>Chevereto has been installed. You can now login to your dashboard panel to configure your website to fit your needs.</p>
-        <p class="alert">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
+        <p class="alert">You must remove the installer file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
         <p>Take note on the installation details below.</p>
         <div class="install-details p highlight font-size-80p"></div>
         <p>❤ Hope you enjoy using Chevereto.</p>

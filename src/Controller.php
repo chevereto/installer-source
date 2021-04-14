@@ -254,23 +254,6 @@ class Controller
         $this->response = 'Setup complete';
     }
 
-    public function selfDestructAction()
-    {
-        $filePath = $this->runtime->installerFilepath;
-        $basename = basename($filePath);
-        $isDone = 'app.php' == $basename ?: @unlink($filePath);
-        if ($isDone) {
-            if(file_exists(ERROR_LOG_FILEPATH)) {
-                @unlink(ERROR_LOG_FILEPATH);
-            }
-            $this->code = 200;
-            $this->response = 'Installer removed';
-        } else {
-            $this->code = 503;
-            $this->response = 'Unable to remove installer file at ' . $filePath;
-        }
-    }
-
     /**
      * @param string $url      Target download URL
      * @param string $params   Request params
