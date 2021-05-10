@@ -151,7 +151,8 @@ if(!empty($_POST)) {
             $params['filePath'] = $opts['f'] ?? null;
             break;
         case 'submitInstallForm':            
-            $opts = getopt('a:u:e:x:f:i:m:');
+            $opts = getopt('a:w:u:e:x:f:i:m:');
+            $params['website'] = $opts['w'] ?? null;
             $params['username'] = $opts['u'] ?? null;
             $params['email'] = $opts['e'] ?? null;
             $params['password'] = $opts['x'] ?? null;

@@ -223,8 +223,14 @@ class Controller
 
     public function submitInstallFormAction(array $params)
     {
+        $installUrl = $this->runtime->rootUrl;
         $missing = [];
-        foreach(['username', 'email', 'password', 'email_from_email', 'email_incoming_email', 'website_mode'] as $param) {
+        $required = ['username', 'email', 'password', 'email_from_email', 'email_incoming_email', 'website_mode'];
+        if(PHP_SAPI === 'cli') {
+            $required[] = 'website';
+            $installUrl = rtrim($params['website'], '/') . '/';
+        }
+        foreach($required as $param) {
             if(!isset($params[$param])) {
                 $missing[] = $param;
             }
@@ -232,7 +238,6 @@ class Controller
         if($missing !== []) {
             throw new InvalidArgumentException(sprintf('Missing %s', implode(', ', $missing)));
         }
-        $installUrl = $this->runtime->rootUrl;
         if(isDocker()) {
             $installUrl = 'http://localhost/';
         }
