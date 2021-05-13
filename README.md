@@ -1,6 +1,12 @@
 # Installer source
 
-This repository contains the source code used by the single-file [Chevereto/Installer](https://github.com/Chevereto/Installer).
+> 🔔 [Subscribe](https://newsletter.chevereto.com/subscription?f=PmL892XuTdfErVq763PCycJQrvZ8PYc9JbsVUttqiPV1zXt6DDtf7lhepEStqE8LhGs8922ZYmGT7CYjMH5uSx23pL6Q) to don't miss any update regarding Chevereto.
+
+![Chevereto](LOGO.svg)
+
+[![Discord](https://img.shields.io/discord/759137550312407050?style=flat-square)](https://chv.to/discord)
+
+This is the repository for the source code used by the well-known [chevereto/installer](https://github.com/chevereto/installer).
 
 ## Components
 
@@ -25,8 +31,6 @@ If everything goes OK you should get a message indicating the location of the bu
 [OK] build/installer.php
 ```
 
-If something goes wrong, check the actual console output and make sure that your PHP interpreter isn't suppressing errors.
-
 ## Application development
 
-Make your HTTP/CLI calls to `./app.php`. Learn more at the [Installer API](https://github.com/Chevereto/Installer#api).
+Make your HTTP/CLI calls to `./app.php`. Learn more at the [Installer API](https://github.com/chevereto/installer#apis).
