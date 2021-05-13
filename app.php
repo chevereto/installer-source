@@ -20,7 +20,7 @@
 declare(strict_types=1);
 
 const APP_NAME = 'Chevereto Installer';
-const APP_VERSION = '2.2.0';
+const APP_VERSION = '2.3.0';
 const APP_URL = 'https://github.com/chevereto/installer';
 const PHP_VERSION_MIN = '7.4';
 const PHP_VERSION_RECOMMENDED = '7.4';
@@ -35,7 +35,7 @@ const APPLICATIONS = [
         'name' => 'Chevereto',
         'license' => 'Paid',
         'url' => 'https://chevereto.com',
-        'zipball' => 'https://chevereto.com/api/download/latest',
+        'zipball' => 'https://chevereto.com/api/download/%tag%',
         'folder' => 'chevereto',
         'vendor' => VENDOR,
     ],
@@ -43,8 +43,8 @@ const APPLICATIONS = [
         'name' => 'Chevereto-Free',
         'license' => 'Open Source',
         'url' => 'https://github.com/Chevereto/Chevereto-Free',
-        'zipball' => 'https://api.github.com/repos/Chevereto/Chevereto-Free/releases/latest',
-        'folder' => 'Chevereto/Chevereto-Free-',
+        'zipball' => 'https://api.github.com/repos/Chevereto/Chevereto-Free/releases/%tag%',
+        'folder' => 'Chevereto-Chevereto-Free-%commit%',
         'vendor' => VENDOR,
     ],
 ];
@@ -131,8 +131,9 @@ if(!empty($_POST)) {
             $params['password'] = $opts['p'] ?? null;
             break;
         case 'download':            
-            $opts = getopt('a:s:l::');
+            $opts = getopt('a:s:t::l::');
             $params['software'] = $opts['s'] ?? null;
+            $params['tag'] = $opts['t'] ?? null;
             $params['license'] = $opts['l'] ?? null;
             break;
         case 'extract':            

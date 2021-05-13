@@ -110,6 +110,11 @@ class Controller
         if (!isset($zipball)) {
             throw new Exception('Invalid software parameter', 400);
         }
+        $tag = $params['tag'] ?? 'latest';
+        if($tag !== 'latest' && $params['software'] == 'chevereto-free') {
+            $tag = "tags/$tag";
+        }
+        $zipball = str_replace('%tag%', $tag, $zipball);
         if ($params['software'] == 'chevereto') {
             $isPost = true;
         } else {
@@ -121,7 +126,6 @@ class Controller
             $zipball = $get->json->zipball_url;
         }
         $curl = $this->downloadFile($zipball, $params, $filePath, $isPost);
-        // Default chevereto.com API handling
         if (isset($curl->json->error)) {
             throw new RuntimeException($curl->json->error->message, $curl->json->status_code);
         }
@@ -178,7 +182,7 @@ class Controller
         $folder = $software['folder'];
         if ($params['software'] == 'chevereto-free') {
             $comment = $zipExt->getArchiveComment();
-            $folder = str_replace('/', '-', $folder) . substr($comment, 0, 7);
+            $folder = str_replace('%commit%', substr($comment, 0, 7), $folder);
         }
         $extraction = $zipExt->extractSubdirTo($workingPath, $folder);
         if (!empty($extraction)) {
