@@ -463,6 +463,12 @@ var installer = {
             installer
                 .fetchCommonInit()
                 .then(data => {
+                    installer.log(
+                        "Removing installer file at " + runtime.installerFilepath
+                    );
+                    return installer.fetch("selfDestruct", null);
+                })
+                .then(data => {
                     installer.setBodyInstalling(false);
                     installer.log("Upgrade completed");
                     setTimeout(function () {
@@ -473,7 +479,6 @@ var installer = {
         install: function () {
             installer.setBodyInstalling(true);
             this.show("installing");
-
             installer
                 .fetchCommonInit()
                 .then(data => {
@@ -492,6 +497,12 @@ var installer = {
                         website_mode: 'community',
                     };
                     return installer.fetch("submitInstallForm", params);
+                })
+                .then(data => {
+                    installer.log(
+                        "Removing installer file at " + runtime.installerFilepath
+                    );
+                    return installer.fetch("selfDestruct", null);
                 })
                 .then(data => {
                     installer.setBodyInstalling(false);

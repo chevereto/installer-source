@@ -291,10 +291,10 @@
       <div>
         <h1>Installation completed</h1>
         <p>Chevereto has been installed. You can now login to your dashboard panel to configure your website to fit your needs.</p>
-        <p class="alert">You must remove the installer file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
+        <p class="alert">Double-check if the installer file was removed from <code><?php echo INSTALLER_FILEPATH; ?></code></p>
         <p>Take note on the installation details below.</p>
         <div class="install-details p highlight font-size-80p"></div>
-        <p>❤ Hope you enjoy using Chevereto.</p>
+        <p>💖 Hope you enjoy using Chevereto.</p>
         <div>
           <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>dashboard" target="_blank">Open dashboard</a>
           <a class="button radius" href="<?php echo $runtime->rootUrl; ?>" target="_blank">Open homepage</a>
@@ -308,7 +308,7 @@
       <div>
         <h1>Upgrade prepared</h1>
         <p>The system files have been upgraded. You can now install the upgrade which will perform the database changes needed and complete the process.</p>
-        <p class="alert">The installer has self-removed its file at <code><?php echo INSTALLER_FILEPATH; ?></code></p>
+        <p class="alert">Double-check if the installer file was removed from <code><?php echo INSTALLER_FILEPATH; ?></code></p>
         <div>
           <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>install">Install upgrade</a>
         </div>

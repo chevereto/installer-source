@@ -1,9 +1,8 @@
 <?php
 
-$lockRelative = 'app/installer.lock';
-if(file_exists($runtime->absPath . $lockRelative)) {
+if(file_exists(LOCK_FILEPATH)) {
     if(PHP_SAPI === 'cli') {
-        logger("Locked ($lockRelative)\n");
+        logger("Locked (" . LOCK_FILEPATH . ")\n");
     } else {
         set_status_header(403);
     }

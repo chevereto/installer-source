@@ -95,6 +95,30 @@ class Controller
         }
     }
 
+    public function lockAction(array $params)
+    {
+        put(LOCK_FILEPATH, '');
+        if(file_exists(LOCK_FILEPATH)) {
+            $this->code = 200;
+            $this->response = 'installer locked';
+        } else {
+            $this->code = 500;
+            $this->response = 'unable to lock installer';
+        }
+    }
+
+    public function selfDestructAction(array $params)
+    {
+        unlink(INSTALLER_FILEPATH);
+        if(!file_exists(LOCK_FILEPATH)) {
+            $this->code = 200;
+            $this->response = 'installer destroyed';
+        } else {
+            $this->code = 500;
+            $this->response = 'unable to destroy installer';
+        }
+    }
+
     public function downloadAction(array $params)
     {
         if(!isset($params['software'])) {
