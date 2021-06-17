@@ -20,7 +20,7 @@
 declare(strict_types=1);
 
 const APP_NAME = 'Chevereto Installer';
-const APP_VERSION = '2.2.2';
+const APP_VERSION = '2.2.3';
 const APP_URL = 'https://github.com/chevereto/installer';
 const PHP_VERSION_MIN = '7.4';
 const PHP_VERSION_RECOMMENDED = '7.4';
@@ -227,7 +227,7 @@ if (isset($params)) {
         const appUrl = <?php echo json_encode(APP_URL); ?>;
         const runtime = <?php echo json_encode($jsVars); ?>;
         const patterns = <?php echo json_encode($patterns); ?>;
-        const useCpanel = <?php echo json_encode(isset($_GET['cpanel'])); ?>;
+        const useCpanel = true;
     </script>
 </head>
 <body class="body--flex">

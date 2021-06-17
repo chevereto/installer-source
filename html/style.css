@@ -231,7 +231,7 @@ button,
   font-weight: bold;
   padding-right: 15px;
   padding-left: 15px;
-  line-height: 1;
+  line-height: 0.83em;
   outline: 0;
   cursor: pointer;
   text-shadow: 1px 1px 0 rgba(255, 255, 255, .1);
