@@ -152,16 +152,6 @@ if(!empty($_POST)) {
             $params['userPassword'] = $opts['x'] ?? null;
             $params['filePath'] = $opts['f'] ?? null;
             break;
-        case 'submitInstallForm':            
-            $opts = getopt('a:w:u:e:x:f:i:m:');
-            $params['website'] = $opts['w'] ?? null;
-            $params['username'] = $opts['u'] ?? null;
-            $params['email'] = $opts['e'] ?? null;
-            $params['password'] = $opts['x'] ?? null;
-            $params['email_from_email'] = $opts['f'] ?? null;
-            $params['email_incoming_email'] = $opts['i'] ?? null;
-            $params['website_mode'] = $opts['m'] ?? null;
-            break;
         case 'lock':
         case 'selfDestruct':
             break;

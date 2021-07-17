@@ -290,14 +290,13 @@
     <div class="flex-box col-width">
       <div>
         <h1>Installation completed</h1>
-        <p>Chevereto has been installed. You can now login to your dashboard panel to configure your website to fit your needs.</p>
+        <p>You can now create your admin account and configure your website to fit your needs.</p>
         <p class="alert">Double-check if the installer file was removed from <code><?php echo INSTALLER_FILEPATH; ?></code></p>
         <p>Take note on the installation details below.</p>
         <div class="install-details p highlight font-size-80p"></div>
         <p>💖 Hope you enjoy using Chevereto.</p>
         <div>
-          <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>dashboard" target="_blank">Open dashboard</a>
-          <a class="button radius" href="<?php echo $runtime->rootUrl; ?>" target="_blank">Open homepage</a>
+          <a class="button action radius" href="<?php echo $runtime->rootUrl; ?>" target="_blank">Open website</a>
         </div>
       </div>
     </div>

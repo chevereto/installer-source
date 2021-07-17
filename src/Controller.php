@@ -249,44 +249,6 @@ class Controller
         $this->response = 'Settings file OK';
     }
 
-    public function submitInstallFormAction(array $params)
-    {
-        $installUrl = $this->runtime->rootUrl;
-        $missing = [];
-        $required = ['username', 'email', 'password', 'email_from_email', 'email_incoming_email', 'website_mode'];
-        if(PHP_SAPI === 'cli') {
-            $required[] = 'website';
-            $installUrl = rtrim($params['website'], '/') . '/';
-        }
-        foreach($required as $param) {
-            if(!isset($params[$param])) {
-                $missing[] = $param;
-            }
-        }
-        if($missing !== []) {
-            throw new InvalidArgumentException(sprintf('Missing %s', implode(', ', $missing)));
-        }
-        if(isDocker()) {
-            $installUrl = 'http://localhost/';
-        }
-        $installUrl .= 'install';
-        $post = $this->curl($installUrl, [
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => http_build_query($params),
-        ]);
-        if (!empty($post->json->error)) {
-            throw new Exception($post->json->error->message, $post->json->error->code);
-        }
-        if (preg_match('/system error/i', $post->raw)) {
-            throw new Exception('System error :(', 400);
-        }
-        if (preg_match('/<p class="highlight\s.*">(.*)<\/p>/', $post->raw, $post_errors)) {
-            throw new Exception(strip_tags(str_replace('<br><br>', ' ', $post_errors[1])), 400);
-        }
-        $this->code = 200;
-        $this->response = 'Setup complete';
-    }
-
     /**
      * @param string $url      Target download URL
      * @param string $params   Request params

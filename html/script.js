@@ -330,11 +330,6 @@ var installer = {
             "| URL: " + runtime.rootUrl + "\n" +
             "| Software: " + data.software + "\n" +
             "| --" + "\n" +
-            "| # Admin" + "\n" +
-            "| Email: " + data.admin.email + "\n" +
-            "| Username: " + data.admin.username + "\n" +
-            "| Password: " + data.admin.password + "\n" +
-            "| --" + "\n" +
             "| # Database" + "\n" +
             "| Host: " + data.db.host + "\n" +
             "| Port: " + data.db.port + "\n" +
@@ -485,18 +480,6 @@ var installer = {
                     installer.log("Creating app/settings.php file");
                     let = params = Object.assign({ filePath: runtime.absPath + "app/settings.php" }, installer.data.db)
                     return installer.fetch("createSettings", params);
-                })
-                .then(data => {
-                    installer.log("Performing system setup");
-                    let params = {
-                        username: installer.data.admin.username,
-                        email: installer.data.admin.email,
-                        password: installer.data.admin.password,
-                        email_from_email: installer.data.email.emailNoreply,
-                        email_incoming_email: installer.data.email.emailInbox,
-                        website_mode: 'community',
-                    };
-                    return installer.fetch("submitInstallForm", params);
                 })
                 .then(data => {
                     installer.log(
