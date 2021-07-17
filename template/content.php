@@ -182,36 +182,6 @@
     </div>
   </div>
 
-  <div id="screen-admin" class="screen animate animate--slow">
-    <div class="flex-box col-width">
-      <div>
-        <h1>Administrator</h1>
-        <p>Fill in your administrator user details. You can edit this account or add more administrators later.</p>
-        <form method="post" name="admin" data-trigger="setAdmin" autocomplete="off">
-          <p class="p alert"></p>
-          <div class="p input-label">
-            <label for="adminEmail">Email</label>
-            <input class="radius width-100p" type="email" name="adminEmail" id="adminEmail" placeholder="username@domain.com" autocomplete="off" required>
-            <div><small>Make sure that this email is working or you won't be able to recover the account if you lost the password.</small></div>
-          </div>
-          <div class="p input-label">
-            <label for="adminUsername">Username</label>
-            <input class="radius width-100p" type="text" name="adminUsername" id="adminUsername" placeholder="admin" pattern="<?php echo $patterns['username_pattern']; ?>" autocomplete="off" required>
-            <div><small>3 to 16 characters. Letters, numbers and underscore.</small></div>
-          </div>
-          <div class="p input-label">
-            <label for="adminPassword">Password</label>
-            <input class="radius width-100p" type="password" name="adminPassword" id="adminPassword" placeholder="password" pattern="<?php echo $patterns['user_password_pattern']; ?>" autocomplete="off" required>
-            <div><small>6 to 128 characters.</small></div>
-          </div>
-          <div>
-            <button class="action radius">Set administrator</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <div id="screen-emails" class="screen animate animate--slow">
     <div class="flex-box col-width">
       <div>
