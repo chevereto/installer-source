@@ -379,8 +379,7 @@ body.body--installing .flex-box .loader {
   transition-delay: 400ms;
 }
 
-.sel--chevereto .chevereto--hide,
-.sel--chevereto-free .chevereto-free--hide {
+.sel--chevereto .chevereto--hide {
   display: none;
 }
 

@@ -186,11 +186,10 @@
     <div class="flex-box col-width">
       <div>
         <h1>Ready to install</h1>
-        <p>The installer is ready to download and install the latest <span class="chevereto-free--hide">Chevereto</span><span class="chevereto--hide">Chevereto-Free</span> release in <code><?php echo $runtime->absPath; ?></code></p>
-        <p class="highlight chevereto-free--hide">By installing is understood that you accept the <a href="https://chevereto.com/license" target="_blank">Chevereto EULA</a>.</p>
-        <p class="highlight chevereto--hide">By installing is understood that you accept the Chevereto-Free <a href="<?php echo APPLICATIONS['chevereto-free']['url'] . '/blob/master/LICENSE'; ?>" target="_blank">MIT license</a>.</p>
+        <p>The installer is ready to download and install the latest Chevereto release in <code><?php echo $runtime->absPath; ?></code></p>
+        <p class="highlight">By installing is understood that you accept the <a href="https://chevereto.com/license" target="_blank">Chevereto EULA</a>.</p>
         <div>
-          <button class="action radius" data-action="install">Install <span class="chevereto-free--hide">Chevereto</span><span class="chevereto--hide">Chevereto-Free</span></button>
+          <button class="action radius" data-action="install">Install Chevereto</button>
         </div>
       </div>
     </div>

@@ -135,9 +135,6 @@ class Controller
             throw new Exception('Invalid software parameter', 400);
         }
         $tag = $params['tag'] ?? 'latest';
-        if($tag !== 'latest' && $params['software'] == 'chevereto-free') {
-            $tag = "tags/$tag";
-        }
         $zipball = str_replace('%tag%', $tag, $zipball);
         if ($params['software'] == 'chevereto') {
             $isPost = true;
@@ -204,10 +201,6 @@ class Controller
         }
         $numFiles = $zipExt->numFiles - 1; // because of top level folder
         $folder = $software['folder'];
-        if ($params['software'] == 'chevereto-free') {
-            $comment = $zipExt->getArchiveComment();
-            $folder = str_replace('%commit%', substr($comment, 0, 7), $folder);
-        }
         $extraction = $zipExt->extractSubdirTo($workingPath, $folder);
         if (!empty($extraction)) {
             throw new Exception(implode(', ', $extraction));

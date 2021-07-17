@@ -39,14 +39,6 @@ const APPLICATIONS = [
         'folder' => 'chevereto',
         'vendor' => VENDOR,
     ],
-    'chevereto-free' => [
-        'name' => 'Chevereto-Free',
-        'license' => 'Open Source',
-        'url' => 'https://github.com/Chevereto/Chevereto-Free',
-        'zipball' => 'https://api.github.com/repos/Chevereto/Chevereto-Free/releases/%tag%',
-        'folder' => 'Chevereto-Chevereto-Free-%commit%',
-        'vendor' => VENDOR,
-    ],
 ];
 $patterns = [
     'username_pattern' => '^[\w]{3,16}$',

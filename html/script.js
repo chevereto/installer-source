@@ -367,7 +367,7 @@ var installer = {
             });
         },
         setSoftware: function (software) {
-            document.body.classList.remove("sel--chevereto", "sel--chevereto-free");
+            document.body.classList.remove("sel--chevereto");
             document.body.classList.add("sel--" + software);
             installer.data.software = software;
             installer.log("Software has been set to: " + software);
@@ -375,7 +375,6 @@ var installer = {
         },
         setUpgrade: function () {
             console.log("setUpgrade");
-            document.body.classList.remove("sel--chevereto-free");
             document.body.classList.add("sel--chevereto");
             var license = document.getElementById("upgradeKey").value;
             installer.checkLicense(license, {
