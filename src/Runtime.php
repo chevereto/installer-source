@@ -60,7 +60,7 @@ class Runtime
             'log_errors' => ini_set('log_errors', (string) $settings['log_errors']),
             'display_errors' => ini_set('display_errors', (string) $settings['display_errors']),
             'error_log' => ini_set('error_log', $settings['error_log']),
-            'set_time_limit' => set_time_limit($settings['time_limit']),
+            'time_limit' => @set_time_limit($settings['time_limit']),
             'ini_set' => ini_set('default_charset', $settings['default_charset']),
             'setlocale' => setlocale(LC_ALL, $settings['LC_ALL']),
         ];
@@ -69,7 +69,7 @@ class Runtime
             if (false === $v) {
                 $this->logger->addMessage(strtr($messageTemplate, [
                     '%k' => $k,
-                    '%v' => var_export($settings[$k], true),
+                    '%v' => var_export($settings[$k] ?? '', true),
                 ]));
             }
         }
