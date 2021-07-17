@@ -48,8 +48,21 @@ class RequirementsCheck
         $this->checkApacheModRewrite();
         $this->checkUtf8Functions();
         $this->checkCurl();
+        $this->checkImageLibrary();
         if (!$this->isMissing('cURL')) {
             $this->checkSourceAPI();
+        }
+    }
+
+    public function checkImageLibrary() {
+        $image_lib = [
+            'gd' => extension_loaded('gd') && function_exists('gd_info'),
+            'imagick' => extension_loaded('imagick'),
+        ];
+        if(!$image_lib['gd'] && !$image_lib['imagick']) {
+            $this->addMissing('GD', 'https://www.php.net/manual/en/book.image.php', 'No %l library support in this PHP installation.');
+            $this->addMissing('Imagick', 'https://www.php.net/manual/en/book.imagick.php', 'No %l library support in this PHP installation.');
+            $this->addMissing('PHP', '', 'Enable either Imagick extension or GD extension to perform image processing.');
         }
     }
 
