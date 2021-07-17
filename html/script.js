@@ -391,7 +391,7 @@ var installer = {
         },
         cPanelProcess: function () {
             if (installer.isCpanelDone) {
-                installer.actions.show("admin");
+                installer.actions.show("ready");
                 return;
             }
             var els = {
@@ -421,7 +421,7 @@ var installer = {
                     }
                     installer.writeFormData("db", json.data.db);
                     installer.isCpanelDone = true;
-                    installer.actions.show("admin");
+                    installer.actions.show("ready");
                 });
         },
         setDb: function () {
@@ -429,19 +429,11 @@ var installer = {
             installer.fetch("checkDatabase", params, {
                 success: function (response, json) {
                     installer.writeFormData("db", params);
-                    installer.actions.show("admin");
+                    installer.actions.show("ready");
                 },
                 error: function (response, json) {
                 }
             });
-        },
-        setAdmin: function () {
-            installer.writeFormData("admin");
-            this.show("emails");
-        },
-        setEmails: function () {
-            installer.writeFormData("email");
-            this.show("ready");
         },
         setReadyUpgrade() {
             this.show("ready-upgrade");

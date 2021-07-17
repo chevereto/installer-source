@@ -182,31 +182,6 @@
     </div>
   </div>
 
-  <div id="screen-emails" class="screen animate animate--slow">
-    <div class="flex-box col-width">
-      <div>
-        <h1>Email addresses</h1>
-        <p>Fill in the email addresses that will be used by the system. You can edit this later.</p>
-        <form method="post" name="emails" data-trigger="setEmails">
-          <p class="p alert"></p>
-          <div class="p input-label">
-            <label for="no-reply">No-reply</label>
-            <input class="radius width-100p" type="email" name="emailNoreply" id="emailNoreply" placeholder="no-reply@domain.com" required>
-            <div><small>This address will be used as FROM email address when sending transactional emails (account functions, singup, alerts, etc.)</small></div>
-          </div>
-          <div class="p input-label">
-            <label for="inbox">Inbox</label>
-            <input class="radius width-100p" type="email" name="emailInbox" id="emailInbox" placeholder="inbox@domain.com" required>
-            <div><small>This address will be used to get contact form messages.</small></div>
-          </div>
-          <div>
-            <button class="action radius">Set emails</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <div id="screen-ready" class="screen animate animate--slow">
     <div class="flex-box col-width">
       <div>
