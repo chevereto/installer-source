@@ -153,6 +153,18 @@ function isDocker(): bool {
     return getenv('CHEVERETO_SERVICING') == 'docker';
 }
 
+function isDatabaseEnvProvided(): bool {
+    if(isDocker()) {
+        return true;
+    }
+    return getenv('CHEVERETO_DB_HOST') !== false
+        && getenv('CHEVERETO_DB_PORT') !== false
+        && getenv('CHEVERETO_DB_NAME') !== false
+        && getenv('CHEVERETO_DB_USER') !== false
+        && getenv('CHEVERETO_DB_PASS') !== false;
+
+}
+
 function get_ini_bytes($size)
 {
     return get_bytes($size, -1);

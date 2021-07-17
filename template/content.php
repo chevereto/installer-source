@@ -114,9 +114,9 @@
     <div class="flex-box col-width">
       <div>
         <h1>Database</h1>
-        <p>Chevereto requires MySQL 8 or MariaDB 10. Chevereto also supports MySQL 5.7.</p>
-        <?php if(isDocker()) { ?>
-        <p class="highlight">Database values are being provided using environment variables.</p>
+        <p>Chevereto requires MySQL 8 (5.7 min), MariaDB 10.</p>
+        <?php if(isDatabaseEnvProvided()) { ?>
+        <p class="highlight"><b>Note:</b> Database values are being automatically provided using environment variables.</p>
         <?php } ?>
         <?php
             function echoDatabaseEnv(string $env, string $default): void {
@@ -173,7 +173,7 @@
           <div>
             <button class="action radius">
             <?php 
-                echo isDocker() ? 'Check' : 'Set';
+                echo isDatabaseEnvProvided() ? 'Check' : 'Set';
             ?> Database
             </button>
           </div>
