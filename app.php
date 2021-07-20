@@ -5,22 +5,17 @@
     http://chevereto.com/
 
     @author	Rodolfo Berrios A. <http://rodolfoberrios.com/>
-
-      /$$$$$$  /$$                                                           /$$
-     /$$__  $$| $$                                                          | $$
-    | $$  \__/| $$$$$$$   /$$$$$$  /$$    /$$ /$$$$$$   /$$$$$$   /$$$$$$  /$$$$$$    /$$$$$$
-    | $$      | $$__  $$ /$$__  $$|  $$  /$$//$$__  $$ /$$__  $$ /$$__  $$|_  $$_/   /$$__  $$
-    | $$      | $$  \ $$| $$$$$$$$ \  $$/$$/| $$$$$$$$| $$  \__/| $$$$$$$$  | $$    | $$  \ $$
-    | $$    $$| $$  | $$| $$_____/  \  $$$/ | $$_____/| $$      | $$_____/  | $$ /$$| $$  | $$
-    |  $$$$$$/| $$  | $$|  $$$$$$$   \  $/  |  $$$$$$$| $$      |  $$$$$$$  |  $$$$/|  $$$$$$/
-     \______/ |__/  |__/ \_______/    \_/    \_______/|__/       \_______/   \___/   \______/
+          __                        __     
+     ____/ /  ___ _  _____ _______ / /____ 
+    / __/ _ \/ -_) |/ / -_) __/ -_) __/ _ \ 
+    \__/_//_/\__/|___/\__/_/  \__/\__/\___/
 
   --------------------------------------------------------------------- */
 
 declare(strict_types=1);
 
 const APP_NAME = 'Chevereto Installer';
-const APP_VERSION = '2.2.3';
+const APP_VERSION = '2.3.0';
 const APP_URL = 'https://github.com/chevereto/installer';
 const PHP_VERSION_MIN = '7.4';
 const PHP_VERSION_RECOMMENDED = '7.4';
@@ -39,11 +34,6 @@ const APPLICATIONS = [
         'folder' => 'chevereto',
         'vendor' => VENDOR,
     ],
-];
-$patterns = [
-    'username_pattern' => '^[\w]{3,16}$',
-    'user_password_pattern' => '^.{6,128}$',
-    'email_pattern' => "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$",
 ];
 $phpSettings = [
     'error_reporting' => E_ALL ^ E_NOTICE,
@@ -208,7 +198,6 @@ if (isset($params)) {
     <script>
         const appUrl = <?php echo json_encode(APP_URL); ?>;
         const runtime = <?php echo json_encode($jsVars); ?>;
-        const patterns = <?php echo json_encode($patterns); ?>;
         const useCpanel = true;
     </script>
 </head>
