@@ -10,6 +10,10 @@
 
 This is the repository for the source code used by the well-known [chevereto/installer](https://github.com/chevereto/installer).
 
+## Requirements
+
+* PHP 7.4
+
 ## Components
 
 * `./app.php` The actual application (front controller).
