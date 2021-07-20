@@ -61,10 +61,6 @@ var installer = {
         this.popScreen(this.defaultScreen);
         this.history.replace(this.defaultScreen);
         if (page != "error") {
-            var inputEmailEls = document.querySelectorAll("input[type=email]");
-            for (let inputEmailEl of inputEmailEls) {
-                inputEmailEl.pattern = patterns.email_pattern;
-            }
             this.bindActions();
         }
         document.addEventListener(
