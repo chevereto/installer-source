@@ -326,6 +326,9 @@ var installer = {
             if (history.state.view != screen) {
                 installer.history.push(screen);
             }
+            if(screen == "license") {
+                document.querySelector("#installKey").focus();
+            }
         },
         setLicense: function (elId) {
             var licenseEl = document.getElementById(elId);
