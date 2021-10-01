@@ -82,41 +82,13 @@
     </div>
   </div>
 
-  <div id="screen-cpanel" class="screen animate animate--slow">
-    <div class="header flex-item"><?php echo $svgCpanelLogo; ?></div>
-    <div class="flex-box col-width">
-      <div>
-        <h1>cPanel access</h1>
-        <p>This installer can connect to a cPanel backend using the <a href="https://documentation.cpanel.net/display/DD/Guide+to+UAPI" target="_blank">cPanel UAPI</a> to create the database, its user, and grant database privileges.</p>
-        <?php if ('http' == $runtime->httpProtocol) { ?>
-          <p class="highlight">You are not browsing using HTTPS. For extra security, change your cPanel password once the installation gets completed.</p>
-        <?php } ?>
-        <p>The cPanel credentials won't be stored either transmitted to anyone.</p>
-        <p class="highlight">Skip this if you don't run cPanel or if you want to setup the database requirements manually.</p>
-        <p class="p alert"></p>
-        <div class="p input-label">
-          <label for="cpanelUser">User</label>
-          <input class="radius width-100p" type="text" name="cpanelUser" id="cpanelUser" placeholder="username" autocomplete="off">
-        </div>
-        <div class="p input-label">
-          <label for="cpanelPassword">Password</label>
-          <input class="radius width-100p" type="password" name="cpanelPassword" id="cpanelPassword" placeholder="password" autocomplete="off">
-        </div>
-        <div>
-          <button class="action radius" data-action="cPanelProcess">Connect to cPanel</button>
-          <button class="radius" data-action="show" data-arg="db">Skip</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div id="screen-db" class="screen animate animate--slow">
     <div class="flex-box col-width">
       <div>
         <h1>Database</h1>
-        <p>Chevereto requires MySQL 8 (5.7 min), MariaDB 10.</p>
+        <p>Chevereto requires a MySQL 8 (5.7 min), MariaDB 10 database.</p>
         <?php if(isDatabaseEnvProvided()) { ?>
-        <p class="highlight"><b>Note:</b> Database values are being automatically provided using environment variables.</p>
+        <p class="highlight"><b>Note:</b> ✨ Database values are being automatically provided using environment variables.</p>
         <?php } ?>
         <?php
             function echoDatabaseEnv(string $env, string $default): void {

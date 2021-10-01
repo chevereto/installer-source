@@ -1,18 +1,14 @@
 <?php
 
-class Controller
+final class Controller
 {
-    /** @var array */
-    public $params;
+    public array $params;
 
-    /** @var string */
-    public $response;
+    public string $response;
 
-    /** @var array */
-    public $data;
+    public array $data;
 
-    /** @var Runtime */
-    public $runtime;
+    public Runtime $runtime;
 
     public function __construct(array $params, Runtime $runtime)
     {
@@ -28,7 +24,7 @@ class Controller
         $this->{$method}($this->params);
     }
 
-    public function checkLicenseAction(array $params)
+    public function checkLicenseAction(array $params): void
     {
         if(!isset($params['license'])) {
             throw new InvalidArgumentException('Missing license parameter');
@@ -43,7 +39,7 @@ class Controller
         $this->response = 200 == $this->code ? 'Valid license key' : 'Unable to check license';
     }
 
-    public function checkDatabaseAction(array $params)
+    public function checkDatabaseAction(array $params): void
     {
         try {
             $database = new Database(
@@ -62,40 +58,7 @@ class Controller
         }
     }
 
-    public function cPanelProcessAction(array $params)
-    {
-        try {
-            $cpanel = new Cpanel($params['user'], $params['password']);
-            $createDb = $cpanel->setupMysql();
-            $this->code = 200;
-            $this->response = 'cPanel process completed';
-            $this->data['db'] = $createDb;
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage(), 503);
-        }
-    }
-
-    public function cPanelHtaccessHandlersAction(array $params)
-    {
-        $filePath = $this->runtime->absPath . '.htaccess';
-        if (!@is_readable($filePath)) {
-            $this->code = 404;
-            $this->response = 'No .htaccess found';
-
-            return;
-        }
-        $handlers = Cpanel::getHtaccessHandlers($filePath);
-        if (isset($handlers)) {
-            $this->code = 200;
-            $this->response = 'cPanel .htaccess handlers found';
-            $this->data['handlers'] = trim($handlers);
-        } else {
-            $this->code = 404;
-            $this->response = 'No cPanel .htaccess handlers found';
-        }
-    }
-
-    public function lockAction(array $params)
+    public function lockAction(): void
     {
         put(LOCK_FILEPATH, '');
         if(file_exists(LOCK_FILEPATH)) {
@@ -107,7 +70,7 @@ class Controller
         }
     }
 
-    public function selfDestructAction(array $params)
+    public function selfDestructAction(): void
     {
         unlink(INSTALLER_FILEPATH);
         if(!file_exists(LOCK_FILEPATH)) {
@@ -119,7 +82,7 @@ class Controller
         }
     }
 
-    public function downloadAction(array $params)
+    public function downloadAction(array $params): void
     {
         if(!isset($params['software'])) {
             throw new InvalidArgumentException('Missing software');
@@ -130,29 +93,28 @@ class Controller
             @unlink($filePath);
         }
         $isPost = false;
-        $zipball = APPLICATIONS[$params['software']]['zipball'] ?? null;
-        if (!isset($zipball)) {
+        $zipBall = APPLICATIONS[$params['software']]['zipball'] ?? null;
+        if (!isset($zipBall)) {
             throw new Exception('Invalid software parameter', 400);
         }
         $tag = $params['tag'] ?? 'latest';
-        $zipball = str_replace('%tag%', $tag, $zipball);
+        $zipBall = str_replace('%tag%', $tag, $zipBall);
         if ($params['software'] == 'chevereto') {
             $isPost = true;
         } else {
-            $params = null;
-            $get = $this->curl($zipball);
+            $params = [];
+            $get = $this->curl($zipBall);
             if(!isset($get->json->zipball_url)) {
                 throw new RuntimeException('No zipball for ' . $params['software']);
             }
-            $zipball = $get->json->zipball_url;
+            $zipBall = $get->json->zipball_url;
         }
-        $curl = $this->downloadFile($zipball, $params, $filePath, $isPost);
+        $curl = $this->downloadFile($zipBall, $params, $filePath, $isPost);
         if (isset($curl->json->error)) {
             throw new RuntimeException($curl->json->error->message, $curl->json->status_code);
         }
-        // Everybody else
         if (200 != $curl->transfer['http_code']) {
-            throw new RuntimeException('[HTTP ' . $curl->transfer['http_code'] . '] ' . $zipball, $curl->transfer['http_code']);
+            throw new RuntimeException('[HTTP ' . $curl->transfer['http_code'] . '] ' . $zipBall, $curl->transfer['http_code']);
         }
         $fileSize = filesize($filePath);
         $this->response = strtr('Downloaded %f (%w @%s)', array(
@@ -164,7 +126,7 @@ class Controller
         $this->data['filePath'] = $filePath;
     }
 
-    public function extractAction(array $params)
+    public function extractAction(array $params): void
     {
         if (!isset($params['software'])) {
             throw new Exception('Missing software parameter', 400);
@@ -199,25 +161,20 @@ class Controller
                 '%z' => $zipOpen,
             )), 503);
         }
-        $numFiles = $zipExt->numFiles - 1; // because of top level folder
+        $numFiles = $zipExt->numFiles - 1;
         $folder = $software['folder'];
-        $extraction = $zipExt->extractSubdirTo($workingPath, $folder);
+        $extraction = $zipExt->extractSubDirTo($workingPath, $folder);
         if (!empty($extraction)) {
             throw new Exception(implode(', ', $extraction));
         }
         $zipExt->close();
         $timeTaken = round(microtime(true) - $timeStart, 2);
         @unlink($filePath);
-
-        $htaccessFiepath = $workingPath . '.htaccess';
-        if (!empty($params['appendHtaccess']) && file_exists($htaccessFiepath)) {
-            file_put_contents($htaccessFiepath, "\n\n" . $params['appendHtaccess'], FILE_APPEND | LOCK_EX);
-        }
         $this->code = 200;
-        $this->response = strtr('Extraction completeted (%n files in %ss)', ['%n' => $numFiles, '%s' => $timeTaken]);
+        $this->response = strtr('Extraction completed (%n files in %ss)', ['%n' => $numFiles, '%s' => $timeTaken]);
     }
 
-    public function createSettingsAction(array $params)
+    public function createSettingsAction(array $params): void
     {
         if(!isset($params['filePath'])) {
             throw new InvalidArgumentException('Missing filePath');
@@ -242,14 +199,7 @@ class Controller
         $this->response = 'Settings file OK';
     }
 
-    /**
-     * @param string $url      Target download URL
-     * @param string $params   Request params
-     * @param string $filePath Location to save the downloaded file
-     * @param bool   $post     TRUE to download using a POST request
-     * @param return curl handle
-     */
-    public function downloadFile(string $url, array $params = null, string $filePath, bool $post = true)
+    public function downloadFile(string $url, array $params, string $filePath, bool $post = true): object
     {
         $fp = @fopen($filePath, 'wb+');
         if (!$fp) {
@@ -258,7 +208,7 @@ class Controller
         $ops = [
             CURLOPT_FILE => $fp,
         ];
-        if ($params) {
+        if ($params !== []) {
             $ops[CURLOPT_POSTFIELDS] = http_build_query($params);
         }
         if ($post) {
@@ -331,16 +281,10 @@ class Controller
         return $return;
     }
 
-    /**
-     * @param string $bytes bytes to be formatted
-     * @param int    $round how many decimals you want to get, default 1
-     *
-     * @return string formatted size string like 10 MB
-     */
-    public function getFormatBytes($bytes, $round = 1)
+    public function getFormatBytes($bytes, int $round = 1): string
     {
         if (!is_numeric($bytes)) {
-            return false;
+            return (string) $bytes;
         }
         if ($bytes < 1000) {
             return "$bytes B";
@@ -357,14 +301,7 @@ class Controller
         }
     }
 
-    /**
-     * Converts bytes to MB.
-     *
-     * @param string $bytes bytes to be formatted
-     *
-     * @return float MB representation
-     */
-    public function getBytesToMb($bytes, $round = 2)
+    public function getBytesToMb($bytes, int $round = 2): float
     {
         $mb = $bytes / pow(10, 6);
         if ($round) {

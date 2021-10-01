@@ -47,7 +47,6 @@ function escapeHtml(unsafe) {
 var installer = {
     uid: false,
     data: {},
-    isCpanelDone: false,
     isUpgradeToPaid: locationHasParameter("UpgradeToPaid"),
     process: "install",
     defaultScreen: "welcome",
@@ -123,14 +122,14 @@ var installer = {
         }, 500);
     },
     pushAlert: function (message) {
-        var pushiInnerHTML =
-            "<span>" + message + '</span><a class="alert-close"></a>';
+        var pushInnerHTML =
+            "<span>😰 " + message + '</span><a class="alert-close"></a>';
         var el = this.getShownScreenEl(".alert");
         var html = el.innerHTML;
-        if (pushiInnerHTML == html) {
+        if (pushInnerHTML == html) {
             this.shakeEl(el);
         } else {
-            el.innerHTML = pushiInnerHTML;
+            el.innerHTML = pushInnerHTML;
         }
     },
     popAlert: function () {
@@ -170,12 +169,12 @@ var installer = {
     },
     history: {
         push: function (view) {
-            this.writter("push", { view: view });
+            this.writer("push", { view: view });
         },
         replace: function (view) {
-            this.writter("replace", { view: view });
+            this.writer("replace", { view: view });
         },
-        writter: function (fn, data) {
+        writer: function (fn, data) {
             data.uid = new Date().getTime();
             installer.uid = data.uid;
             switch (fn) {
@@ -186,12 +185,11 @@ var installer = {
                     history.replaceState(data, data.view);
                     break;
             }
-            document.title = screens[data.view].title; // Otherwise the titles at the browser bar could fail
-            console.log("history.writter:", fn, data);
+            document.title = screens[data.view].title;
+            console.log("history.writer:", fn, data);
         }
     },
     /**
-     *
      * @param {string} action
      * @param {object} params
      * @param {object} callback {success: fn(data), error: fn(data),}
@@ -240,7 +238,6 @@ var installer = {
             .catch(error => {
                 installer.pushAlert(error);
             })
-
             .then(function (data) {
                 loader.classList.remove("loader--show");
                 for (let disableEl of disableEls) {
@@ -268,9 +265,6 @@ var installer = {
                     });
                 }
             });
-        // .catch(error => {
-        //   installer.pushAlert(error);
-        // });
     },
     popScreen: function (screen) {
         console.log("popScreen:" + screen);
@@ -292,31 +286,20 @@ var installer = {
         installer.log(data.message);
     },
     fetchCommonInit: function () {
-        this.log("Trying to detect cPanel .htaccess handlers (if any)");
+        installer.log("Downloading latest " + installer.data.software + " release");
         return this
-            .fetch("cPanelHtaccessHandlers", null, {
-                error: function () {
-                    return true;
-                }
-            })
-            .then(json => {
-                installer.data.cPanelHtaccessHandlers = "data" in json && "handlers" in json.data ? json.data.handlers : '';
-            })
-            .then(json => {
-                installer.log("Downloading latest " + installer.data.software + " release");
-                return installer.fetch("download", {
-                    software: installer.data.software,
-                    license: "data" in installer && "license" in installer.data ? installer.data.license : ''
-                });
+            .fetch("download", {
+                software: installer.data.software,
+                license: "data" in installer && "license" in installer.data ? installer.data.license : ''
             })
             .then(json => {
                 installer.log("Extracting " + json.data.fileBasename);
-                return installer.fetch("extract", {
-                    software: installer.data.software,
-                    filePath: json.data.filePath,
-                    workingPath: runtime.absPath,
-                    appendHtaccess: installer.data.cPanelHtaccessHandlers,
-                });
+                return installer
+                    .fetch("extract", {
+                        software: installer.data.software,
+                        filePath: json.data.filePath,
+                        workingPath: runtime.absPath,
+                    });
             });
     },
     fillInstallDetails: function (data) {
@@ -367,7 +350,7 @@ var installer = {
             document.body.classList.add("sel--" + software);
             installer.data.software = software;
             installer.log("Software has been set to: " + software);
-            this.show(useCpanel ? "cpanel" : "db");
+            this.show("db");
         },
         setUpgrade: function () {
             console.log("setUpgrade");
@@ -383,41 +366,6 @@ var installer = {
                     installer.data.license = null;
                 }
             });
-        },
-        cPanelProcess: function () {
-            if (installer.isCpanelDone) {
-                installer.actions.show("ready");
-                return;
-            }
-            var els = {
-                user: document.getElementById("cpanelUser"),
-                password: document.getElementById("cpanelPassword")
-            };
-            var params = {};
-            for (let key in els) {
-                let el = els[key];
-                if (!el.value) {
-                    el.focus();
-                    installer.shakeEl(el);
-                    return;
-                } else {
-                    params[key] = el.value;
-                }
-            }
-            installer.fetch("cPanelProcess", params, {
-                error: function (data) {
-                    installer.isCpanelDone = false;
-                }
-            })
-                .then(json => {
-                    for (let key in els) {
-                        els[key].setAttribute("data-disabled", "");
-                        els[key].disabled = true;
-                    }
-                    installer.writeFormData("db", json.data.db);
-                    installer.isCpanelDone = true;
-                    installer.actions.show("ready");
-                });
         },
         setDb: function () {
             var params = installer.getFormData();
