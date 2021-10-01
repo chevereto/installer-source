@@ -36,7 +36,20 @@ final class Controller
         if (isset($post->json->error)) {
             throw new Exception($post->json->error->message, 403);
         }
-        $this->response = 200 == $this->code ? 'Valid license key' : 'Unable to check license';
+        if($post->json->data->version != APPLICATION['version']) {
+            throw new Exception(
+                strtr(
+                    '%required% license required (V%provided% license provided)',
+                    [
+                        '%required%' => APPLICATION_FULL_NAME,
+                        '%provided%' => $post->json->data->version,
+                    ]
+                ),
+                404);
+        }
+        $this->response = 200 == $this->code
+            ? 'Valid license key'
+            : 'Unable to check license';
     }
 
     public function checkDatabaseAction(array $params): void
@@ -93,10 +106,7 @@ final class Controller
             @unlink($filePath);
         }
         $isPost = false;
-        $zipBall = APPLICATIONS[$params['software']]['zipball'] ?? null;
-        if (!isset($zipBall)) {
-            throw new Exception('Invalid software parameter', 400);
-        }
+        $zipBall = APPLICATION['zipball'];
         $tag = $params['tag'] ?? 'latest';
         $zipBall = str_replace('%tag%', $tag, $zipBall);
         if ($params['software'] == 'chevereto') {
@@ -128,14 +138,7 @@ final class Controller
 
     public function extractAction(array $params): void
     {
-        if (!isset($params['software'])) {
-            throw new Exception('Missing software parameter', 400);
-        } elseif (!isset(APPLICATIONS[$params['software']])) {
-            throw new Exception(sprintf('Unknown software %s', $params['software']), 400);
-        }
-
-        $software = APPLICATIONS[$params['software']];
-
+        $software = APPLICATION;
         if (!isset($params['workingPath'])) {
             throw new Exception('Missing workingPath parameter', 400);
         }

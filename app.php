@@ -25,16 +25,17 @@ const VENDOR = [
     'apiUrl' => 'https://chevereto.com/api',
     'apiLicense' => 'https://chevereto.com/api/license/check',
 ];
-const APPLICATIONS = [
-    'chevereto' => [
-        'name' => 'Chevereto',
-        'license' => 'Paid',
-        'url' => 'https://chevereto.com',
-        'zipball' => 'https://chevereto.com/api/download/%tag%',
-        'folder' => 'chevereto',
-        'vendor' => VENDOR,
-    ],
+const APPLICATION = [
+    'name' => 'Chevereto',
+    'version' => '3',
+    'license' => 'Paid',
+    'url' => 'https://chevereto.com',
+    'zipball' => 'https://chevereto.com/api/download/%tag%',
+    'folder' => 'chevereto',
+    'vendor' => VENDOR,
 ];
+const APPLICATION_FULL_NAME = APPLICATION['name'] . ' V' . APPLICATION['version'];
+
 $phpSettings = [
     'error_reporting' => E_ALL ^ E_NOTICE,
     'log_errors' => true,

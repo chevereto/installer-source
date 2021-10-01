@@ -3,7 +3,7 @@
     <div class="flex-box error-box">
       <div>
         <h1>Aw, Snap!</h1>
-        <p>Your web server lacks some requirements that must be fixed to install Chevereto.</p>
+        <p>Your web server lacks some requirements that must be fixed to install <?php echo APPLICATION_FULL_NAME; ?>.</p>
         <p>Please check:</p>
         <ul>
           <?php
@@ -20,10 +20,10 @@
   </div>
 <?php } else { ?>
   <div id="screen-welcome" class="screen screen--show animate animate--slow">
-    <div class="header flex-item"><?php echo $svgLogo; ?></div>
+    <div class="header flex-item"><a href="<?php echo VENDOR['url']; ?>" target="_blank"><?php echo $svgLogo; ?></a></div>
     <div class="flex-box flex-item">
       <div>
-        <h1>Chevereto Installer</h1>
+        <h1><?php echo APPLICATION_FULL_NAME; ?> Installer</h1>
         <p>This tool will guide you through the process of installing Chevereto. To proceed, check the information below.</p>
         <ul>
           <li>Server path <code><?php echo $runtime->absPath; ?></code></li>
@@ -45,11 +45,11 @@
     <div class="flex-box col-width">
       <div>
         <h1>Enter license key</h1>
-        <p>A license key is required to install Chevereto.</p>
+        <p>A license key is required to install <?php echo APPLICATION_FULL_NAME; ?>.</p>
         <p class="p alert"></p>
         <div class="p input-label">
           <label for="installKey">License key</label>
-          <input class="radius width-100p" type="password" name="installKey" id="installKey" placeholder="Paste your license key here" autofill="off" autocomplete="off">
+          <input class="radius width-100p" type="password" name="installKey" id="installKey" placeholder="Paste your V<?php echo APPLICATION['version']; ?> license key here" autofill="off" autocomplete="off">
           <div><small>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</small></div>
         </div>
         <div>
@@ -65,13 +65,13 @@
     <div class="flex-box col-width">
       <div>
         <h1>Upgrade</h1>
-        <p>A license key is required to upgrade to our main edition.</p>
+        <p>A license key is required to upgrade to <?php echo APPLICATION_FULL_NAME; ?>.</p>
         <p>The system database schema will change, and the system files will get replaced. Don't forget to backup.</p>
         <p>Your system settings, previous uploads, and all user-generated content will remain there.</p>
         <p class="p alert"></p>
         <div class="p input-label">
           <label for="upgradeKey">License key</label>
-          <input class="radius width-100p" type="password" name="upgradeKey" id="upgradeKey" placeholder="Paste your license key here">
+          <input class="radius width-100p" type="password" name="upgradeKey" id="upgradeKey" placeholder="Paste your V<?php echo APPLICATION['version']; ?> license key here">
           <div><small>You can find the license key at your <a href="https://chevereto.com/panel/license" target="_blank">client panel</a>.</small></div>
         </div>
         <div>
@@ -86,7 +86,7 @@
     <div class="flex-box col-width">
       <div>
         <h1>Database</h1>
-        <p>Chevereto requires a MySQL 8 (5.7 min), MariaDB 10 database.</p>
+        <p><?php echo APPLICATION_FULL_NAME; ?> requires a MySQL 8 (5.7 min), MariaDB 10 database.</p>
         <?php if(isDatabaseEnvProvided()) { ?>
         <p class="highlight"><b>Note:</b> ✨ Database values are being automatically provided using environment variables.</p>
         <?php } ?>
@@ -158,10 +158,10 @@
     <div class="flex-box col-width">
       <div>
         <h1>Ready to install</h1>
-        <p>The installer is ready to download and install the latest Chevereto release in <code><?php echo $runtime->absPath; ?></code></p>
+        <p>The installer is ready to download and install the latest <?php echo APPLICATION_FULL_NAME; ?> release in <code><?php echo $runtime->absPath; ?></code></p>
         <p class="highlight">By installing is understood that you accept the <a href="https://chevereto.com/license" target="_blank">Chevereto EULA</a>.</p>
         <div>
-          <button class="action radius" data-action="install">Install Chevereto</button>
+          <button class="action radius" data-action="install">Install <?php echo APPLICATION_FULL_NAME; ?></button>
         </div>
       </div>
     </div>
@@ -174,7 +174,7 @@
         <p>The installer is ready to download and upgrade to the latest Chevereto release in <code><?php echo $runtime->absPath; ?></code></p>
         <p class="highlight">By upgrading is understood that you accept the <a href="https://chevereto.com/license" target="_blank">Chevereto EULA</a>.</p>
         <div>
-          <button class="action radius" data-action="upgrade">Upgrade Chevereto</button>
+          <button class="action radius" data-action="upgrade">Upgrade to <?php echo APPLICATION_FULL_NAME; ?></button>
         </div>
       </div>
     </div>
