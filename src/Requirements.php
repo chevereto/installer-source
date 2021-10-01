@@ -1,19 +1,13 @@
 <?php
 
-class Requirements
+final class Requirements
 {
-    /** @var array */
-    public $phpVersions;
+    public array $phpVersions;
 
-    /** @var array */
-    public $phpExtensions;
+    public array $phpExtensions;
 
-    /** @var array */
-    public $phpClasses;
+    public array $phpClasses;
 
-    /**
-     * @param array $phpVersions an array listing the minimum PHP version followed by the recommended PHP version
-     */
     public function __construct(array $phpVersions)
     {
         $this->phpVersions = $phpVersions;

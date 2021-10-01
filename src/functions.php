@@ -3,7 +3,6 @@
 function password(int $length)
 {
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?';
-
     return substr(str_shuffle($chars), 0, $length);
 }
 function dump()
@@ -28,7 +27,6 @@ function put(string $filename, string $contents)
         throw new RuntimeException('Unable to put content to file ' . $filename);
     }
 }
-
 function prepareDirFor(string $filename)
 {
     if (!file_exists($filename)) {
@@ -38,7 +36,6 @@ function prepareDirFor(string $filename)
         }
     }
 }
-
 function createPath(string $path): string
 {
     if (!mkdir($path, 0777, true)) {
@@ -46,7 +43,6 @@ function createPath(string $path): string
     }
     return $path;
 }
-
 function logger(string $message)
 {
     if(PHP_SAPI !== 'cli') {
@@ -54,7 +50,6 @@ function logger(string $message)
     }
     fwrite(fopen('php://stdout', 'r+'), $message);
 }
-
 function progressCallback($resource, $download_size = 0, $downloaded = 0, $upload_size = 0, $uploaded = 0)
 {
     if($download_size == 0) {
@@ -62,13 +57,11 @@ function progressCallback($resource, $download_size = 0, $downloaded = 0, $uploa
     }
     logger(progress_bar($downloaded, $download_size, ' download'));
 }
-
 function progress_bar($done, $total, $info="", $width=50) {
     $perc = (int) round(($done * 100) / $total);
     $bar = (int) round(($width * $perc) / 100);
     return sprintf("  %s%%[%s>%s]%s\r", $perc, str_repeat("=", $bar), str_repeat(" ", $width-$bar), $info);
 }
-
 function set_status_header($code)
 {
     if(headers_sent()) {
@@ -85,7 +78,6 @@ function set_status_header($code)
     $set_status_header = "$protocol $code $desc";
     header($set_status_header, true, $code);
 }
-
 function get_set_status_header_desc($code)
 {
     $codes_to_desc = array(
@@ -141,18 +133,14 @@ function get_set_status_header_desc($code)
         507 => 'Insufficient Storage',
         510 => 'Not Extended',
     );
-
     return $codes_to_desc[$code] ?? 'n/a';
 }
-
 function writeToStderr(string $message) {
     fwrite(fopen('php://stderr', 'wb'), $message . "\n");
 }
-
 function isDocker(): bool {
     return getenv('CHEVERETO_SERVICING') == 'docker';
 }
-
 function isDatabaseEnvProvided(): bool {
     if(isDocker()) {
         return true;
@@ -162,14 +150,11 @@ function isDatabaseEnvProvided(): bool {
         && getenv('CHEVERETO_DB_NAME') !== false
         && getenv('CHEVERETO_DB_USER') !== false
         && getenv('CHEVERETO_DB_PASS') !== false;
-
 }
-
 function get_ini_bytes($size)
 {
     return get_bytes($size, -1);
 }
-
 function get_bytes($size, $cut = null)
 {
     if ($cut == null) {
@@ -180,16 +165,13 @@ function get_bytes($size, $cut = null)
     }
     $number = (int) str_replace($suffix, '', $size);
     $suffix = strtoupper($suffix);
-
     $units = ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']; // Default dec units
-
     if (strlen($suffix) == 3) { // Convert units to bin
         foreach ($units as &$unit) {
             $split = str_split($unit);
             $unit = $split[0] . 'I' . $split[1];
         }
     }
-
     if (strlen($suffix) == 1) {
         $suffix .= 'B'; // Adds missing "B" for shorthand ini notation (Turns 1G into 1GB)
     }
@@ -197,6 +179,5 @@ function get_bytes($size, $cut = null)
         return $number;
     }
     $pow_factor = array_search($suffix, $units) + 1;
-
     return $number * pow(strlen($suffix) == 2 ? 1000 : 1024, $pow_factor);
 }

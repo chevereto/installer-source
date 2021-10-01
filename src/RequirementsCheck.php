@@ -1,20 +1,15 @@
 <?php
 
-class RequirementsCheck
+final class RequirementsCheck
 {
-    /** @var Requirements */
-    public $requirements;
+    public Requirements $requirements;
 
-    /** @var Runtime */
-    public $runtime;
+    public Runtime $runtime;
 
-    /** @var array Error messages */
-    public $errors;
+    public array $errors = [];
 
-    /** @var array Missed components array used for internal awareness */
-    public $missed;
+    public array $missed = [];
 
-    /** @var array Maps PHP extension name to its documentation identifier */
     const EXTENSIONS_MAP = array(
         'curl' => 'book.curl',
         'hash' => 'book.hash',
@@ -26,7 +21,6 @@ class RequirementsCheck
         'zip' => 'book.zip',
     );
 
-    /** @var array Maps PHP extension name to its documentation identifier */
     const CLASSES_MAP = array(
         'DateTime' => 'class.datetime',
         'DirectoryIterator' => 'class.directoryiterator',
@@ -40,7 +34,6 @@ class RequirementsCheck
 
     public function __construct(Requirements $requirements, Runtime $runtime)
     {
-        $this->errors = array();
         $this->checkPHPVersion($requirements->phpVersions);
         $this->checkPHPProfile($requirements->phpExtensions, $requirements->phpClasses);
         $this->checkWorkingPaths($runtime->workingPaths);
@@ -54,7 +47,8 @@ class RequirementsCheck
         }
     }
 
-    public function checkImageLibrary() {
+    public function checkImageLibrary(): void
+    {
         $image_lib = [
             'gd' => extension_loaded('gd') && function_exists('gd_info'),
             'imagick' => extension_loaded('imagick'),
@@ -66,14 +60,14 @@ class RequirementsCheck
         }
     }
 
-    public function checkPHPVersion(array $phpVersions)
+    public function checkPHPVersion(array $phpVersions): void
     {
         if (version_compare(PHP_VERSION, $phpVersions[0], '<')) {
             $this->addMissing('PHP', 'https://php.net', 'Use a newer %l version (%c ' . $phpVersions[0] . ' required, ' . $phpVersions[1] . ' recommended)');
         }
     }
 
-    public function checkPHPProfile(array $extensions, array $classes)
+    public function checkPHPProfile(array $extensions, array $classes): void
     {
         $core = array(
             'extensions' => array_intersect_key(static::EXTENSIONS_MAP, array_flip($extensions)),
@@ -98,7 +92,9 @@ class RequirementsCheck
                     $v = strtolower($v);
                 }
             } else {
-                $function = create_function('$var', 'return @' . $core_check[1] . '($var);');
+                $function = function($var) use ($core_check) {
+                    return @$core_check[1]($var);
+                };
             }
             foreach ($array as $k => $v) {
                 if (($loaded && !in_array(strtolower($k), $loaded)) || (isset($function) && $function($k))) {
@@ -128,7 +124,7 @@ class RequirementsCheck
         }
     }
 
-    public function checkWorkingPaths(array $workingPaths)
+    public function checkWorkingPaths(array $workingPaths): void
     {
         $rw_fn = array('read' => 'is_readable', 'write' => 'is_writeable');
         foreach ($workingPaths as $var) {
@@ -139,7 +135,6 @@ class RequirementsCheck
             }
             if (isset($permissions_errors)) {
                 $error = implode('/', $permissions_errors);
-                // $component = $var . ' ' . $error . ' permission' . (count($permissions_errors) > 1 ? 's' : null);
                 $message = "PHP don't have  %l permission in <code>" . $var . '</code>';
                 $this->addMissing($error, 'https://unix.stackexchange.com/questions/35711/giving-php-permission-to-write-to-files-and-folders', $message);
                 unset($permissions_errors);
@@ -147,21 +142,21 @@ class RequirementsCheck
         }
     }
 
-    public function checkFileUploads()
+    public function checkFileUploads(): void
     {
         if (!ini_get('file_uploads')) {
             $this->addMissing('file_uploads', 'http://php.net/manual/en/ini.core.php#ini.file-uploads', 'Enable %l (needed for file uploads)');
         }
     }
 
-    public function checkApacheModRewrite()
+    public function checkApacheModRewrite(): void
     {
         if (isset($_SERVER['SERVER_SOFTWARE']) && preg_match('/apache/i', $_SERVER['SERVER_SOFTWARE']) && function_exists('apache_get_modules') && !in_array('mod_rewrite', apache_get_modules())) {
             $this->addMissing('mod_rewrite', 'http://httpd.apache.org/docs/current/mod/mod_rewrite.html', 'Enable %l (needed for URL rewriting)');
         }
     }
 
-    public function checkUtf8Functions()
+    public function checkUtf8Functions(): void
     {
         $utf8_errors = array();
         foreach (array('utf8_encode', 'utf8_decode') as $v) {
@@ -175,14 +170,14 @@ class RequirementsCheck
         }
     }
 
-    public function checkCurl()
+    public function checkCurl(): void
     {
         if (!function_exists('curl_init')) {
             $this->addMissing('cURL', 'http://php.net/manual/en/book.curl.php', 'Enable PHP %l');
         }
     }
 
-    public function checkSourceAPI()
+    public function checkSourceAPI(): void
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, VENDOR['apiUrl']);
@@ -204,25 +199,17 @@ class RequirementsCheck
         }
     }
 
-    /**
-     * @param string $component
-     * @param string $link
-     * @param string $msgtpl    The message template. Use %l and %c placeholders
-     */
-    protected function addMissing(string $component, string $url, string $msgtpl)
+    protected function addMissing(string $component, string $url, string $msgTpl): void
     {
-        $this->addBundleMissing([$component], [$url], strtr($msgtpl, ['%c' => '%c0', '%l' => '%l0']));
+        $this->addBundleMissing([$component], [$url], strtr($msgTpl, ['%c' => '%c0', '%l' => '%l0']));
     }
 
     /**
-     * Same as addMissing, but for bundled requirements like utf8_encode/utf8_decode where multiple requirements are
-     * linked to the same resource.
-     *
      * @param array  $components ['component1', 'component2',]
      * @param array  $urls       ['component1_url', 'component2_url',]
-     * @param string $msgtpl     The message template. Use %l0 and %c0 placeholders
+     * @param string $msgTpl     The message template. Use %l0 and %c0 placeholders
      */
-    protected function addBundleMissing(array $components, array $urls, string $msgtpl)
+    protected function addBundleMissing(array $components, array $urls, string $msgTpl): void
     {
         $placeholders = array();
         foreach ($components as $k => $v) {
@@ -230,15 +217,12 @@ class RequirementsCheck
             $placeholders['%c' . $k] = $v;
             $placeholders['%l' . $k] = '<a href="' . $urls[$k] . '" target="_blank">' . $v . '</a>';
         }
-        $message = strtr($msgtpl, $placeholders);
+        $message = strtr($msgTpl, $placeholders);
         $this->errors[] = $message;
     }
 
-    /**
-     * @return bool
-     */
-    public function isMissing(string $key)
+    public function isMissing(string $key): bool
     {
-        return is_array($this->missed) ? in_array($key, $this->missed) : false;
+        return in_array($key, $this->missed);
     }
 }

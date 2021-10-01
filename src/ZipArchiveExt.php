@@ -1,26 +1,25 @@
 <?php
 
-class ZipArchiveExt extends ZipArchive
+final class ZipArchiveExt extends ZipArchive
 {
-    public function extractSubdirTo($destination, $subdir)
+    public function extractSubDirTo($destination, $subDir)
     {
         $errors = array();
-        // Prepare dirs
         $destination = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $destination);
-        $subdir = str_replace(array('/', '\\'), '/', $subdir);
+        $subDir = str_replace(array('/', '\\'), '/', $subDir);
         if (substr($destination, mb_strlen(DIRECTORY_SEPARATOR, 'UTF-8') * -1) != DIRECTORY_SEPARATOR) {
             $destination .= DIRECTORY_SEPARATOR;
         }
-        $inputSubdir = $subdir;
-        $subdir = rtrim($subdir, '/') . '/';
+        $inputSubDir = $subDir;
+        $subDir = rtrim($subDir, '/') . '/';
         $folderExists = false;
         for ($i = 0; $i < $this->numFiles; ++$i) {
             $filename = $this->getNameIndex($i);
-            if (!$folderExists && $filename == $subdir) {
+            if (!$folderExists && $filename == $subDir) {
                 $folderExists = true;
             }
-            if (substr($filename, 0, mb_strlen($subdir, 'UTF-8')) == $subdir) {
-                $relativePath = substr($filename, mb_strlen($subdir, 'UTF-8'));
+            if (substr($filename, 0, mb_strlen($subDir, 'UTF-8')) == $subDir) {
+                $relativePath = substr($filename, mb_strlen($subDir, 'UTF-8'));
                 $relativePath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $relativePath);
                 if (mb_strlen($relativePath, 'UTF-8') > 0) {
                     if (substr($filename, -1) == '/') {
@@ -45,7 +44,7 @@ class ZipArchiveExt extends ZipArchive
         }
 
         if (!$folderExists) {
-            throw new Exception(sprintf("Folder %s doesn't exists in zip file", $inputSubdir));
+            throw new Exception(sprintf("Folder %s doesn't exists in zip file", $inputSubDir));
         }
 
         return $errors;

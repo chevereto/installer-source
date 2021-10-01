@@ -1,11 +1,10 @@
 <?php
 
-class Logger
+final class Logger
 {
-    /** @var string */
-    public $name;
-    /** @var array */
-    public $log;
+    public string $name;
+
+    public array $log;
 
     public function __construct(string $name)
     {

@@ -1,26 +1,20 @@
 <?php
 
-class Database
+final class Database
 {
     const PRIVILEGES = ['ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'SELECT', 'UPDATE'];
 
-    /** @var string */
-    protected $host;
+    private string $host;
 
-    /** @var string */
-    protected $port;
+    private string $port;
 
-    /** @var string */
-    protected $name;
+    private string $name;
 
-    /** @var string */
-    protected $user;
+    private string $user;
 
-    /** @var string */
-    protected $userPassword;
+    private string $userPassword;
 
-    /** @var PDO */
-    private $pdo;
+    private PDO $pdo;
 
     public function __construct(string $host, string $port, string $name, string $user, string $userPassword)
     {
@@ -33,7 +27,7 @@ class Database
         $this->userPassword = $userPassword;
     }
 
-    public function checkEmpty()
+    public function checkEmpty(): void
     {
         $query = $this->pdo->query("SHOW TABLES FROM `$this->name`;");
         $tables = $query->fetchAll(PDO::FETCH_COLUMN);
@@ -42,7 +36,7 @@ class Database
         }
     }
 
-    public function checkPrivileges()
+    public function checkPrivileges(): void
     {
         $query = $this->pdo->query('SHOW GRANTS FOR CURRENT_USER;');
         $tables = $query->fetchAll(PDO::FETCH_COLUMN, 0);
@@ -81,7 +75,7 @@ class Database
         ]));
     }
 
-    private function unquote(string $quoted)
+    private function unquote(string $quoted): string
     {
         return str_replace(['`', "'"], '', stripslashes($quoted));
     }

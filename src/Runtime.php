@@ -1,60 +1,50 @@
 <?php
 
-class Runtime
+final class Runtime
 {
-    /** @var array Runtime settings */
-    public $settings;
+    public array $settings;
 
-    /** @var Logger */
-    protected $logger;
+    private Logger $logger;
 
-    /** @var string Working path (absolute) */
-    public $absPath;
+    public string $absPath;
 
-    /** @var string Working path (relative) */
-    public $relPath;
+    public string $relPath;
 
-    /** @var string Path to this installer file (absolute) */
-    public $installerFilepath;
+    public string $installerFilepath;
 
-    /** @var string HTTP hostname */
-    public $httpHost;
+    public string $httpHost;
 
-    /** @var string HTTP protocol (http, https) */
-    public $httpProtocol;
+    public string $httpProtocol;
 
-    /** @var string Root URL for the current project */
-    public $rootUrl;
+    public string $rootUrl;
 
-    /** @var string Human-readable server information */
-    public $serverString;
+    public string $serverString;
 
-    /** @var array */
-    public $workingPaths;
+    public array $workingPaths;
 
     public function __construct(Logger $logger)
     {
         $this->logger = $logger;
     }
 
-    public function setSettings(array $settings)
+    public function setSettings(array $settings): void
     {
         $this->settings = $settings;
     }
 
-    public function setServer(array $server)
+    public function setServer(array $server): void
     {
         $this->server = $server;
     }
 
-    public function run()
+    public function run(): void
     {
         error_reporting($this->settings['error_reporting']);
         $this->applyPHPSettings($this->settings);
         $this->processContext();
     }
 
-    protected function applyPHPSettings(array $settings)
+    private function applyPHPSettings(array $settings): void
     {
         $runtimeTable = [
             'log_errors' => ini_set('log_errors', (string) $settings['log_errors']),
@@ -75,7 +65,7 @@ class Runtime
         }
     }
 
-    protected function processContext()
+    private function processContext(): void
     {
         if (!isset($this->server)) {
             $this->setServer($_SERVER);
@@ -99,7 +89,7 @@ class Runtime
         $this->setWorkingPaths([INSTALLER_FILEPATH, $this->absPath]);
     }
 
-    protected function setWorkingPaths(array $workingPaths)
+    private function setWorkingPaths(array $workingPaths): void
     {
         $this->workingPaths = $workingPaths;
     }
