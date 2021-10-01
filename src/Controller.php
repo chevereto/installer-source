@@ -234,10 +234,6 @@ final class Controller
         curl_setopt($ch, CURLOPT_FAILONERROR, 0);
         curl_setopt($ch, CURLOPT_VERBOSE, 0);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Chevereto Installer');
-        if(PHP_SAPI === 'cli') {
-            curl_setopt($ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback');
-            curl_setopt($ch, CURLOPT_NOPROGRESS, 0);
-        }
         $fp = false;
         foreach ($curlOpts as $k => $v) {
             if (CURLOPT_FILE == $k) {
