@@ -353,16 +353,11 @@ body.body--installing .flex-box .loader {
 }
 
 .animate {
-    -webkit-backface-visibility: hidden;
     transition: all 200ms ease;
 }
 
 .animate--slow {
     transition-duration: 800ms;
-}
-
-.sel--chevereto .chevereto--hide {
-    display: none;
 }
 
 .text-align-center {

@@ -105,7 +105,7 @@
             <label for="dbHost">Host</label>
             <input class="radius width-100p" type="text" name="dbHost" id="dbHost"
             <?php
-                echoDatabaseEnv('CHEVERETO_DB_HOST', 'localhost');
+                echoDatabaseEnv('CHEVERETO_DB_HOST', 'Hostname or IP');
             ?>
             required>
           </div>
@@ -121,7 +121,7 @@
             <label for="dbName">Name</label>
             <input class="radius width-100p" type="text" name="dbName" id="dbName"
             <?php
-                echoDatabaseEnv('CHEVERETO_DB_NAME', 'database');
+                echoDatabaseEnv('CHEVERETO_DB_NAME', 'Database name');
             ?>
             required>
           </div>
@@ -129,7 +129,7 @@
             <label for="dbUser">User</label>
             <input class="radius width-100p" type="text" name="dbUser" id="dbUser"
             <?php
-                echoDatabaseEnv('CHEVERETO_DB_USER', 'username');
+                echoDatabaseEnv('CHEVERETO_DB_USER', 'Database username');
             ?>
             required>
             <div><small>The database user must have ALL PRIVILEGES on the target database.</small></div>
@@ -138,7 +138,7 @@
             <label for="dbUserPassword">User password</label>
             <input class="radius width-100p" type="password" name="dbUserPassword" id="dbUserPassword"
             <?php
-                echoDatabaseEnv('CHEVERETO_DB_PASS', 'password');
+                echoDatabaseEnv('CHEVERETO_DB_PASS', 'Database username password');
             ?>
             >
           </div>

@@ -4,15 +4,15 @@ final class JsonResponse
 {
     public string $status;
 
-    public string $code;
+    public int $code;
 
     public string $message;
 
     public array $data = [];
 
-    public function setResponse(string $message, $httpCode = 200): void
+    public function setResponse(string $message, int $httpCode = 200): void
     {
-        $this->code = $httpCode;
+        $this->code = (int) $httpCode;
         $this->message = $message;
         $this->status = $this->getHttpStatusDesc($httpCode);
     }
@@ -22,7 +22,7 @@ final class JsonResponse
         return get_set_status_header_desc($httpCode);
     }
 
-    public function setStatusCode($httpCode): void
+    public function setStatusCode(int $httpCode): void
     {
         http_response_code($httpCode);
     }

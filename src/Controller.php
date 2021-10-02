@@ -10,6 +10,8 @@ final class Controller
 
     public Runtime $runtime;
 
+    public int $code;
+
     public function __construct(array $params, Runtime $runtime)
     {
         $this->runtime = $runtime;
@@ -97,9 +99,6 @@ final class Controller
 
     public function downloadAction(array $params): void
     {
-        if(!isset($params['software'])) {
-            throw new InvalidArgumentException('Missing software');
-        }
         $fileBasename = 'chevereto-pkg-' . substr(bin2hex(random_bytes(8)), 0, 8) . '.zip';
         $filePath = $this->runtime->absPath . $fileBasename;
         if (file_exists($filePath)) {
@@ -109,16 +108,7 @@ final class Controller
         $zipBall = APPLICATION['zipball'];
         $tag = $params['tag'] ?? 'latest';
         $zipBall = str_replace('%tag%', $tag, $zipBall);
-        if ($params['software'] == 'chevereto') {
-            $isPost = true;
-        } else {
-            $params = [];
-            $get = $this->curl($zipBall);
-            if(!isset($get->json->zipball_url)) {
-                throw new RuntimeException('No zipball for ' . $params['software']);
-            }
-            $zipBall = $get->json->zipball_url;
-        }
+        $isPost = true;
         $curl = $this->downloadFile($zipBall, $params, $filePath, $isPost);
         if (isset($curl->json->error)) {
             throw new RuntimeException($curl->json->error->message, $curl->json->status_code);

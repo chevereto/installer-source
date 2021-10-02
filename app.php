@@ -108,14 +108,12 @@ if(!empty($_POST)) {
             $params['userPassword'] = $opts['x'] ?? null;
             break;
         case 'download':            
-            $opts = getopt('a:s:t::l::');
-            $params['software'] = $opts['s'] ?? null;
+            $opts = getopt('a:t::l::');
             $params['tag'] = $opts['t'] ?? null;
             $params['license'] = $opts['l'] ?? null;
             break;
         case 'extract':            
-            $opts = getopt('a:s:p:f:');
-            $params['software'] = $opts['s'] ?? null;
+            $opts = getopt('a:p:f:');
             $params['workingPath'] = $opts['p'] ?? null;
             $params['filePath'] = $opts['f'] ?? null;
             break;
@@ -191,6 +189,7 @@ if (isset($params)) {
     <script>
         const appUrl = <?php echo json_encode(APP_URL); ?>;
         const runtime = <?php echo json_encode($jsVars); ?>;
+        const applicationFullName = <?php echo json_encode(APPLICATION_FULL_NAME); ?>;
     </script>
 </head>
 <body class="body--flex">

@@ -23,17 +23,17 @@ This is the repository for the source code used by the well-known [chevereto/ins
 
 ## Build
 
-```bash
+```sh
 php make.php
 ```
 
-If everything goes OK you should get a message indicating the location of the build file (relative path):
-
-```bash
+```sh
 [OK] build/installer.php
 ```
 
 ## Application development
+
+### HTTP server
 
 Spawn PHP development HTTP server.
 
@@ -47,6 +47,18 @@ php -S 127.0.0.1:8888 -t build
 
 ```sh
 php -S 127.0.0.1:8888 -t .
+```
+
+### Database
+
+```sh
+docker run -p 127.0.0.1:3306:3306 \
+    --name chv-installer-db \
+    -e MYSQL_ROOT_PASSWORD=password \
+    -e MYSQL_DATABASE=chevereto \
+    -e MYSQL_USER=chevereto \
+    -e MYSQL_PASSWORD=user_database_password \
+    -d mariadb:focal
 ```
 
 ## API

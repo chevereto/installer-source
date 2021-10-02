@@ -286,10 +286,9 @@ var installer = {
         installer.log(data.message);
     },
     fetchCommonInit: function () {
-        installer.log("Downloading latest " + installer.data.software + " release");
+        installer.log("Downloading latest " + applicationFullName + " release");
         return this
             .fetch("download", {
-                software: installer.data.software,
                 license: "data" in installer && "license" in installer.data ? installer.data.license : ''
             })
             .then(json => {
@@ -341,28 +340,24 @@ var installer = {
             installer.checkLicense(license, {
                 success: function () {
                     installer.data.license = license;
-                    installer.actions.setSoftware("chevereto");
+                    installer.actions.setSoftware();
                 },
                 error: function () {
                     installer.data.license = null;
                 }
             });
         },
-        setSoftware: function (software) {
-            document.body.classList.remove("sel--chevereto");
-            document.body.classList.add("sel--" + software);
-            installer.data.software = software;
-            installer.log("Software has been set to: " + software);
+        setSoftware: function () {
+            installer.data.software = "chevereto";
+            installer.log("Software: " + applicationFullName);
             this.show("db");
         },
         setUpgrade: function () {
-            console.log("setUpgrade");
-            document.body.classList.add("sel--chevereto");
             var license = document.getElementById("upgradeKey").value;
             installer.checkLicense(license, {
                 success: function () {
                     installer.data.license = license;
-                    installer.actions.setSoftware("chevereto");
+                    installer.actions.setSoftware();
                     installer.actions.show("ready-upgrade");
                 },
                 error: function () {
@@ -391,7 +386,7 @@ var installer = {
             installer.setBodyInstalling(true);
             this.show("upgrading");
             installer.log(
-                "Downloading latest " + installer.data.software + " release"
+                "Downloading latest " + applicationFullName + " release"
             );
             installer
                 .fetchCommonInit()
